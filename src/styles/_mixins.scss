@@ -1,0 +1,9 @@
+@use './variables' as *;
+
+@mixin hover-accent {
+    &:hover {
+        color: $color-accent-hover;
+        text-shadow: 0 0 6px rgba($color-accent-hover, 0.35);
+        transition: color 150ms ease, text-shadow 150ms ease;
+    }
+}
