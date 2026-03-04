@@ -3,6 +3,40 @@
     src: url('../assets/fonts/Orbitron-Regular.woff2') format('woff2');
     font-weight: 400;
     font-style: normal;
+    letter-spacing: 0;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Formula 1';
+    src: url('../assets/fonts/Formula1-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Formula 1';
+    src: url('../assets/fonts/Formula1-Bold.woff2') format('woff2');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Titillium Web';
+    src: url('../assets/fonts/TitilliumWeb-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Titillium Web';
+    src: url('../assets/fonts/TitilliumWeb-SemiBold.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+    text-transform: uppercase;
     font-display: swap;
 }
 
@@ -24,7 +58,16 @@
 
 @font-face {
     font-family: 'Inter';
-    src: url('../assets/fonts/Inter-VariableFont_opsz,wght.woff2') format('woff2');
+    src: url('../assets/fonts/Inter-VariableFont_opsz,wght.woff2')
+        format('woff2');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: '7-segment';
+    src: url('../assets/fonts/7-Segment.woff2') format('woff2');
     font-weight: 100 900;
     font-style: normal;
     font-display: swap;

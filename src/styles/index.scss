@@ -4,11 +4,11 @@
 @use 'reset';
 
 :root {
-    --font-title: 'Orbitron', system-ui, sans-serif;
-    --font-body: 'Inter', system-ui, sans-serif;
-    --font-mono: 'IBM Plex Mono', ui-monospace, Consolas;
-    --weight-title: 400;
-    --weight-body: 300;
+    --font-title: 'Formula 1', system-ui, sans-serif;
+    --font-body: 'Titillium Web', system-ui, sans-serif;
+    // --font-mono: 'IBM Plex Mono', ui-monospace, Consolas;
+    --weight-title: 600;
+    --weight-body: 400;
 }
 
 body {
@@ -18,8 +18,36 @@ body {
     color: $color-text;
     line-height: 1.6;
     min-width: 360px;
-    max-width: 1440px;
-    margin: 0 auto;
+    max-width: 1920px;
+    margin: 0;
+}
+
+.app-layout {
+    height: 100vh;
+}
+
+.app-main {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: var(--header-h, 0px);
+    bottom: var(--footer-h, 0px);
+    overflow-y: auto;
+
+    /* cacher la scrollbar */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+
+    &::-webkit-scrollbar {
+        display: none; /* Chrome/Safari */
+    }
+}
+
+.nav-link {
+    color: $color-link;
+    &:hover {
+        border-bottom: 1px solid $color-link-border;
+    }
 }
 
 h1,
@@ -40,18 +68,8 @@ textarea:focus-visible {
     outline-offset: 2px;
 }
 
-.app {
-    min-height: 100vh;
-    max-width: 1440px;
-    margin: 0 auto;
-    width: 100%;
-}
-
-
 @media (max-width: 1024px) {
-
 }
 
 @media (max-width: 768px) {
-
 }
