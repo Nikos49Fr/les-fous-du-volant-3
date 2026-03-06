@@ -8,6 +8,11 @@
     gap: 1rem;
     padding: 2rem;
 
+    &__media-content {
+        display: flex;
+        flex-direction: row;
+    }
+
     &__image {
         max-height: clamp(200px, 50vw, 400px);
     }
