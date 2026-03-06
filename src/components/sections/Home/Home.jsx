@@ -6,16 +6,6 @@ import trailer from '../../../assets/videos/video_trailer_fdv3.mp4';
 export default function Home() {
     return (
         <section className="app-section app-home">
-            <div className="app-home__logo">
-                <video
-                    className="app-home__logo-video"
-                    src={logo}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                />
-            </div>
             <div className="app-home__title">
                 <span className="app-home__title-slash" aria-hidden="true" />
                 <span className="app-home__title-slash" aria-hidden="true" />
@@ -32,6 +22,16 @@ export default function Home() {
                     src={trailer}
                     controls
                     preload="metadata"
+                />
+            </div>
+            <div className="app-home__logo">
+                <video
+                    className="app-home__logo-video"
+                    src={logo}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
                 />
             </div>
             <article className="app-home__article">
