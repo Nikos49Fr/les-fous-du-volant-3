@@ -1,28 +1,31 @@
 import './Nav.scss';
 import { NavLink } from 'react-router-dom';
 
+const getNavLinkClass = ({ isActive }) =>
+    `app-header__nav-link${isActive ? ' app-header__nav-link--active' : ''}`;
+
 export default function Nav() {
     return (
         <nav className="app-header__nav">
-            <NavLink className="app-header__nav-link" to="/">
+            <NavLink className={getNavLinkClass} to="/">
                 Accueil
             </NavLink>
-            <NavLink className="app-header__nav-link" to="/drivers">
+            <NavLink className={getNavLinkClass} to="/drivers">
                 Pilotes
             </NavLink>
-            <NavLink className="app-header__nav-link" to="/calendar">
+            <NavLink className={getNavLinkClass} to="/calendar">
                 Calendrier
             </NavLink>
-            <NavLink className="app-header__nav-link" to="/circuits">
+            <NavLink className={getNavLinkClass} to="/circuits">
                 Circuits
             </NavLink>
-            <NavLink className="app-header__nav-link" to="/results">
+            <NavLink className={getNavLinkClass} to="/results">
                 Résultats
             </NavLink>
-            <NavLink className="app-header__nav-link" to="/multi-twitch">
+            <NavLink className={getNavLinkClass} to="/multi-twitch">
                 Multi-Twitch
             </NavLink>
-            <NavLink className="app-header__nav-link" to="/lobby-setup">
+            <NavLink className={getNavLinkClass} to="/lobby-setup">
                 Réglages Lobby
             </NavLink>
         </nav>
