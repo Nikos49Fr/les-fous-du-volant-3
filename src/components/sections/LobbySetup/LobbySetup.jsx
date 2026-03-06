@@ -1,10 +1,12 @@
 import './LobbySetup.scss';
+import Wip from '../../ui/Wip/Wip';
+import Title from '../../ui/Title/Title';
 
 export default function LobbySetup() {
   return (
-    <section className="app-section app-section--lobby-setup">
-      <h1>Lobby GP</h1>
-      <p>Placeholder des réglages de lobby.</p>
+    <section className="app-section app-lobby-setup">
+      <Title title="Les réglages du lobby" />
+      <Wip />
     </section>
   );
 }

@@ -3,10 +3,8 @@
 .app-home {
     background-color: $color-bg-alt;
     color: $color-text;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
+    gap: 0;
+    padding: 0;
 
     &__logo {
         width: 100%;
@@ -17,34 +15,6 @@
         border-bottom: 2px solid $color-border;
         &-video {
             width: 20%;
-        }
-    }
-
-    &__title {
-        background-color: $color-bg-alt2;
-        color: $color-text-alt;
-        width: 100%;
-        height: 48px;
-        max-height: 6vw;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        gap: 0.5rem;
-        border-bottom: 2px solid $color-border;
-
-        &-content {
-            padding: 0 2rem;
-            font-size: clamp(8px, 2vw, 32px);
-            line-height: 1;
-        }
-
-        &-slash {
-            width: 3%;
-            height: 3rem;
-            background: linear-gradient(180deg, $color-bg-alt2, $color-bg-alt4);
-            transform: skewX(-20deg);
-            display: inline-block;
         }
     }
 

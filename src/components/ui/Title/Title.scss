@@ -1,0 +1,29 @@
+@use '../../../styles/variables' as *;
+
+.app-title {
+    background-color: $color-bg-alt2;
+    color: $color-text-alt;
+    width: 100%;
+    height: 48px;
+    max-height: 6vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    gap: 0.5rem;
+    border-bottom: 2px solid $color-border;
+
+    &__content {
+        padding: 0 2rem;
+        font-size: clamp(8px, 2vw, 32px);
+        line-height: 1;
+    }
+
+    &__slash {
+        width: 3%;
+        height: 3rem;
+        background: linear-gradient(180deg, $color-bg-alt2, $color-bg-alt4);
+        transform: skewX(-20deg);
+        display: inline-block;
+    }
+}

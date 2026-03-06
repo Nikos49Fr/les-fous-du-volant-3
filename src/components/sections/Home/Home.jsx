@@ -2,20 +2,13 @@ import './Home.scss';
 import { NavLink } from 'react-router-dom';
 import logo from '../../../assets/videos/logo_anime_fdv.mp4';
 import trailer from '../../../assets/videos/video_trailer_fdv3.mp4';
+import Title from '../../ui/Title/Title';
 
 export default function Home() {
     return (
         <section className="app-section app-home">
-            <div className="app-home__title">
-                <span className="app-home__title-slash" aria-hidden="true" />
-                <span className="app-home__title-slash" aria-hidden="true" />
-                <h2 className="app-home__title-content">Les Fous du volant</h2>
-                <span className="app-home__title-slash" aria-hidden="true" />
-                <span className="app-home__title-slash" aria-hidden="true" />
-                <h3 className="app-home__title-content">Saison 3</h3>
-                <span className="app-home__title-slash" aria-hidden="true" />
-                <span className="app-home__title-slash" aria-hidden="true" />
-            </div>
+            <Title title="Les Fous du volant" subtitle="Saison 3" />
+
             <div className="app-home__trailer">
                 <video
                     className="app-home__trailer-video"

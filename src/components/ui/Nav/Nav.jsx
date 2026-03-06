@@ -26,7 +26,7 @@ export default function Nav() {
                 Multi-Twitch
             </NavLink>
             <NavLink className={getNavLinkClass} to="/lobby-setup">
-                Réglages Lobby
+                Réglages
             </NavLink>
         </nav>
     );

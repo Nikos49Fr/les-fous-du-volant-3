@@ -1,10 +1,12 @@
 import './MultiTwitch.scss';
+import Wip from '../../ui/Wip/Wip';
+import Title from '../../ui/Title/Title';
 
 export default function MultiTwitch() {
   return (
-    <section className="app-section app-section--multi-twitch">
-      <h1>Multi-Twitch</h1>
-      <p>Placeholder de la page multi-twitch.</p>
+    <section className="app-section app-multi-twitch">
+      <Title title="Multi-Twitch POV" />
+      <Wip />
     </section>
   );
 }

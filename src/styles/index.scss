@@ -22,6 +22,24 @@ body {
     margin: 0;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-title);
+    font-weight: var(--weight-title);
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid $color-accent;
+    outline-offset: 2px;
+}
+
 .app-layout {
     height: 100vh;
 }
@@ -33,6 +51,9 @@ body {
     top: var(--header-h, 0px);
     bottom: var(--footer-h, 0px);
     overflow-y: auto;
+
+    display: flex;
+    flex-direction: column;
 
     /* cacher la scrollbar */
     scrollbar-width: none; /* Firefox */
@@ -50,22 +71,27 @@ body {
     }
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    font-family: var(--font-title);
-    font-weight: var(--weight-title);
-}
+// :where() permet de baisser la spécificité, et donc de surcharger librement la section localement
+:where(.app-section) {
+    background-color: $color-bg-alt4;
+    color: $color-text-alt;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1 1 auto;
+    justify-content: flex-start;
 
-a:focus-visible,
-button:focus-visible,
-input:focus-visible,
-textarea:focus-visible {
-    outline: 2px solid $color-accent;
-    outline-offset: 2px;
+    & h2 {
+        font-size: clamp(1rem, 2.6vw, 1.6rem);
+        margin: 0;
+    }
+
+    & p {
+        font-size: clamp(0.75rem, 2.2vw, 1rem);
+        margin: 0;
+        max-width: 1000px;
+        text-align: center;
+    }
 }
 
 @media (max-width: 1024px) {
