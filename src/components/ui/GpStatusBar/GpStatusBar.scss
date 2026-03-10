@@ -1,0 +1,93 @@
+@use '../../../styles/variables' as *;
+
+.gp-status {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: clamp(0.5rem, 1vw, 2rem);
+    background-color: $color-accent;
+    color: $color-text;
+    padding: 0 0.5rem;
+
+    &--upcoming {
+        background-color: $color-bg-alt2;
+        color: $color-text-alt;
+    }
+
+    &--today {
+        background-color: $color-accent-hover;
+        color: $color-text-muted;
+    }
+
+    &--live {
+        background-color: $color-accent;
+        color: $color-text;
+    }
+
+    &--season-ended {
+        background-color: $color-bg-alt4;
+        color: $color-text-alt;
+    }
+
+    &__link {
+        color: $color-link-hover;
+        &:hover {
+            color: $color-link;
+        }
+    }
+
+    &__title,
+    &__race {
+        font-family: 'Formula 1', sans-serif;
+        font-size: clamp(10px, 1.3vw, 24px);
+        display: flex;
+        align-items: center;
+        gap: clamp(0.5rem, 1vw, 2rem);
+    }
+
+    &__flag {
+        border: 1px solid $color-bg;
+    }
+
+    &__time,
+    &__state {
+        font-family: '7-segment', sans-serif;
+        font-size: clamp(12px, 1.5vw, 32px);
+        line-height: 1.2;
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+
+    &__label {
+        font-family: '7-segment', sans-serif;
+
+        &--live {
+            font-family: 'Formula 1', sans-serif;
+        }
+    }
+
+    &__tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        margin-left: 0.6rem;
+        padding: 0.2rem 0.6rem;
+        background-color: $color-text-alt;
+        color: $color-text;
+        border-radius: 999px;
+        font-family: 'Formula 1', sans-serif;
+        font-size: clamp(10px, 1.3vw, 24px);
+        line-height: 1;
+        align-self: center;
+
+        &::before {
+            content: '';
+            width: 0.45em;
+            height: 0.45em;
+            border-radius: 50%;
+            background-color: $color-accent;
+            display: inline-block;
+        }
+    }
+}

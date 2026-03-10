@@ -1,9 +1,9 @@
 import './Calendar.scss';
-import { GP_DATES, GP_NAMES, GP_REVEALED } from '../../../data/dataGP';
+import { getGpSchedule } from '../../../utils/gpHelpers';
 import Title from '../../ui/Title/Title';
 
 export default function Calendar() {
-    const gpById = Object.fromEntries(GP_NAMES.map((gp) => [gp.id, gp]));
+    const schedule = getGpSchedule();
 
     return (
         <section className="app-section app-calendar">
@@ -18,31 +18,19 @@ export default function Calendar() {
                     volant :
                 </p>
                 <ol className="app-calendar__gp-list">
-                    {GP_DATES.map((gpDate, index) => {
-                        const gpId = GP_REVEALED[index] ?? 0;
-                        const gp = gpById[gpId];
-                        const isKnown = gpId !== 0 && gp;
-                        const timePart = gpDate.label.split(' ').slice(-1)[0];
-                        const datePart = gpDate.label.replace(
-                            ` ${timePart}`,
-                            '',
-                        );
-
+                    {schedule.map((gp) => {
                         return (
-                            <li
-                                className="app-calendar__gp-item"
-                                key={gpDate.id}
-                            >
+                            <li className="app-calendar__gp-item" key={gp.id}>
                                 <span className="app-calendar__gp-item-number">
-                                    {gpDate.id}
+                                    {gp.id}
                                 </span>
                                 <span className="app-calendar__gp-item-country">
-                                    {isKnown ? (
+                                    {gp.isKnown ? (
                                         <span className="app-calendar__gp-item-country-name">
                                             {gp.country}
                                         </span>
                                     ) : null}
-                                    {isKnown && gp.flag ? (
+                                    {gp.isKnown && gp.flag ? (
                                         <span
                                             className={`app-calendar__gp-item-flag fi fi-${gp.flag}`}
                                         />
@@ -50,24 +38,21 @@ export default function Calendar() {
                                 </span>
                                 <span
                                     className={`app-calendar__gp-item-name${
-                                        isKnown
+                                        gp.isKnown
                                             ? ''
                                             : ' app-calendar__gp-item-name--unknown'
                                     }`}
                                 >
-                                    {isKnown
+                                    {gp.isKnown
                                         ? gp.name
                                         : 'Circuit révélé à la fin du précédent GP'}
                                 </span>
                                 <time
                                     className="app-calendar__gp-item-date"
-                                    dateTime={gpDate.dateTime}
+                                    dateTime={gp.startDateTime}
                                 >
                                     <span className="app-calendar__gp-item-date-part">
-                                        {datePart}
-                                    </span>{' '}
-                                    <span className="app-calendar__gp-item-time">
-                                        {timePart}
+                                        {gp.startLabel}
                                     </span>
                                 </time>
                             </li>

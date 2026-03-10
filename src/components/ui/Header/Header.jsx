@@ -2,12 +2,12 @@ import { forwardRef } from 'react';
 import './Header.scss';
 import banner from '../../../assets/brand/banner_fdv.webp';
 import Nav from '../Nav/Nav';
-import InfoBar from '../InfoBar/InfoBar';
+import GpStatusBar from '../GpStatusBar/GpStatusBar';
 
 const Header = forwardRef(function Header(_props, ref) {
     return (
         <header className="app-header" ref={ref}>
-            <InfoBar />
+            <GpStatusBar />
             <div className="app-header__brand">
                 <img
                     className="app-header__brand-bg"

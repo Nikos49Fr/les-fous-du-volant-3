@@ -1,3 +1,7 @@
+// Index 1..12 map to a GP name id from GP_NAMES.
+// 0 means "unknown" (???)
+export const GP_REVEALED = [1, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
 export const GP_NAMES = [
   { id: 0, country: '', flag: '', name: '' },
   {
@@ -117,20 +121,65 @@ export const GP_NAMES = [
 ];
 
 export const GP_DATES = [
-  { id: 1, dateTime: '2026-03-08T20:30:00+01:00', label: '8 mars 20h30' },
-  { id: 2, dateTime: '2026-03-22T20:30:00+01:00', label: '22 mars 20h30' },
-  { id: 3, dateTime: '2026-04-05T20:30:00+02:00', label: '5 avril 20h30' },
-  { id: 4, dateTime: '2026-04-19T20:30:00+02:00', label: '19 avril 20h30' },
-  { id: 5, dateTime: '2026-05-03T20:30:00+02:00', label: '3 mai 20h30' },
-  { id: 6, dateTime: '2026-05-17T20:30:00+02:00', label: '17 mai 20h30' },
-  { id: 7, dateTime: '2026-05-31T20:30:00+02:00', label: '31 mai 20h30' },
-  { id: 8, dateTime: '2026-06-14T20:30:00+02:00', label: '14 juin 20h30' },
-  { id: 9, dateTime: '2026-06-28T20:30:00+02:00', label: '28 juin 20h30' },
-  { id: 10, dateTime: '2026-07-12T20:30:00+02:00', label: '12 juillet 20h30' },
-  { id: 11, dateTime: '2026-07-26T20:30:00+02:00', label: '26 juillet 20h30' },
-  { id: 12, dateTime: '2026-08-09T20:30:00+02:00', label: '9 aout 20h30' },
+  {
+    id: 1,
+    startDateTime: '2026-03-08T20:30:00+01:00',
+    endDateTime: '2026-03-08T23:30:00+01:00',
+  },
+  {
+    id: 2,
+    startDateTime: '2026-03-22T20:30:00+01:00',
+    endDateTime: '2026-03-22T23:30:00+01:00',
+  },
+  {
+    id: 3,
+    startDateTime: '2026-04-05T20:30:00+02:00',
+    endDateTime: '2026-04-05T23:30:00+02:00',
+  },
+  {
+    id: 4,
+    startDateTime: '2026-04-19T20:30:00+02:00',
+    endDateTime: '2026-04-19T23:30:00+02:00',
+  },
+  {
+    id: 5,
+    startDateTime: '2026-05-03T20:30:00+02:00',
+    endDateTime: '2026-05-03T23:30:00+02:00',
+  },
+  {
+    id: 6,
+    startDateTime: '2026-05-17T20:30:00+02:00',
+    endDateTime: '2026-05-17T23:30:00+02:00',
+  },
+  {
+    id: 7,
+    startDateTime: '2026-05-31T20:30:00+02:00',
+    endDateTime: '2026-05-31T23:30:00+02:00',
+  },
+  {
+    id: 8,
+    startDateTime: '2026-06-14T20:30:00+02:00',
+    endDateTime: '2026-06-14T23:30:00+02:00',
+  },
+  {
+    id: 9,
+    startDateTime: '2026-06-28T20:30:00+02:00',
+    endDateTime: '2026-06-28T23:30:00+02:00',
+  },
+  {
+    id: 10,
+    startDateTime: '2026-07-12T20:30:00+02:00',
+    endDateTime: '2026-07-12T23:30:00+02:00',
+  },
+  {
+    id: 11,
+    startDateTime: '2026-07-26T20:30:00+02:00',
+    endDateTime: '2026-07-26T23:30:00+02:00',
+  },
+  {
+    id: 12,
+    startDateTime: '2026-08-09T20:30:00+02:00',
+    endDateTime: '2026-08-09T23:30:00+02:00',
+  },
 ];
 
-// Index 1..12 map to a GP name id from GP_NAMES.
-// 0 means "unknown" (???)
-export const GP_REVEALED = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
