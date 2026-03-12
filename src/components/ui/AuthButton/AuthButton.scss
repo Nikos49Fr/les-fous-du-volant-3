@@ -4,20 +4,38 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    font-family: 'Formula 1', sans-serif;
-    font-size: clamp(8px, 1vw, 24px);
+    // font-family: 'Formula 1', sans-serif;
+    // font-size: clamp(8px, 1vw, 24px);
 
     &__button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
         background: transparent;
-        border: 1px solid $color-bg;
+        margin: 0 2rem;
         color: $color-bg;
-        padding: 0.2rem 0.8rem;
-        border-radius: 999px;
         cursor: pointer;
+        border: none;
 
         &:hover {
-            border-color: $color-accent;
-            color: $color-accent;
+            color: $color-accent-hover;
+        }
+        &:hover .app-auth__icon {
+            fill: currentColor;
+        }
+        &:hover .app-auth__icon--twitch {
+            fill: $color-twitch;
+        }
+    }
+
+    &__icon {
+        width: 1.2rem;
+        height: 1.2rem;
+        flex: 0 0 auto;
+        fill: currentColor;
+
+        &--twitch {
+            fill: $color-twitch;
         }
     }
 

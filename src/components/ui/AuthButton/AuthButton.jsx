@@ -1,5 +1,8 @@
 import './AuthButton.scss';
 import { useEffect, useState } from 'react';
+import LogoutIcon from '../../../assets/icons/arrow-right-from-bracket-solid-full.svg?react';
+import LoginIcon from '../../../assets/icons/arrow-right-to-bracket-solid-full.svg?react';
+import TwitchIcon from '../../../assets/icons/twitch-brands-solid-full.svg?react';
 
 const AUTH_ME_URL = '/api/auth/twitch/me';
 const AUTH_LOGIN_URL = '/api/auth/twitch/login';
@@ -83,7 +86,9 @@ export default function AuthButton() {
                     window.location.href = AUTH_LOGIN_URL;
                 }}
             >
-                Connexion
+                <LoginIcon className="app-auth__icon app-auth__icon--login" aria-hidden="true" focusable="false" />
+                Se connecter
+                <TwitchIcon className="app-auth__icon app-auth__icon--twitch" aria-hidden="true" focusable="false" />
             </button>
         </div>
     );
