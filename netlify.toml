@@ -1,6 +1,16 @@
 [build]
   functions = "netlify/functions"
 
+[dev]
+  command = "npm run dev"
+  targetPort = 5173
+  port = 8888
+  framework = "#custom"
+
+  [dev.https]
+    certFile = "dev-certs/localhost.pem"
+    keyFile = "dev-certs/localhost-key.pem"
+
 [[redirects]]
   from = "/api/auth/twitch/login"
   to = "/.netlify/functions/twitch-login"
