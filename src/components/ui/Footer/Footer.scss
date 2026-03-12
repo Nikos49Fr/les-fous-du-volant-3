@@ -1,6 +1,9 @@
 @use '../../../styles/variables' as *;
 
 .app-footer {
+    $footer-space-inline: clamp(0.75rem, 2.4vw, 2rem);
+    $footer-gap-inline: clamp(0.55rem, 1.8vw, 1.25rem);
+
     position: fixed;
     bottom: 0;
     left: 0;
@@ -17,22 +20,24 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 0.5rem 0;
+        padding: 0.5rem $footer-space-inline;
         border-top: solid 2px $color-border;
+        gap: $footer-gap-inline;
     }
 
-    // &__auth {
-    //     margin-left: 2rem;
-    // }
+    &__auth {
+        min-width: 0;
+    }
 
     &__nav {
         display: flex;
         align-items: center;
         justify-content: flex-end;
+        gap: $footer-gap-inline;
 
         &-link {
             border-bottom: solid 1px transparent;
-            margin: 0 2rem;
+            margin: 0;
 
             &:hover {
                 box-sizing: border-box;

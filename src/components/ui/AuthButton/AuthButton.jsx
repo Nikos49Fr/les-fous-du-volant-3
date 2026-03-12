@@ -54,14 +54,16 @@ export default function AuthButton() {
     if (user) {
         return (
             <div className="app-auth app-auth--connected">
-                <img
-                    className="app-auth__avatar"
-                    src={user.profile_image_url}
-                    alt={`Avatar ${user.display_name}`}
-                />
-                <span className="app-auth__name">{user.display_name}</span>
+                <div className="app-auth__chip app-auth__chip--user">
+                    <img
+                        className="app-auth__avatar"
+                        src={user.profile_image_url}
+                        alt={`Avatar ${user.display_name}`}
+                    />
+                    <span className="app-auth__name">{user.display_name}</span>
+                </div>
                 <button
-                    className="app-auth__logout"
+                    className="app-auth__button app-auth__button--logout app-auth__chip app-auth__chip--logout"
                     type="button"
                     onClick={async () => {
                         await fetch(AUTH_LOGOUT_URL, {
@@ -71,7 +73,8 @@ export default function AuthButton() {
                         setUser(null);
                     }}
                 >
-                    Déco
+                    <LogoutIcon className="app-auth__icon app-auth__icon--logout" aria-hidden="true" focusable="false" />
+                    Se déconnecter
                 </button>
             </div>
         );
@@ -80,7 +83,7 @@ export default function AuthButton() {
     return (
         <div className="app-auth">
             <button
-                className="app-auth__button"
+                className="app-auth__button app-auth__chip app-auth__chip--login"
                 type="button"
                 onClick={() => {
                     window.location.href = AUTH_LOGIN_URL;

@@ -1,18 +1,23 @@
 @use '../../../styles/variables' as *;
 
 .app-auth {
+    $chip-height: clamp(1.9rem, 2.4vw, 2.2rem);
+    $auth-gap-inline: clamp(0.4rem, 1.2vw, 0.75rem);
+    $auth-font-size: clamp(7px, 0.9vw, 14px);
+
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: $auth-gap-inline;
     // font-family: 'Formula 1', sans-serif;
     // font-size: clamp(8px, 1vw, 24px);
 
     &__button {
         display: inline-flex;
         align-items: center;
-        gap: 0.45rem;
+        gap: clamp(0.35rem, 1vw, 0.55rem);
         background: transparent;
-        margin: 0 2rem;
+        margin: 0;
+        font-size: $auth-font-size;
         color: $color-bg;
         cursor: pointer;
         border: none;
@@ -26,11 +31,43 @@
         &:hover .app-auth__icon--twitch {
             fill: $color-twitch;
         }
+        &:hover .app-auth__icon--logout {
+            fill: $color-accent;
+        }
+    }
+
+    &__button--logout {
+        &:hover {
+            color: $color-accent;
+        }
+    }
+
+    &__chip {
+        display: inline-flex;
+        align-items: center;
+        gap: clamp(0.35rem, 1vw, 0.55rem);
+        min-height: $chip-height;
+        background: $color-bg-alt3;
+        padding: 0 clamp(0.6rem, 1.4vw, 0.75rem);
+        border-radius: 999px;
+        box-sizing: border-box;
+    }
+
+    &__chip--login:hover {
+        background: $color-bg-alt4;
+    }
+
+    &__chip--logout:hover {
+        background: $color-bg-alt2;
+    }
+
+    &__chip--user {
+        background: $color-bg-alt2;
     }
 
     &__icon {
-        width: 1.2rem;
-        height: 1.2rem;
+        width: clamp(0.9rem, 1.1vw, 1.2rem);
+        height: clamp(0.9rem, 1.1vw, 1.2rem);
         flex: 0 0 auto;
         fill: currentColor;
 
@@ -40,8 +77,8 @@
     }
 
     &__avatar {
-        width: 28px;
-        height: 28px;
+        width: clamp(1.15rem, 1.7vw, 1.35rem);
+        height: clamp(1.15rem, 1.7vw, 1.35rem);
         border-radius: 50%;
         border: 1px solid $color-bg;
         object-fit: cover;
@@ -49,23 +86,11 @@
 
     &__name,
     &__status {
+        font-size: $auth-font-size;
         color: $color-bg;
-    }
-
-    &__logout {
-        background: transparent;
-        border: none;
-        color: $color-bg;
-        cursor: pointer;
-        padding: 0;
-        font-size: 0.85em;
-
-        &:hover {
-            color: $color-accent;
-        }
     }
 
     &--connected {
-        gap: 0.6rem;
+        gap: $auth-gap-inline;
     }
 }
