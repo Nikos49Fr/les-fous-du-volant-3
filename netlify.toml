@@ -2,6 +2,16 @@
   functions = "netlify/functions"
 
 [[redirects]]
-  from = "/api/auth/twitch/*"
-  to = "/.netlify/functions/:splat"
+  from = "/api/auth/twitch/login"
+  to = "/.netlify/functions/twitch-login"
+  status = 200
+
+[[redirects]]
+  from = "/api/auth/twitch/callback"
+  to = "/.netlify/functions/twitch-callback"
+  status = 200
+
+[[redirects]]
+  from = "/api/auth/twitch/me"
+  to = "/.netlify/functions/twitch-me"
   status = 200
