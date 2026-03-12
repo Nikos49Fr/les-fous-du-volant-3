@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 const AUTH_ME_URL = '/api/auth/twitch/me';
 const AUTH_LOGIN_URL = '/api/auth/twitch/login';
+const AUTH_LOGOUT_URL = '/api/auth/twitch/logout';
 
 export default function AuthButton() {
     const [user, setUser] = useState(null);
@@ -56,6 +57,19 @@ export default function AuthButton() {
                     alt={`Avatar ${user.display_name}`}
                 />
                 <span className="app-auth__name">{user.display_name}</span>
+                <button
+                    className="app-auth__logout"
+                    type="button"
+                    onClick={async () => {
+                        await fetch(AUTH_LOGOUT_URL, {
+                            method: 'POST',
+                            credentials: 'include',
+                        });
+                        setUser(null);
+                    }}
+                >
+                    Déco
+                </button>
             </div>
         );
     }

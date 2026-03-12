@@ -15,3 +15,8 @@
   from = "/api/auth/twitch/me"
   to = "/.netlify/functions/twitch-me"
   status = 200
+
+[[redirects]]
+  from = "/api/auth/twitch/logout"
+  to = "/.netlify/functions/twitch-logout"
+  status = 200
