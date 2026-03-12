@@ -25,7 +25,7 @@ export async function getCurrentTwitchUser(event) {
         return null;
     }
 
-    const cookies = parseCookies(event.headers.cookie ?? '');
+    const cookies = parseCookies(event?.headers?.cookie ?? '');
     const accessToken = cookies.tw_access;
     if (!accessToken) {
         return null;

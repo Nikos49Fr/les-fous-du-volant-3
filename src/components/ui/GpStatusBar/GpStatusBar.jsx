@@ -2,6 +2,7 @@ import './GpStatusBar.scss';
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { getActiveGpDisplay } from '../../../utils/gpHelpers';
+import { fetchRevealedGpIds } from '../../../utils/calendarApi';
 
 const USE_MOCK_NOW = false;
 const MOCK_NOW_ISO = '2026-03-22T23:30:01+01:00';
@@ -10,6 +11,8 @@ export default function GpStatusBar() {
     const [now, setNow] = useState(
         USE_MOCK_NOW ? new Date(MOCK_NOW_ISO) : new Date(),
     );
+    const [revealedIds, setRevealedIds] = useState(null);
+    const [hasError, setHasError] = useState(false);
 
     useEffect(() => {
         const intervalId = setInterval(() => {
@@ -19,7 +22,48 @@ export default function GpStatusBar() {
         return () => clearInterval(intervalId);
     }, []);
 
-    const active = getActiveGpDisplay(now);
+    useEffect(() => {
+        let active = true;
+
+        const loadRevealed = async () => {
+            try {
+                const ids = await fetchRevealedGpIds();
+                if (active) {
+                    setRevealedIds(ids);
+                    setHasError(false);
+                }
+            } catch {
+                if (active) {
+                    setHasError(true);
+                }
+            }
+        };
+
+        loadRevealed();
+        return () => {
+            active = false;
+        };
+    }, []);
+
+    if (hasError) {
+        return (
+            <div className="gp-status gp-status--season-ended">
+                <p className="gp-status__title">
+                    Donnees GP indisponibles pour le moment.
+                </p>
+            </div>
+        );
+    }
+
+    if (!revealedIds) {
+        return (
+            <div className="gp-status gp-status--season-ended">
+                <p className="gp-status__title">Chargement du calendrier GP...</p>
+            </div>
+        );
+    }
+
+    const active = getActiveGpDisplay(now, revealedIds);
 
     if (active.phase === 'season-ended') {
         return (

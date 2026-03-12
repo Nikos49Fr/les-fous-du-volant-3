@@ -97,3 +97,4 @@
 - Appliquer une sanction a posteriori sans casser l'historique.
 - Afficher plusieurs vues: par course, par GP, classement général pilotes, classement écuries.
 - Ouvrir plus tard un module d'édition à permissions ciblées sans refaire le modèle.
+- Pas de fallback local sur la revelation GP: si la BDD/API est indisponible, afficher un etat d'erreur dedie.

@@ -1,4 +1,4 @@
-import { GP_DATES, GP_NAMES, GP_REVEALED } from '../data/dataGP';
+import { GP_DATES, GP_NAMES } from '../data/dataGP';
 
 const DATE_FORMAT_OPTIONS = {
     day: 'numeric',
@@ -14,7 +14,25 @@ const TIME_FORMAT_OPTIONS = {
 const UNKNOWN_GP_NAME = 'Révélation à venir';
 const UNKNOWN_GP_FALLBACK = 'À venir';
 
-// Paramètres : dateTime (string ISO), locale (string). Retourne : chaîne formatée "8 mars 20h30".
+function normalizeRevealedIds(revealedIds) {
+    if (!Array.isArray(revealedIds)) {
+        return null;
+    }
+
+    if (revealedIds.length !== 12) {
+        return null;
+    }
+
+    const normalized = revealedIds.map((value) => {
+        const parsed = Number(value);
+        return Number.isInteger(parsed) ? parsed : -1;
+    });
+
+    const valid = normalized.every((value) => value >= 0 && value <= 24);
+    return valid ? normalized : null;
+}
+
+// Returns a formatted label like "8 mars 20h30".
 function formatGpDate(dateTime, locale = 'fr-FR') {
     const date = new Date(dateTime);
     const datePart = new Intl.DateTimeFormat(
@@ -27,11 +45,9 @@ function formatGpDate(dateTime, locale = 'fr-FR') {
     ).format(date);
     const formatted = `${datePart} ${timePart.replace(':', 'h')}`;
 
-// Retire les accents (ex : "août" -> "aout")
     return formatted.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
-// Parametres : a (Date), b (Date). Retourne : true si meme jour (annee/mois/jour).
 function isSameDay(a, b) {
     return (
         a.getFullYear() === b.getFullYear() &&
@@ -40,12 +56,15 @@ function isSameDay(a, b) {
     );
 }
 
-// Paramètres : aucun. Retourne : tableau d'objets GP avec start/end, libellés et données de révélation.
-export function getGpSchedule() {
+export function getGpSchedule(revealedIds) {
     const gpById = Object.fromEntries(GP_NAMES.map((gp) => [gp.id, gp]));
+    const normalizedRevealed = normalizeRevealedIds(revealedIds);
+    if (!normalizedRevealed) {
+        throw new Error('Invalid revealed ids');
+    }
 
     return GP_DATES.map((gpDate, index) => {
-        const gpId = GP_REVEALED[index] ?? 0;
+        const gpId = normalizedRevealed[index] ?? 0;
         const gp = gpById[gpId];
         const isKnown = gpId !== 0 && gp;
         const startLabel = formatGpDate(gpDate.startDateTime);
@@ -63,7 +82,6 @@ export function getGpSchedule() {
     });
 }
 
-// Paramètres : now (Date), gp (élément du planning). Retourne : 'upcoming' | 'live' | 'finished' | 'unknown'.
 function getGpStatus(now, gp) {
     if (!gp) return 'unknown';
 
@@ -75,9 +93,8 @@ function getGpStatus(now, gp) {
     return 'finished';
 }
 
-// Paramètres : now (Date). Retourne : { gp, status } pour la fenêtre GP active (jusqu'à l'heure de fin).
-function getActiveGp(now = new Date()) {
-    const schedule = getGpSchedule();
+function getActiveGp(now = new Date(), revealedIds) {
+    const schedule = getGpSchedule(revealedIds);
 
     for (const gp of schedule) {
         const end = new Date(gp.endDateTime);
@@ -90,7 +107,6 @@ function getActiveGp(now = new Date()) {
     return { gp: null, status: 'unknown' };
 }
 
-// Paramètres : now (Date), gpStartDateTime (string ISO). Retourne : { days, hours, minutes, seconds }.
 function getCountdown(now, gpStartDateTime) {
     const target = new Date(gpStartDateTime);
     const diffMs = Math.max(0, target.getTime() - now.getTime());
@@ -104,9 +120,11 @@ function getCountdown(now, gpStartDateTime) {
     return { days, hours, minutes, seconds };
 }
 
-// Paramètres : now (Date). Retourne : données formatées d'affichage pour la barre de statut.
-export function getActiveGpDisplay(now = new Date()) {
-    const { gp, status } = getActiveGp(now);
+export function getActiveGpDisplay(
+    now = new Date(),
+    revealedIds,
+) {
+    const { gp, status } = getActiveGp(now, revealedIds);
 
     if (!gp) {
         return {

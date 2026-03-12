@@ -22,15 +22,26 @@
     &__gp-item {
         display: grid;
         grid-template-columns:
-            clamp(1.5rem, 2.5vw, 2rem) clamp(8rem, 20vw, 12rem)
-            1fr auto;
-        grid-template-areas: 'number country name date';
+            clamp(1.5rem, 2vw, 1.9rem) clamp(1.5rem, 2.5vw, 2rem)
+            clamp(8rem, 20vw, 12rem) 1fr auto;
+        grid-template-areas: 'edit number country name date';
         align-items: center;
         column-gap: 1rem;
         background-color: $color-bg-alt2;
         border: 1px solid $color-border;
         border-radius: 6px;
         padding: 0.75rem clamp(0.5rem, 1.5vw, 1rem);
+
+        &-edit-slot {
+            grid-area: edit;
+            display: inline-flex;
+            justify-content: center;
+        }
+
+        &--readonly {
+            grid-template-columns: clamp(1.5rem, 2.5vw, 2rem) clamp(8rem, 20vw, 12rem) 1fr auto;
+            grid-template-areas: 'number country name date';
+        }
 
         &-number {
             font-family: 'Formula 1', sans-serif;
@@ -78,7 +89,6 @@
         &-date {
             font-family: '7-segment', sans-serif;
             font-size: clamp(0.75rem, 1.4vw, 1.125rem);
-            // white-space: nowrap;
             grid-area: date;
             text-align: right;
             justify-self: end;
@@ -93,6 +103,218 @@
             font-weight: 400;
         }
     }
+
+    &__edit-trigger {
+        width: 1.75rem;
+        height: 1.75rem;
+        border: none;
+        background: transparent;
+        padding: 0;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        &-icon {
+            width: 1.3rem;
+            height: 1.3rem;
+            display: inline-block;
+            background-color: $color-accent-hover;
+            mask: url('../../../assets/icons/pen-to-square-regular-full.svg')
+                center / contain no-repeat;
+            -webkit-mask: url('../../../assets/icons/pen-to-square-regular-full.svg')
+                center / contain no-repeat;
+        }
+
+        &:hover {
+            & .app-calendar__edit-trigger-icon {
+                background-color: $color-accent;
+            }
+        }
+    }
+
+    &__modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.55);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1200;
+        padding: 1rem;
+    }
+
+    &__modal {
+        position: relative;
+        width: min(500px, 95vw);
+        background-color: $color-bg;
+        color: $color-text;
+        border: 1px solid $color-bg-alt3;
+        border-radius: 8px;
+        box-shadow: 0 14px 34px rgba(0, 0, 0, 0.24);
+        padding: 2.2rem 1rem 1rem;
+
+        &-close {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            border: none;
+            background: transparent;
+            width: 1.5rem;
+            height: 1.5rem;
+            padding: 0;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            &-icon {
+                width: 1rem;
+                height: 1rem;
+                display: inline-block;
+                background-color: $color-text;
+                mask: url('../../../assets/icons/xmark-solid-full.svg')
+                    center / contain no-repeat;
+                -webkit-mask: url('../../../assets/icons/xmark-solid-full.svg')
+                    center / contain no-repeat;
+            }
+
+            &:hover {
+                & .app-calendar__modal-close-icon {
+                    background-color: $color-accent;
+                }
+            }
+        }
+
+        &-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 0;
+            align-items: start;
+        }
+
+        &-select {
+            position: relative;
+            min-width: 0;
+            width: 100%;
+
+            &-trigger {
+                width: 100%;
+                min-width: 0;
+                height: 2.45rem;
+                font-family: 'Titillium Web', sans-serif;
+                font-size: 0.95rem;
+                border: 1px solid $color-bg-alt3;
+                border-right: none;
+                border-radius: 6px 0 0 6px;
+                background-color: $color-bg-alt2;
+                color: $color-text-alt;
+                padding: 0.45rem 0.7rem;
+                cursor: pointer;
+                text-align: left;
+            }
+
+            &-trigger-content {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                width: 100%;
+                overflow: hidden;
+            }
+
+            &-label {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            &-flag {
+                width: 1.25rem;
+                line-height: 1;
+                display: inline-flex;
+                flex: 0 0 auto;
+            }
+
+            &-menu {
+                position: absolute;
+                top: calc(100% + 0.3rem);
+                left: 0;
+                right: 0;
+                margin: 0;
+                padding: 0.35rem;
+                list-style: none;
+                border: 1px solid $color-bg-alt3;
+                border-radius: 6px;
+                background-color: $color-bg-alt2;
+                max-height: 14rem;
+                overflow-y: auto;
+                z-index: 20;
+                box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+            }
+
+            &-option {
+                width: 100%;
+                border: none;
+                border-radius: 4px;
+                background-color: transparent;
+                color: $color-text-alt;
+                padding: 0.35rem 0.45rem;
+                cursor: pointer;
+                text-align: left;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+
+                &:hover {
+                    background-color: $color-bg-alt3;
+                }
+            }
+
+            &-option.app-calendar__modal-select-option--active {
+                background-color: rgba(255, 255, 255, 0.12);
+            }
+        }
+
+        &-save {
+            width: 2.45rem;
+            height: 2.45rem;
+            border: 1px solid $color-bg-alt3;
+            border-radius: 0 6px 6px 0;
+            background-color: $color-bg-alt2;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+
+            &:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+            }
+
+            &-icon {
+                width: 1.7rem;
+                height: 1.7rem;
+                display: inline-block;
+                background-color: $color-accent-hover;
+                mask: url('../../../assets/icons/floppy-disk-regular-full.svg')
+                    center / contain no-repeat;
+                -webkit-mask: url('../../../assets/icons/floppy-disk-regular-full.svg')
+                    center / contain no-repeat;
+            }
+
+            &:hover {
+                opacity: 0.92;
+            }
+        }
+
+        &-error {
+            margin-top: 0.7rem;
+            color: $color-accent;
+            font-size: 0.85rem;
+            text-align: left;
+        }
+    }
 }
 
 @media (max-width: 1024px) {
@@ -101,10 +323,12 @@
 @media (max-width: 768px) {
     .app-calendar {
         &__gp-item {
-            grid-template-columns: clamp(1.5rem, 2.5vw, 2rem) 1fr auto;
+            grid-template-columns:
+                clamp(1.5rem, 2vw, 1.9rem) clamp(1.5rem, 2.5vw, 2rem)
+                1fr auto;
             grid-template-areas:
-                'number country date'
-                'number name date';
+                'edit number country date'
+                'edit number name date';
             row-gap: 0.35rem;
 
             &-name {
@@ -123,6 +347,22 @@
 
             &-country-name {
                 order: 2;
+            }
+
+            &--readonly {
+                grid-template-columns: clamp(1.5rem, 2.5vw, 2rem) 1fr auto;
+                grid-template-areas:
+                    'number country date'
+                    'number name date';
+            }
+        }
+
+        &__modal {
+            width: min(96vw, 500px);
+            padding: 2rem 0.75rem 0.75rem;
+
+            &-row {
+                grid-template-columns: 1fr auto;
             }
         }
     }

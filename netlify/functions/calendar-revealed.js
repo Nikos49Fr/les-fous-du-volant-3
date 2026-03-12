@@ -9,13 +9,41 @@ function sanitizeRevealed(input) {
         return null;
     }
 
-    const normalized = input
-        .map((value) => Number(value))
-        .filter((value) => Number.isInteger(value) && value >= 1 && value <= 12);
+    if (input.length !== 12) {
+        return null;
+    }
 
-    const unique = [...new Set(normalized)];
-    unique.sort((a, b) => a - b);
-    return unique;
+    const normalized = input.map((value) => Number(value));
+    const valid = normalized.every(
+        (value) => Number.isInteger(value) && value >= 0 && value <= 24,
+    );
+
+    if (!valid) {
+        return null;
+    }
+
+    return normalized;
+}
+
+function normalizeRevealedForRead(input) {
+    if (!Array.isArray(input)) {
+        return null;
+    }
+
+    if (input.length > 12) {
+        return null;
+    }
+
+    const normalized = input.map((value) => Number(value));
+    const valid = normalized.every(
+        (value) => Number.isInteger(value) && value >= 0 && value <= 24,
+    );
+
+    if (!valid) {
+        return null;
+    }
+
+    return [...normalized, ...Array(12 - normalized.length).fill(0)];
 }
 
 function json(statusCode, payload) {
@@ -26,18 +54,22 @@ function json(statusCode, payload) {
     };
 }
 
-async function handleGet() {
+async function handleGet(event) {
+    const user = await getCurrentTwitchUser(event);
+    const canEdit = !!(user && isAdminLogin(user.login));
+
     const db = getDb();
     const ref = db.collection(COLLECTION).doc(DOCUMENT);
     const snap = await ref.get();
 
     if (!snap.exists) {
-        return json(200, { revealed: [] });
+        return json(200, { revealed: Array(12).fill(0), canEdit });
     }
 
     const data = snap.data() ?? {};
-    const revealed = sanitizeRevealed(data.revealed ?? []) ?? [];
-    return json(200, { revealed });
+    const revealed =
+        normalizeRevealedForRead(data.revealed ?? []) ?? Array(12).fill(0);
+    return json(200, { revealed, canEdit });
 }
 
 async function handlePost(event) {
@@ -56,7 +88,9 @@ async function handlePost(event) {
 
     const revealed = sanitizeRevealed(payload.revealed);
     if (!revealed) {
-        return json(400, { error: 'Field "revealed" must be an array of GP ids' });
+        return json(400, {
+            error: 'Field "revealed" must be an array of 12 integers (0..24)',
+        });
     }
 
     const db = getDb();
@@ -79,7 +113,7 @@ async function handlePost(event) {
 
 export async function handler(event) {
     if (event.httpMethod === 'GET') {
-        return handleGet();
+        return handleGet(event);
     }
 
     if (event.httpMethod === 'POST') {

@@ -66,11 +66,15 @@ export default function AuthButton() {
                     className="app-auth__button app-auth__button--logout app-auth__chip app-auth__chip--logout"
                     type="button"
                     onClick={async () => {
-                        await fetch(AUTH_LOGOUT_URL, {
-                            method: 'POST',
-                            credentials: 'include',
-                        });
-                        setUser(null);
+                        try {
+                            await fetch(AUTH_LOGOUT_URL, {
+                                method: 'POST',
+                                credentials: 'include',
+                            });
+                        } finally {
+                            setUser(null);
+                            window.location.href = '/';
+                        }
                     }}
                 >
                     <LogoutIcon className="app-auth__icon app-auth__icon--logout" aria-hidden="true" focusable="false" />
