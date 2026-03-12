@@ -1,0 +1,7 @@
+[build]
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/auth/twitch/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
