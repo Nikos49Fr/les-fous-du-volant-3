@@ -16,6 +16,8 @@ Site vitrine du tournoi **Les Fous du Volant**, saison 3, sur le jeu **F1 25**.
 1. `npm install`
 2. `npm run dev`
 
+Note: pour l’auth Twitch en local (functions + HTTPS), utiliser `netlify dev`.
+
 ## Scripts
 - `npm run dev`: serveur de dev Vite
 - `npm run build`: build prod
@@ -52,6 +54,7 @@ Déclaré dans `src/App.jsx` via `BrowserRouter` + `Routes`.
 ## Données et logique
 - Données statiques dans `src/data/`.
 - Helpers dans `src/utils/` (ex: gestion calendrier GP).
+- Source BDD actée: Firebase Firestore (la révélation des GP est prévue côté BDD, pas en source JS finale).
 
 ## Assets
 - Centralisés dans `src/assets/`.

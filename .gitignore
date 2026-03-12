@@ -26,5 +26,8 @@ dist-ssr
 # Local HTTPS certs (Netlify dev)
 dev-certs/
 
+# Firebase admin service account keys
+*-firebase-adminsdk-*.json
+
 # Local Netlify folder
 .netlify

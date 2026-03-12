@@ -30,3 +30,8 @@
   from = "/api/auth/twitch/logout"
   to = "/.netlify/functions/twitch-logout"
   status = 200
+
+[[redirects]]
+  from = "/api/calendar/revealed"
+  to = "/.netlify/functions/calendar-revealed"
+  status = 200
