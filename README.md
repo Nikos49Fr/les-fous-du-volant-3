@@ -1,61 +1,98 @@
-# Les Fous du Volant — Saison 3
-Site vitrine du tournoi **Les Fous du Volant**, saison 3, sur le jeu **F1 25**.
+# Les Fous du Volant - Saison 3
 
-## Contexte projet (résumé)
-- Site orienté contenu, design déjà défini (header, home, calendrier).
-- Les sections sont des pages, les composants `ui` sont réutilisables.
-- Les assets (brand, fonts, images, vidéos) sont gérés localement.
+Frontend React (Vite) avec backend serverless Netlify Functions, authentification Twitch et donnees Firebase Firestore.
 
-## Stack
-- Vite + React 19 (ES modules)
+## Stack technique
+
+- React 19 + Vite
 - React Router 7
 - Sass (SCSS)
-- `flag-icons` pour les drapeaux
+- Netlify Functions
+- Twitch OAuth
+- Firebase Firestore
+- flag-icons
 
-## Démarrage
-1. `npm install`
-2. `npm run dev`
+## Prerequis
 
-Note: pour l’auth Twitch en local (functions + HTTPS), utiliser `netlify dev`.
+- Node.js 20+
+- npm
+- Netlify CLI (`npm i -g netlify-cli`)
+- Certificats HTTPS locaux (mkcert) pour OAuth Twitch en local
 
-## Scripts
-- `npm run dev`: serveur de dev Vite
-- `npm run build`: build prod
-- `npm run preview`: preview du build
-- `npm run lint`: ESLint
+## Installation
+
+```bash
+npm install
+```
+
+## Configuration
+
+Variables d'environnement requises (Netlify + local via `netlify dev`) :
+
+- `TWITCH_CLIENT_ID`
+- `TWITCH_CLIENT_SECRET`
+- `FIREBASE_PROJECT_ID`
+- `FIREBASE_CLIENT_EMAIL`
+- `FIREBASE_PRIVATE_KEY`
+- `SUPER_ADMIN_TWITCH_ID`
+
+## Demarrage development
+
+Commande de dev a utiliser pour ce projet :
+
+```bash
+netlify dev
+```
+
+Pourquoi : ce mode lance le frontend + les fonctions `/api/*` + les cookies/session auth + le callback Twitch local HTTPS (`https://localhost:8888`).
+
+## Scripts npm
+
+- `npm run build` : build production
+- `npm run preview` : preview local du build
+- `npm run lint` : lint ESLint
+- `npm run dev` : Vite seul (sans auth/API), reserve au debug UI ponctuel
+
+## Endpoints API (Netlify Functions)
+
+Auth Twitch :
+- `GET /api/auth/twitch/login`
+- `GET /api/auth/twitch/callback`
+- `GET /api/auth/twitch/me`
+- `POST /api/auth/twitch/logout`
+
+Calendar :
+- `GET /api/calendar/revealed`
+- `POST /api/calendar/revealed` (admin uniquement)
+
+Admin permissions :
+- `GET /api/admin/permissions` (super-admin uniquement)
+- `POST /api/admin/permissions` (super-admin uniquement)
+
+## Route interne
+
+- Panel permissions : `/admin/permissions` (super-admin)
+
+## Structure projet
+
+- `src/components/sections` : pages/sections
+- `src/components/ui` : composants reutilisables
+- `src/data` : donnees frontend
+- `src/utils` : helpers + clients API
+- `netlify/functions` : endpoints serverless
 
 ## Conventions de code
-- Un composant = un dossier, avec `Component.jsx` + `Component.scss`.
-- Import du style local en premier dans chaque composant.
-- Nommage **PascalCase** pour dossiers/fichiers de composants.
-- Classes CSS en BEM-ish: `bloc`, `bloc__element`, `bloc__element--modifier`.
-- Nommage fréquent en parties `xxx-yyy-zzz` pour les blocs ou éléments.
-- Les sections utilisent `className="app-section app-<section>"`.
-- Les textes sont en français.
 
-## Styles (Sass)
-- Utiliser **l’imbrication SCSS avec `&`** pour les éléments et modificateurs.
-- Exemples:
-```
-.bloc {
-  &__element {
-    &--modifier {}
-  }
-}
-```
-- Variables globales: `src/styles/_variables.scss`.
-- Mixins: `src/styles/_mixins.scss`.
-- Fonts: `src/styles/_fonts.scss`.
-- Reset: `src/styles/_reset.scss`.
+- 1 composant par dossier (`Component.jsx` + `Component.scss`)
+- import du style local en premier
+- composants en PascalCase
+- classes CSS type BEM
 
-## Routing
-Déclaré dans `src/App.jsx` via `BrowserRouter` + `Routes`.
+## Securite
 
-## Données et logique
-- Données statiques dans `src/data/`.
-- Helpers dans `src/utils/` (ex: gestion calendrier GP).
-- Source BDD actée: Firebase Firestore (la révélation des GP est prévue côté BDD, pas en source JS finale).
+- Ne jamais commiter de secrets, tokens, ni cles de service account.
+- Les permissions d'ecriture API sont controlees cote serveur (Twitch login + whitelist admin).
 
-## Assets
-- Centralisés dans `src/assets/`.
-- Résolution dynamique possible via `src/utils/assetResolver.js`.
+## Deploiement
+
+- Plateforme : Netlify

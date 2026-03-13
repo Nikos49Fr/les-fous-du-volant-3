@@ -1,100 +1,160 @@
 # PROJECT_CONTEXT
 
-## Contexte actuel (déjà fait)
-- Design principal défini.
-- Header, Accueil et Calendrier réalisés.
-- Structure sections/pages et UI réutilisable en place.
-- Styling SCSS avec imbrication via `&`.
+## Role
 
-## Intentions et règles de rédaction
-- Utiliser souvent “prévu”, “envisagé”, “à confirmer”.
-- Rien n’est figé, mais certaines pages/UI sont considérées stables tant qu’aucun besoin ne change.
+Memoire de travail du projet pour garder les decisions, contraintes et priorites entre conversations.
 
-## Priorités à venir (résumé)
-- **Classement / Résultats** (prévu): stockage des résultats (GP + général) sur Firebase, interface de saisie/modif, accès protégé.
-- **Authentification** (prévu): connexion via Twitch pour tous les utilisateurs, gestion de permissions par nom Twitch.
-- **Multi‑Twitch** (à confirmer): étude des possibilités/limites/impacts avant implémentation.
-- **Réglages** (prévu): page statique tutorielle avec captures, retouches d’images, nommage/classes propres.
-- **Pilotes** (prévu): page statique avec images, design soigné “vitrine”.
-- **Hébergement** (à confirmer): alternatives à GitHub Pages, possibilité d’hébergement payant annuel.
+## Etat actuel
 
-## Règles de travail (priorisation)
-- Ne traiter qu’un seul sujet à la fois, sauf dépendance explicite.
-- Quand il y a dépendance, détailler les choix possibles et impacts entre solutions.
+- Design principal en place.
+- Header, Home et Calendar implementes.
+- Auth Twitch fonctionnelle en local et en production.
+- Firestore connecte.
+- Calendar est la premiere section migree vers stockage persistant.
+- Registre `users/{twitchId}` alimente automatiquement lors du callback Twitch.
 
-## Détails validés (à date)
-- Auth Twitch obligatoire pour accéder aux sections protégées et aux menus d’édition.
-- Permissions ciblées par noms Twitch, plutôt qu’un système de rôles génériques.
-- Admin principal: accès total; possibilité future de co‑dev avec accès total.
-- Permissions dédiées: saisie/modif des résultats; une permission spécifique pour la section Circuits (rédaction type blog).
-- Résultats GP: données visées = classement sprint, classement course, meilleur tour, grille de départ, DNF/DQ, sanctions post‑course (commission), règles à préciser lors du dev.
-- Saisie résultats: manuelle, avec UI drag & drop.
-- Pilotes et Réglages: pages statiques, indépendantes, pas prioritaires.
-- Hébergement: préférence Europe/France.
-- Auth Twitch fonctionnelle en **dev** et en **prod** (login + affichage avatar/username + déconnexion).
+## Choix techniques verrouilles
 
-## Choix actés (infrastructure)
-- Hébergement: **Netlify** (sans domaine personnalisé pour le moment).
-- Auth: **Twitch OAuth** avec fonctions serverless Netlify.
-- BDD: **Firebase (Firestore)** acté.
-  - Pas de migration BDD prévue à moyen terme.
-  - App Twitch: **Les Fous du Volant – Saison 3**
-  - Redirect URLs prévues:
-    - Production: `https://les-fous-du-volant.netlify.app/api/auth/twitch/callback`
-    - Local (HTTPS): `https://localhost:8888/api/auth/twitch/callback`
-  - Flow: Authorization Code + refresh token.
+- Hebergement: Netlify.
+- Base de donnees: Firebase Firestore.
+- Auth: Twitch OAuth via Netlify Functions.
+- Region ciblee: Europe/France.
+- Dev local complet: `netlify dev` (pas `npm run dev` seul).
 
-## Points à retenir (contexte assistant)
-- Objectif à court terme: publier en ligne + préparer la partie Classement.
-- Le repo GitHub contient le code brut; un build est nécessaire pour déployer.
-- On avance étape par étape, sans traiter plusieurs sujets en parallèle sauf dépendance.
-- Dev local pour l’auth: **utiliser `netlify dev`** (HTTPS local + functions).
-- Certificats locaux: générés avec mkcert dans `dev-certs/`.
-- Choix BDD verrouillé: Firebase uniquement.
+## Direction architecture
 
-## BDD / Résultats (à structurer)
-### Essentiel (confirmé)
-- Résultats des 12 GP, avec 2 courses par GP (sprint + course).
-- Classements individuels + points (barème sprint / course propre au tournoi).
-- Classement écuries (2 pilotes par écurie).
-- Meilleur tour sprint + course (+1 point, sans condition de top 10).
-- Gestion des statuts par pilote: DNF, ABS, DSQ, bug/déconnexion.
-- Sanctions de commission (post‑course): disqualification, retrait de points, déclassement, pénalité temps.
-- Données pilotes/écuries: pseudo, numéro, équipe, chaîne Twitch, tags utiles.
-- Interface d’édition sécurisée (au début admin seul, puis permissions ciblées).
+- Firestore est la couche de persistance de tout le projet dynamique (pas uniquement Calendar).
+- Calendar est un bootstrap technique pour les futures sections (resultats, sanctions, predictions, etc.).
+- Pas de fallback statique local pour les donnees dynamiques venant de la BDD.
 
-### Envisagé / à confirmer
-- Stockage des positions de grille (qualifs).
-- Stockage des temps/écarts pour faciliter les sanctions.
-- Choix “brut + calcul client” vs “pré‑calcul + stockage”.
+## Permissions - vision validee
 
-### Volumétrie estimée
-- Saisie manuelle après chaque GP, puis corrections ponctuelles.
-- Lecture majoritaire (faible trafic): ~200 personnes x 20 visites/mois (estimation haute).
+- Modele par capacites (capability-based), evolutif.
+- Les capacites sont ajoutees au fur et a mesure des sections.
+- Capacite initiale validee pour Calendar: `calendar.write`.
+- Capacite d'administration permissions fixee: `admin.permissions.manage`.
 
-## Schéma grossier (JS vs BDD)
-### Données plutôt JS (stables, rarement modifiées)
-- Liste des GP statiques (12 manches, dates, labels).
-- Métadonnées visuelles stables (noms de sections, textes statiques, assets fixes).
+### Garde-fou critique
 
-### Données plutôt BDD (évolutives, éditables)
-- Révélation GP (`GP_REVEALED`) en source de vérité Firestore.
-- Pilotes (identité, pseudo Twitch, numéro, statut actif/inactif).
-- Écuries et affectations pilote <-> écurie.
-- Sessions de GP (sprint/course) et classements.
-- Statuts de résultat (DNF, ABS, DSQ, bug/déco).
-- Points calculés et/ou points bruts selon stratégie retenue.
-- Sanctions de commission et leur impact (points, places, temps, DSQ).
+- Le super-admin a les permissions totales par defaut.
+- Les permissions du super-admin ne sont modifiables via aucune interface du site.
+- Protection obligatoire cote serveur (pas seulement cote UI).
+- Source super-admin technique: `SUPER_ADMIN_TWITCH_ID` (env var serveur).
 
-### Cas à anticiper (pas encore détaillés)
-- Départ d'un pilote en cours de saison.
-- Arrivée d'un pilote remplaçant en cours de saison.
-- Changement d'écurie en cours de saison.
-- Conservation de l'historique: un résultat passé doit rester lié au pilote/écurie du moment.
+## Registre utilisateurs (auth)
 
-### Capacités visées du schéma
-- Saisir un résultat brut de session puis recalculer les classements.
-- Appliquer une sanction a posteriori sans casser l'historique.
-- Afficher plusieurs vues: par course, par GP, classement général pilotes, classement écuries.
-- Ouvrir plus tard un module d'édition à permissions ciblées sans refaire le modèle.
-- Pas de fallback local sur la revelation GP: si la BDD/API est indisponible, afficher un etat d'erreur dedie.
+- Le site enregistre les utilisateurs authentifies au premier login.
+- Donnees visees: `twitchId`, `login`, `displayName`, `profileImageUrl`, `firstLoginAt`, `lastLoginAt`.
+- Attribution des droits manuelle via panel admin.
+- Stockage de `profileImageUrl` en BDD accepte (cout faible, panel plus simple).
+
+## Schema Firestore permissions valide
+
+1. `users/{twitchId}`
+- `twitchId`
+- `login`
+- `displayName`
+- `profileImageUrl`
+- `firstLoginAt`
+- `lastLoginAt`
+- `isSuperAdmin` (true uniquement pour le compte super-admin)
+
+2. `users/{twitchId}/capabilities/{capabilityId}`
+- doc id = capacite (`calendar.write`, `results.write`, etc.)
+- `enabled`
+- `createdAt`
+- `createdBy` (twitchId admin)
+- `updatedAt`
+- `updatedBy` (twitchId admin)
+
+Notes:
+- Pas de collection d'audit separee pour le moment.
+- Audit minimal = derniere modification stockee dans le document de capacite.
+
+## Ecart actuel a corriger
+
+- L'ecriture Calendar est encore controlee par whitelist login admin simple.
+- Ce modele est transitoire et doit evoluer vers verification de capacites reutilisable.
+
+## Module Calendar actuel (prod)
+
+- Document Firestore: `calendar/season3`.
+- Champ principal: `revealed` (12 entiers `0..24`).
+  - index = slot GP saison (1..12 cote UI)
+  - valeur = id circuit (`0` = non revele)
+- Metadonnees stockees:
+  - `updatedAt`
+  - `updatedBy.login`
+  - `updatedBy.twitchId`
+
+## API en place
+
+- `GET /api/calendar/revealed` -> retourne `revealed` + signal d'edition
+- `POST /api/calendar/revealed` -> endpoint protege + validation payload
+- `GET /api/admin/permissions` -> liste users + capacites (super-admin uniquement)
+- `POST /api/admin/permissions` -> attribue/retire une capacite (super-admin uniquement)
+
+## Couche auth serveur partagee
+
+- Helpers centralises dans `netlify/functions/_twitch-auth.js`.
+- Verification de capacites disponible via `hasCapability(twitchId, capabilityId)`.
+- Helper event-level disponible via `canCurrentUser(event, capabilityId)`.
+- Regle super-admin appliquee dans cette couche (`isSuperAdmin === true` -> acces autorise).
+- Calendar API migree sur verification de capacite `calendar.write` (plus de check whitelist login).
+- `ADMIN_TWITCH_LOGINS` n'est plus utilise.
+
+## Plan de refonte permissions (valide)
+
+1. [Fait] Ajouter registre utilisateurs alimente automatiquement a la connexion.
+2. [Fait] Implementer couche serveur partagee de verification de capacites.
+3. [Fait] Implementer garde-fou super-admin non modifiable via interface (couche serveur).
+4. [Fait] Migrer Calendar de whitelist admin vers `calendar.write`.
+5. [Fait] Ajouter endpoints admin pour lister utilisateurs et attribuer/retirer des capacites.
+6. [Fait] Construire section/panel admin de gestion des droits.
+
+## Panel admin permissions
+
+- Route frontend: `/admin/permissions`.
+- Interface disponible uniquement pour usage super-admin (lien "Admin" visible en footer une fois connecte).
+- L'UI permet:
+  - lister les utilisateurs enregistres (`users`)
+  - afficher les capacites existantes
+  - ajouter une colonne de capacite (id custom)
+  - activer/desactiver une capacite par utilisateur via case a cocher
+- Le backend reste source de verite (protection super-admin et validation).
+
+## Priorites produit
+
+1. Systeme resultats/classements (modele + saisie + affichage).
+2. Refonte permissions feature-level (pre-requis pour extension propre).
+3. Sections secondaires (Multi-Twitch, Circuits, Reglages, Pilotes).
+
+## Resultats GP - besoins confirmes
+
+- 12 GP, chacun sprint + course.
+- Classement pilotes + classement ecuries.
+- Statuts: DNF, ABS, DSQ, bug/deconnexion.
+- Baremes custom (sprint/course) + meilleur tour (+1, sans contrainte top 10).
+- Sanctions post-course: retrait points, declassement, penalite temps, disqualification.
+- Saisie manuelle securisee.
+
+## Resultats GP - a confirmer
+
+- Niveau de detail temps/ecarts stockes.
+- Integration qualifs/grille de depart.
+- Strategie de calcul:
+  - calcul a la lecture depuis donnees brutes, ou
+  - pre-calcul au write et stockage agrege.
+
+## Hypotheses de charge (hautes)
+
+- ~200 utilisateurs.
+- ~20 visites/mois/utilisateur.
+- Ecritures faibles (cycle GP + ajustements ponctuels).
+
+## Regles de collaboration
+
+- Un sujet a la fois sauf dependance technique explicite.
+- Si dependance: detailler impacts avant implementation.
+- Ne pas faire de changements structurels hors scope demande.
+- Tous les textes UI affiches en francais doivent garder les accents corrects (pas de version sans accents).

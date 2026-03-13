@@ -1,8 +1,9 @@
 import { getDb } from './_firebase-admin.js';
-import { getCurrentTwitchUser, isAdminLogin } from './_twitch-auth.js';
+import { canCurrentUser } from './_twitch-auth.js';
 
 const COLLECTION = 'calendar';
 const DOCUMENT = 'season3';
+const CALENDAR_WRITE_CAPABILITY = 'calendar.write';
 
 function sanitizeRevealed(input) {
     if (!Array.isArray(input)) {
@@ -55,8 +56,8 @@ function json(statusCode, payload) {
 }
 
 async function handleGet(event) {
-    const user = await getCurrentTwitchUser(event);
-    const canEdit = !!(user && isAdminLogin(user.login));
+    const auth = await canCurrentUser(event, CALENDAR_WRITE_CAPABILITY);
+    const canEdit = auth.allowed;
 
     const db = getDb();
     const ref = db.collection(COLLECTION).doc(DOCUMENT);
@@ -73,9 +74,10 @@ async function handleGet(event) {
 }
 
 async function handlePost(event) {
-    const user = await getCurrentTwitchUser(event);
+    const auth = await canCurrentUser(event, CALENDAR_WRITE_CAPABILITY);
+    const user = auth.user;
 
-    if (!user || !isAdminLogin(user.login)) {
+    if (!auth.allowed || !user) {
         return json(403, { error: 'Forbidden' });
     }
 

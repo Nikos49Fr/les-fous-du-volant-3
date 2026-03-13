@@ -1,5 +1,6 @@
 import './AuthButton.scss';
 import { useEffect, useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import LogoutIcon from '../../../assets/icons/arrow-right-from-bracket-solid-full.svg?react';
 import LoginIcon from '../../../assets/icons/arrow-right-to-bracket-solid-full.svg?react';
 import TwitchIcon from '../../../assets/icons/twitch-brands-solid-full.svg?react';
@@ -62,6 +63,14 @@ export default function AuthButton() {
                     />
                     <span className="app-auth__name">{user.display_name}</span>
                 </div>
+                {user.isSuperAdmin ? (
+                    <NavLink
+                        className="app-auth__button app-auth__chip app-auth__chip--admin"
+                        to="/admin/permissions"
+                    >
+                        Admin
+                    </NavLink>
+                ) : null}
                 <button
                     className="app-auth__button app-auth__button--logout app-auth__chip app-auth__chip--logout"
                     type="button"

@@ -1,5 +1,6 @@
 const TOKEN_URL = 'https://id.twitch.tv/oauth2/token';
 const USERS_URL = 'https://api.twitch.tv/helix/users';
+import { getUserRecordByTwitchId, isSuperAdminById } from './_twitch-auth.js';
 
 function parseCookies(cookieHeader = '') {
     return cookieHeader.split(';').reduce((acc, part) => {
@@ -83,6 +84,16 @@ export async function handler(event) {
         return { statusCode: 401, body: 'Not authenticated' };
     }
 
+    let isSuperAdmin = isSuperAdminById(userResult.user.id);
+    if (!isSuperAdmin) {
+        try {
+            const userRecord = await getUserRecordByTwitchId(userResult.user.id);
+            isSuperAdmin = userRecord?.isSuperAdmin === true;
+        } catch {
+            isSuperAdmin = false;
+        }
+    }
+
     const headers = { 'Content-Type': 'application/json' };
     const multiValueHeaders = {};
 
@@ -117,6 +128,7 @@ export async function handler(event) {
                 login: userResult.user.login,
                 display_name: userResult.user.display_name,
                 profile_image_url: userResult.user.profile_image_url,
+                isSuperAdmin,
             },
         }),
     };

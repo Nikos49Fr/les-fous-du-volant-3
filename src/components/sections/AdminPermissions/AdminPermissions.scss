@@ -1,0 +1,181 @@
+@use '../../../styles/variables' as *;
+
+.app-admin-permissions {
+    &__content {
+        width: min(1240px, 100%);
+        padding: clamp(0.9rem, 2.8vw, 1.8rem) clamp(0.8rem, 2.5vw, 1.6rem);
+        display: flex;
+        flex-direction: column;
+        gap: 0.9rem;
+    }
+
+    &__toolbar {
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+
+        &-label {
+            font-family: 'Formula 1', sans-serif;
+            font-size: clamp(0.8rem, 1.5vw, 0.95rem);
+        }
+
+        &-row {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        &-input {
+            flex: 1 1 auto;
+            min-width: 0;
+            border: 1px solid $color-border;
+            background-color: $color-bg-alt2;
+            color: $color-text-alt;
+            border-radius: 6px;
+            padding: clamp(0.45rem, 1.3vw, 0.6rem) clamp(0.6rem, 1.5vw, 0.8rem);
+            font-family: 'Titillium Web', sans-serif;
+            font-size: clamp(0.85rem, 1.7vw, 0.95rem);
+        }
+
+        &-button {
+            border: 1px solid $color-border;
+            background-color: $color-bg-alt3;
+            color: $color-text-alt;
+            border-radius: 6px;
+            padding: clamp(0.45rem, 1.3vw, 0.6rem) clamp(0.75rem, 1.8vw, 1rem);
+            font-family: 'Formula 1', sans-serif;
+            font-size: clamp(0.78rem, 1.5vw, 0.9rem);
+            cursor: pointer;
+
+            &:hover {
+                border-color: $color-accent;
+            }
+        }
+    }
+
+    &__table-wrap {
+        overflow-x: auto;
+        border: 1px solid $color-border;
+        border-radius: 8px;
+        background-color: $color-bg-alt2;
+    }
+
+    &__table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 720px;
+
+        & th,
+        & td {
+            border-bottom: 1px solid $color-border;
+            padding: 0.55rem 0.6rem;
+        }
+
+        & th {
+            font-family: 'Formula 1', sans-serif;
+            font-size: clamp(0.72rem, 1.4vw, 0.86rem);
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        & td {
+            text-align: center;
+            font-size: clamp(0.8rem, 1.5vw, 0.92rem);
+        }
+
+        & tbody tr:last-child td {
+            border-bottom: none;
+        }
+    }
+
+    &__user-cell {
+        text-align: left !important;
+        min-width: 240px;
+    }
+
+    &__user {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+    }
+
+    &__avatar {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 999px;
+        object-fit: cover;
+        border: 1px solid $color-border;
+    }
+
+    &__user-meta {
+        display: inline-flex;
+        flex-direction: column;
+        line-height: 1.15;
+        gap: 0.15rem;
+    }
+
+    &__user-name {
+        font-family: 'Titillium Web', sans-serif;
+        font-weight: 600;
+        color: $color-text-alt;
+        font-size: clamp(0.88rem, 1.8vw, 1rem);
+    }
+
+    &__badge {
+        display: inline-flex;
+        width: fit-content;
+        border: 1px solid $color-accent;
+        color: $color-accent;
+        border-radius: 999px;
+        font-size: clamp(0.64rem, 1.2vw, 0.76rem);
+        padding: 0.08rem 0.45rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    &__toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        & input {
+            width: clamp(1rem, 1.8vw, 1.15rem);
+            height: clamp(1rem, 1.8vw, 1.15rem);
+            accent-color: $color-accent;
+            cursor: pointer;
+
+            &:disabled {
+                cursor: not-allowed;
+                opacity: 0.6;
+            }
+        }
+    }
+
+    &__message {
+        text-align: left !important;
+        width: 100%;
+        max-width: none !important;
+        font-size: clamp(0.85rem, 1.6vw, 0.95rem);
+
+        &--error {
+            color: $color-accent;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .app-admin-permissions {
+        &__content {
+            padding: 0.8rem 0.5rem 1rem;
+        }
+
+        &__toolbar {
+            &-row {
+                flex-direction: column;
+            }
+        }
+
+        &__table {
+            min-width: 640px;
+        }
+    }
+}

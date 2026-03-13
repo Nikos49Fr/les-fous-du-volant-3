@@ -8,6 +8,7 @@ import Circuits from './components/sections/Circuits/Circuits.jsx';
 import Results from './components/sections/Results/Results.jsx';
 import MultiTwitch from './components/sections/MultiTwitch/MultiTwitch.jsx';
 import LobbySetup from './components/sections/LobbySetup/LobbySetup.jsx';
+import AdminPermissions from './components/sections/AdminPermissions/AdminPermissions.jsx';
 import Contact from './components/sections/Contact/Contact.jsx';
 import Credits from './components/sections/Credits/Credits.jsx';
 import { useLayoutEffect, useRef } from 'react';
@@ -57,6 +58,7 @@ export default function App() {
                         <Route path="/results" element={<Results />} />
                         <Route path="/multi-twitch" element={<MultiTwitch />} />
                         <Route path="/lobby-setup" element={<LobbySetup />} />
+                        <Route path="/admin/permissions" element={<AdminPermissions />} />
                         <Route path="/contact" element={<Contact />} />
                         <Route path="/credits" element={<Credits />} />
                         <Route path="*" element={<Home />} />

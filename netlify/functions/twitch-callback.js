@@ -1,4 +1,7 @@
 const TOKEN_URL = 'https://id.twitch.tv/oauth2/token';
+const USERS_URL = 'https://api.twitch.tv/helix/users';
+
+import { getDb } from './_firebase-admin.js';
 
 function getBaseUrl(event) {
     if (process.env.TWITCH_REDIRECT_BASE_URL) {
@@ -31,6 +34,60 @@ function serializeCookie(name, value, options = {}) {
     if (options.secure) parts.push('Secure');
     if (options.sameSite) parts.push(`SameSite=${options.sameSite}`);
     return parts.join('; ');
+}
+
+async function fetchTwitchUser(accessToken, clientId) {
+    const userRes = await fetch(USERS_URL, {
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Client-Id': clientId,
+        },
+    });
+
+    if (!userRes.ok) {
+        return null;
+    }
+
+    const userData = await userRes.json();
+    return userData?.data?.[0] ?? null;
+}
+
+async function upsertUserRegistry(user) {
+    if (!user?.id) return;
+
+    const now = new Date().toISOString();
+    const configuredSuperAdminId = (process.env.SUPER_ADMIN_TWITCH_ID ?? '').trim();
+    const isConfiguredSuperAdmin =
+        !!configuredSuperAdminId && user.id === configuredSuperAdminId;
+    const db = getDb();
+    const ref = db.collection('users').doc(user.id);
+    const snap = await ref.get();
+
+    if (!snap.exists) {
+        await ref.set({
+            twitchId: user.id,
+            login: user.login ?? '',
+            displayName: user.display_name ?? '',
+            profileImageUrl: user.profile_image_url ?? '',
+            firstLoginAt: now,
+            lastLoginAt: now,
+            isSuperAdmin: isConfiguredSuperAdmin,
+        });
+        return;
+    }
+
+    const updatePayload = {
+        login: user.login ?? '',
+        displayName: user.display_name ?? '',
+        profileImageUrl: user.profile_image_url ?? '',
+        lastLoginAt: now,
+    };
+
+    if (isConfiguredSuperAdmin) {
+        updatePayload.isSuperAdmin = true;
+    }
+
+    await ref.set(updatePayload, { merge: true });
 }
 
 export async function handler(event) {
@@ -88,6 +145,15 @@ export async function handler(event) {
     const accessToken = tokenData.access_token;
     const refreshToken = tokenData.refresh_token;
     const expiresIn = tokenData.expires_in ?? 0;
+
+    try {
+        const twitchUser = await fetchTwitchUser(accessToken, clientId);
+        if (twitchUser) {
+            await upsertUserRegistry(twitchUser);
+        }
+    } catch {
+        // Keep auth flow successful even if user registry write fails temporarily.
+    }
 
     const isSecure = baseUrl.startsWith('https://');
     const cookiesToSet = [
