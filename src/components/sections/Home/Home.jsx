@@ -1,8 +1,10 @@
 import './Home.scss';
 import { NavLink } from 'react-router-dom';
-import logo from '../../../assets/videos/logo_anime_fdv.mp4';
-import trailer from '../../../assets/videos/video_trailer_fdv3.mp4';
+import logo from '../../../assets/brand/Logo_FDV.webp';
 import Title from '../../ui/Title/Title';
+
+const TRAILER_URL = 'https://www.youtube.com/watch?v=81RPgyxn-Pk';
+const TRAILER_EMBED_URL = 'https://www.youtube-nocookie.com/embed/81RPgyxn-Pk';
 
 export default function Home() {
     return (
@@ -10,21 +12,29 @@ export default function Home() {
             <Title title="Les Fous du volant" subtitle="Saison 3" />
 
             <div className="app-home__trailer">
-                <video
-                    className="app-home__trailer-video"
-                    src={trailer}
-                    controls
-                    preload="metadata"
-                />
+                <div className="app-home__trailer-frame">
+                    <a
+                        className="app-home__trailer-link"
+                        href={TRAILER_URL}
+                        target="_blank"
+                        rel="noreferrer"
+                    >
+                        <iframe
+                        className="app-home__trailer-embed"
+                        src={TRAILER_EMBED_URL}
+                        title="Tournoi des Fous du Volant - Saison 3 | Trailer officiel"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerPolicy="strict-origin-when-cross-origin"
+                        allowFullScreen
+                        />
+                    </a>
+                </div>
             </div>
             <div className="app-home__logo">
-                <video
-                    className="app-home__logo-video"
+                <img
+                    className="app-home__logo-image"
                     src={logo}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
+                    alt="Logo Les Fous du Volant Saison 3"
                 />
             </div>
             <article className="app-home__article">
@@ -47,7 +57,7 @@ export default function Home() {
                     </em>
                 </p>
                 <p>
-                    Les grands prix s'enchaineront avec une
+                    Les grands prix s'enchaîneront avec une
                     <strong> difficulté progressive</strong>, valorisant
                     <strong> l'endurance et la régularité</strong> des pilotes
                     au fil des courses. La <strong> météo aléatoire</strong>{' '}

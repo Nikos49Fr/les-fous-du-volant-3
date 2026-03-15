@@ -1,4 +1,8 @@
-const REVEALED_URL = '/api/calendar/revealed';
+import { supabase } from './supabaseClient';
+import { fetchCurrentCapabilityIds, fetchCurrentViewer, syncCurrentProfile } from './authApi';
+
+const CALENDAR_ROW_ID = 'season3';
+const CALENDAR_WRITE_CAPABILITY = 'calendar.write';
 
 function normalizeRevealed(input) {
     if (!Array.isArray(input)) {
@@ -21,23 +25,40 @@ function normalizeRevealed(input) {
     return normalized;
 }
 
-export async function fetchCalendarData() {
-    const response = await fetch(REVEALED_URL, { credentials: 'include' });
-
-    if (!response.ok) {
-        throw new Error(`Calendar API failed with ${response.status}`);
+async function resolveCanEdit() {
+    const viewer = await fetchCurrentViewer();
+    if (!viewer) {
+        return false;
     }
 
-    const body = await response.json();
-    const revealed = normalizeRevealed(body.revealed);
+    if (viewer.isSuperAdmin) {
+        return true;
+    }
 
+    const capabilityIds = await fetchCurrentCapabilityIds();
+    return capabilityIds.includes(CALENDAR_WRITE_CAPABILITY);
+}
+
+export async function fetchCalendarData() {
+    const canEdit = await resolveCanEdit().catch(() => false);
+    const { data, error } = await supabase
+        .from('calendar_settings')
+        .select('revealed')
+        .eq('id', CALENDAR_ROW_ID)
+        .maybeSingle();
+
+    if (error) {
+        throw error;
+    }
+
+    const revealed = normalizeRevealed(data?.revealed ?? Array(12).fill(0));
     if (!revealed) {
-        throw new Error('Invalid calendar API payload');
+        throw new Error('Invalid calendar payload');
     }
 
     return {
         revealed,
-        canEdit: Boolean(body.canEdit),
+        canEdit,
     };
 }
 
@@ -47,22 +68,34 @@ export async function fetchRevealedGpIds() {
 }
 
 export async function updateRevealedGpIds(revealed) {
-    const response = await fetch(REVEALED_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ revealed }),
-    });
-
-    const body = await response.json();
-    if (!response.ok) {
-        throw new Error(body.error ?? `Calendar update failed with ${response.status}`);
-    }
-
-    const normalized = normalizeRevealed(body.revealed);
+    const normalized = normalizeRevealed(revealed);
     if (!normalized) {
-        throw new Error('Invalid calendar API response after update');
+        throw new Error('Invalid calendar payload');
     }
 
-    return normalized;
+    const profile = await syncCurrentProfile();
+    if (!profile?.id) {
+        throw new Error('Authentication required');
+    }
+
+    const { data, error } = await supabase
+        .from('calendar_settings')
+        .update({
+            revealed: normalized,
+            updated_by: profile.id,
+        })
+        .eq('id', CALENDAR_ROW_ID)
+        .select('revealed')
+        .single();
+
+    if (error) {
+        throw new Error(error.message ?? 'Calendar update failed');
+    }
+
+    const nextRevealed = normalizeRevealed(data?.revealed);
+    if (!nextRevealed) {
+        throw new Error('Invalid calendar payload');
+    }
+
+    return nextRevealed;
 }

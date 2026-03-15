@@ -1,13 +1,15 @@
-import './AuthButton.scss';
+﻿import './AuthButton.scss';
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import LogoutIcon from '../../../assets/icons/arrow-right-from-bracket-solid-full.svg?react';
 import LoginIcon from '../../../assets/icons/arrow-right-to-bracket-solid-full.svg?react';
 import TwitchIcon from '../../../assets/icons/twitch-brands-solid-full.svg?react';
-
-const AUTH_ME_URL = '/api/auth/twitch/me';
-const AUTH_LOGIN_URL = '/api/auth/twitch/login';
-const AUTH_LOGOUT_URL = '/api/auth/twitch/logout';
+import {
+    fetchCurrentViewer,
+    signInWithTwitch,
+    signOut,
+    subscribeToAuthChanges,
+} from '../../../utils/authApi';
 
 export default function AuthButton() {
     const [user, setUser] = useState(null);
@@ -18,19 +20,10 @@ export default function AuthButton() {
 
         const loadUser = async () => {
             try {
-                const res = await fetch(AUTH_ME_URL, {
-                    credentials: 'include',
-                });
-
-                if (!active) return;
-
-                if (!res.ok) {
-                    setUser(null);
-                    return;
+                const viewer = await fetchCurrentViewer();
+                if (active) {
+                    setUser(viewer);
                 }
-
-                const data = await res.json();
-                setUser(data.user ?? null);
             } catch {
                 if (active) setUser(null);
             } finally {
@@ -39,8 +32,34 @@ export default function AuthButton() {
         };
 
         loadUser();
+        const unsubscribe = subscribeToAuthChanges(async (session) => {
+            if (!active) return;
+
+            if (!session) {
+                setUser(null);
+                setLoading(false);
+                return;
+            }
+
+            try {
+                const viewer = await fetchCurrentViewer();
+                if (active) {
+                    setUser(viewer);
+                }
+            } catch {
+                if (active) {
+                    setUser(null);
+                }
+            } finally {
+                if (active) {
+                    setLoading(false);
+                }
+            }
+        });
+
         return () => {
             active = false;
+            unsubscribe();
         };
     }, []);
 
@@ -76,17 +95,18 @@ export default function AuthButton() {
                     type="button"
                     onClick={async () => {
                         try {
-                            await fetch(AUTH_LOGOUT_URL, {
-                                method: 'POST',
-                                credentials: 'include',
-                            });
+                            await signOut();
                         } finally {
                             setUser(null);
                             window.location.href = '/';
                         }
                     }}
                 >
-                    <LogoutIcon className="app-auth__icon app-auth__icon--logout" aria-hidden="true" focusable="false" />
+                    <LogoutIcon
+                        className="app-auth__icon app-auth__icon--logout"
+                        aria-hidden="true"
+                        focusable="false"
+                    />
                     Se déconnecter
                 </button>
             </div>
@@ -98,13 +118,25 @@ export default function AuthButton() {
             <button
                 className="app-auth__button app-auth__chip app-auth__chip--login"
                 type="button"
-                onClick={() => {
-                    window.location.href = AUTH_LOGIN_URL;
+                onClick={async () => {
+                    try {
+                        await signInWithTwitch();
+                    } catch {
+                        setUser(null);
+                    }
                 }}
             >
-                <LoginIcon className="app-auth__icon app-auth__icon--login" aria-hidden="true" focusable="false" />
+                <LoginIcon
+                    className="app-auth__icon app-auth__icon--login"
+                    aria-hidden="true"
+                    focusable="false"
+                />
                 Se connecter
-                <TwitchIcon className="app-auth__icon app-auth__icon--twitch" aria-hidden="true" focusable="false" />
+                <TwitchIcon
+                    className="app-auth__icon app-auth__icon--twitch"
+                    aria-hidden="true"
+                    focusable="false"
+                />
             </button>
         </div>
     );

@@ -1,160 +1,238 @@
-# PROJECT_CONTEXT
+﻿# PROJECT_CONTEXT
 
-## Role
+## Rôle
 
-Memoire de travail du projet pour garder les decisions, contraintes et priorites entre conversations.
+Mémoire de travail du projet pour garder les décisions, contraintes et priorités entre conversations.
 
-## Etat actuel
+## État actuel
 
-- Design principal en place.
-- Header, Home et Calendar implementes.
-- Auth Twitch fonctionnelle en local et en production.
-- Firestore connecte.
-- Calendar est la premiere section migree vers stockage persistant.
-- Registre `users/{twitchId}` alimente automatiquement lors du callback Twitch.
+- Auth Twitch migrée vers Supabase Auth.
+- Permissions migrées vers Supabase (`profiles`, `capabilities`, `user_capabilities`).
+- Calendar migré vers Supabase (`calendar_settings`).
+- Le panel admin des permissions fonctionne localement.
+- Le mode de développement courant est `npm run dev`.
+- Le déploiement Cloudflare Pages n'est pas encore configuré.
 
-## Choix techniques verrouilles
+## Choix techniques verrouillés
 
-- Hebergement: Netlify.
-- Base de donnees: Firebase Firestore.
-- Auth: Twitch OAuth via Netlify Functions.
-- Region ciblee: Europe/France.
-- Dev local complet: `netlify dev` (pas `npm run dev` seul).
+- Frontend : React + Vite.
+- Auth : Supabase Auth avec Twitch.
+- Base de données : Supabase Postgres.
+- Déploiement cible : Cloudflare Pages.
+- Région Supabase actuelle : Paris (`eu-west-3`).
+- Pas de dépendance résiduelle à Netlify ou Firebase dans le code applicatif.
 
-## Direction architecture
+## Variables d'environnement frontend
 
-- Firestore est la couche de persistance de tout le projet dynamique (pas uniquement Calendar).
-- Calendar est un bootstrap technique pour les futures sections (resultats, sanctions, predictions, etc.).
-- Pas de fallback statique local pour les donnees dynamiques venant de la BDD.
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_PUBLISHABLE_KEY`
 
-## Permissions - vision validee
+Aucune clé `secret` ou `service_role` ne doit être injectée dans le frontend.
 
-- Modele par capacites (capability-based), evolutif.
-- Les capacites sont ajoutees au fur et a mesure des sections.
-- Capacite initiale validee pour Calendar: `calendar.write`.
-- Capacite d'administration permissions fixee: `admin.permissions.manage`.
+## Auth et profils
 
-### Garde-fou critique
+- Les utilisateurs sont synchronisés dans `profiles` à la connexion.
+- Données utiles de profil :
+  - `id`
+  - `provider`
+  - `provider_user_id`
+  - `provider_login`
+  - `display_name`
+  - `avatar_url`
+  - `is_super_admin`
+- `provider_login` correspond au login Twitch.
+- `display_name` correspond au nom d'affichage Twitch avec sa casse.
 
-- Le super-admin a les permissions totales par defaut.
-- Les permissions du super-admin ne sont modifiables via aucune interface du site.
-- Protection obligatoire cote serveur (pas seulement cote UI).
-- Source super-admin technique: `SUPER_ADMIN_TWITCH_ID` (env var serveur).
+## Permissions - vision validée
 
-## Registre utilisateurs (auth)
+- Modèle par capacités, évolutif.
+- Capacités initiales validées :
+  - `admin.permissions.manage`
+  - `calendar.write`
+- Le super-admin a tous les droits par défaut.
+- Les droits du super-admin ne sont modifiables via aucune interface du site.
+- Le backend logique de sécurité repose sur Supabase (RLS + vérifications applicatives), pas sur le frontend.
 
-- Le site enregistre les utilisateurs authentifies au premier login.
-- Donnees visees: `twitchId`, `login`, `displayName`, `profileImageUrl`, `firstLoginAt`, `lastLoginAt`.
-- Attribution des droits manuelle via panel admin.
-- Stockage de `profileImageUrl` en BDD accepte (cout faible, panel plus simple).
+## Schéma SQL actuellement posé
 
-## Schema Firestore permissions valide
+### Tables en place
 
-1. `users/{twitchId}`
-- `twitchId`
-- `login`
-- `displayName`
-- `profileImageUrl`
-- `firstLoginAt`
-- `lastLoginAt`
-- `isSuperAdmin` (true uniquement pour le compte super-admin)
+- `profiles`
+- `capabilities`
+- `user_capabilities`
+- `teams`
+- `drivers`
+- `calendar_settings`
 
-2. `users/{twitchId}/capabilities/{capabilityId}`
-- doc id = capacite (`calendar.write`, `results.write`, etc.)
-- `enabled`
-- `createdAt`
-- `createdBy` (twitchId admin)
-- `updatedAt`
-- `updatedBy` (twitchId admin)
+### Scripts SQL versionnés
 
-Notes:
-- Pas de collection d'audit separee pour le moment.
-- Audit minimal = derniere modification stockee dans le document de capacite.
+- `supabase/sql/001_initial_schema.sql`
 
-## Ecart actuel a corriger
+## Calendar
 
-- L'ecriture Calendar est encore controlee par whitelist login admin simple.
-- Ce modele est transitoire et doit evoluer vers verification de capacites reutilisable.
-
-## Module Calendar actuel (prod)
-
-- Document Firestore: `calendar/season3`.
-- Champ principal: `revealed` (12 entiers `0..24`).
-  - index = slot GP saison (1..12 cote UI)
-  - valeur = id circuit (`0` = non revele)
-- Metadonnees stockees:
-  - `updatedAt`
-  - `updatedBy.login`
-  - `updatedBy.twitchId`
-
-## API en place
-
-- `GET /api/calendar/revealed` -> retourne `revealed` + signal d'edition
-- `POST /api/calendar/revealed` -> endpoint protege + validation payload
-- `GET /api/admin/permissions` -> liste users + capacites (super-admin uniquement)
-- `POST /api/admin/permissions` -> attribue/retire une capacite (super-admin uniquement)
-
-## Couche auth serveur partagee
-
-- Helpers centralises dans `netlify/functions/_twitch-auth.js`.
-- Verification de capacites disponible via `hasCapability(twitchId, capabilityId)`.
-- Helper event-level disponible via `canCurrentUser(event, capabilityId)`.
-- Regle super-admin appliquee dans cette couche (`isSuperAdmin === true` -> acces autorise).
-- Calendar API migree sur verification de capacite `calendar.write` (plus de check whitelist login).
-- `ADMIN_TWITCH_LOGINS` n'est plus utilise.
-
-## Plan de refonte permissions (valide)
-
-1. [Fait] Ajouter registre utilisateurs alimente automatiquement a la connexion.
-2. [Fait] Implementer couche serveur partagee de verification de capacites.
-3. [Fait] Implementer garde-fou super-admin non modifiable via interface (couche serveur).
-4. [Fait] Migrer Calendar de whitelist admin vers `calendar.write`.
-5. [Fait] Ajouter endpoints admin pour lister utilisateurs et attribuer/retirer des capacites.
-6. [Fait] Construire section/panel admin de gestion des droits.
+- Ligne Supabase : `calendar_settings.id = 'season3'`.
+- Champ principal : `revealed` (tableau de 12 entiers `0..24`).
+  - index = slot GP saison côté UI
+  - valeur = id circuit (`0` = circuit non révélé)
+- Métadonnées conservées :
+  - `updated_at`
+  - `updated_by`
+- Pas de fallback local statique pour les données dynamiques.
 
 ## Panel admin permissions
 
-- Route frontend: `/admin/permissions`.
-- Interface disponible uniquement pour usage super-admin (lien "Admin" visible en footer une fois connecte).
-- L'UI permet:
-  - lister les utilisateurs enregistres (`users`)
-  - afficher les capacites existantes
-  - ajouter une colonne de capacite (id custom)
-  - activer/desactiver une capacite par utilisateur via case a cocher
-- Le backend reste source de verite (protection super-admin et validation).
+- Route frontend : `/admin/permissions`.
+- Visibilité réservée au super-admin.
+- Le panel permet :
+  - de lister les utilisateurs enregistrés
+  - d'afficher les capacités connues
+  - d'ajouter une capacité côté UI
+  - d'activer ou désactiver une capacité par utilisateur
+- Le backend reste source de vérité.
 
-## Priorites produit
+## Priorités produit
 
-1. Systeme resultats/classements (modele + saisie + affichage).
-2. Refonte permissions feature-level (pre-requis pour extension propre).
-3. Sections secondaires (Multi-Twitch, Circuits, Reglages, Pilotes).
+1. Finaliser la migration d'hébergement vers Cloudflare Pages.
+2. Structurer les données du module Résultats.
+3. Construire la saisie des résultats GP.
+4. Étendre ensuite les permissions par fonctionnalité.
 
-## Resultats GP - besoins confirmes
+## Résultats GP - besoins confirmés
 
-- 12 GP, chacun sprint + course.
-- Classement pilotes + classement ecuries.
-- Statuts: DNF, ABS, DSQ, bug/deconnexion.
-- Baremes custom (sprint/course) + meilleur tour (+1, sans contrainte top 10).
-- Sanctions post-course: retrait points, declassement, penalite temps, disqualification.
-- Saisie manuelle securisee.
+- 12 GP, chacun avec sprint + course.
+- Classement pilotes + classement écuries.
+- Statuts : `ABS`, `DNF`, `DSQ`, `DC`.
+- Barèmes custom sprint/course + meilleur tour.
+- Sanctions post-course : retrait de points, déclassement, pénalité de temps, disqualification, bannissement.
+- Qualifs distinctes pour sprint et course.
+- Possibilité de saisir le temps du vainqueur et les écarts.
+- Pour un `DNF`, conservation du tour d'abandon envisagée dès le départ.
 
-## Resultats GP - a confirmer
+## Contrat métier validé - résultats
 
-- Niveau de detail temps/ecarts stockes.
-- Integration qualifs/grille de depart.
-- Strategie de calcul:
-  - calcul a la lecture depuis donnees brutes, ou
-  - pre-calcul au write et stockage agrege.
+### Users
 
-## Hypotheses de charge (hautes)
+- `users` au sens métier ne doivent pas structurer les résultats.
+- L'identité applicative passe par `profiles`, mais les résultats ne doivent pas dépendre de l'utilisateur connecté.
 
-- ~200 utilisateurs.
-- ~20 visites/mois/utilisateur.
-- Ecritures faibles (cycle GP + ajustements ponctuels).
+### Drivers
 
-## Regles de collaboration
+- Collection logique cible : `drivers/{driverId}`.
+- Champs validés :
+  - `displayName`
+  - `linkedTwitchId`
+  - `racingNumber`
+  - `teamId`
+  - `isStreamer`
+  - `isActive`
+- Le nom affiché d'un pilote est son pseudo Twitch courant.
 
-- Un sujet a la fois sauf dependance technique explicite.
-- Si dependance: detailler impacts avant implementation.
-- Ne pas faire de changements structurels hors scope demande.
-- Tous les textes UI affiches en francais doivent garder les accents corrects (pas de version sans accents).
+### Teams
+
+- Collection logique cible : `teams/{teamId}`.
+- Champs validés :
+  - `name`
+  - `shortName`
+  - `colorKey`
+  - `logoKey`
+
+### Points rules
+
+- Collection logique cible : `pointsRules/{ruleSetId}`.
+- Règles distinctes pour `sprint` et `race`.
+- Barème prévu jusqu'à la 20e place.
+- Statuts standardisés à conserver :
+  - `ABS`
+  - `DNF`
+  - `DSQ`
+  - `DC`
+- Le bonus meilleur tour reste séparé du barème de position.
+
+### GP et sessions
+
+- Collection logique cible : `gps/{gpId}`.
+- La révélation des circuits reste gérée uniquement par `calendar_settings`.
+- Chaque GP contient 4 sessions métier :
+  - `sprint-qualifying`
+  - `sprint`
+  - `race-qualifying`
+  - `race`
+- Collection logique cible : `gps/{gpId}/sessions/{sessionId}`.
+- Champs attendus :
+  - `sessionType`
+  - `pointsType` (`none`, `sprint`, `race`)
+  - `status`
+
+### Entries de session
+
+- Collection logique cible : `gps/{gpId}/sessions/{sessionId}/entries/{driverId}`.
+- Champs à anticiper :
+  - `driverId`
+  - `classificationType`
+  - `rank`
+  - `bestTime`
+  - `gapToLeader`
+  - `dnfLap`
+  - `gridPenaltyPlaces`
+  - `notes`
+- Règles de structure :
+  - `classificationType` est la source principale d'état métier
+  - `rank` sert au classement officiel quand le pilote est classé
+  - pas de duplication de statut métier dans des champs booléens parallèles
+  - `gridPenaltyPlaces` n'est autorisé que pour une pénalité native du jeu en qualification
+  - les sanctions humaines ne vivent pas dans l'entry brute
+
+### Sanctions
+
+- Les sanctions ne doivent pas écraser destructivement le résultat brut saisi après la course.
+- Collection logique cible : `sanctions/{sanctionId}`.
+- Portée à anticiper :
+  - `session`
+  - `gp`
+  - `season`
+- Types à anticiper :
+  - `time_penalty`
+  - `position_drop`
+  - `points_deduction`
+  - `disqualification`
+  - `ban`
+
+## Hypothèses de charge hautes
+
+- 20 à 100 utilisateurs authentifiés par mois.
+- Environ 1 000 consultations mensuelles sur la partie Résultats.
+- Écritures faibles, concentrées autour des GP et de l'administration.
+
+## Direction technique validée
+
+- Supabase reste la solution retenue pour l'auth, la base et les permissions.
+- Cloudflare Pages reste la cible d'hébergement retenue.
+- Les écritures directes depuis le frontend sont acceptées, à condition d'être protégées côté Supabase.
+- Le modèle relationnel est considéré plus naturel pour le projet que l'ancien modèle Firestore.
+
+## Prochaines étapes
+
+1. Configurer le projet Cloudflare Pages.
+2. Injecter les variables d'environnement Supabase côté Cloudflare.
+3. Valider le build Vite en préproduction hébergée.
+4. Nettoyer ensuite les derniers éléments de configuration historiques inutiles.
+
+## Règles de collaboration
+
+- Un sujet à la fois sauf dépendance technique explicite.
+- Si dépendance : détailler les impacts avant implémentation.
+- Ne pas faire de changements structurels hors scope demandé.
+- Tous les textes UI affichés en français doivent garder les accents corrects.
+
+## Déploiement Cloudflare - procédure courante
+
+- Projet Pages actuel : les-fous-du-volant-3.
+- Mode retenu : Direct Upload via Wrangler après build local.
+- Commande de connexion initiale : 
+px wrangler login.
+- Commande de déploiement production : 
+pm run deploy:cloudflare.
+- Commande de déploiement preview : 
+pm run deploy:cloudflare:preview.
+- On évite le build distant par intégration Git pour garder un contrôle total du déploiement et limiter les surprises de plateforme.
+

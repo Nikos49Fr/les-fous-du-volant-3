@@ -1,23 +1,30 @@
-# Les Fous du Volant - Saison 3
+﻿# Les Fous du Volant - Saison 3
 
-Frontend React (Vite) avec backend serverless Netlify Functions, authentification Twitch et donnees Firebase Firestore.
+Frontend React pour le site de la saison 3 des Fous du Volant, avec authentification Twitch et données persistées via Supabase.
+
+## Statut
+
+- Stack applicative actuelle : React + Vite + Supabase
+- Déploiement cible : Cloudflare Pages
+- Projet Cloudflare Pages créé : `les-fous-du-volant-3`
 
 ## Stack technique
 
-- React 19 + Vite
+- React 19
+- Vite
 - React Router 7
 - Sass (SCSS)
-- Netlify Functions
-- Twitch OAuth
-- Firebase Firestore
+- Supabase Auth (Twitch)
+- Supabase Postgres
+- Cloudflare Pages
 - flag-icons
 
-## Prerequis
+## Prérequis
 
 - Node.js 20+
 - npm
-- Netlify CLI (`npm i -g netlify-cli`)
-- Certificats HTTPS locaux (mkcert) pour OAuth Twitch en local
+- Projet Supabase configuré avec le provider Twitch activé
+- Projet Cloudflare Pages créé
 
 ## Installation
 
@@ -25,74 +32,102 @@ Frontend React (Vite) avec backend serverless Netlify Functions, authentificatio
 npm install
 ```
 
-## Configuration
+## Configuration locale
 
-Variables d'environnement requises (Netlify + local via `netlify dev`) :
+Créer un fichier `.env.local` à la racine :
 
-- `TWITCH_CLIENT_ID`
-- `TWITCH_CLIENT_SECRET`
-- `FIREBASE_PROJECT_ID`
-- `FIREBASE_CLIENT_EMAIL`
-- `FIREBASE_PRIVATE_KEY`
-- `SUPER_ADMIN_TWITCH_ID`
-
-## Demarrage development
-
-Commande de dev a utiliser pour ce projet :
-
-```bash
-netlify dev
+```env
+VITE_SUPABASE_URL=...
+VITE_SUPABASE_PUBLISHABLE_KEY=...
 ```
 
-Pourquoi : ce mode lance le frontend + les fonctions `/api/*` + les cookies/session auth + le callback Twitch local HTTPS (`https://localhost:8888`).
+Ne jamais exposer de clé `secret` ou `service_role` côté frontend.
+
+## Développement local
+
+```bash
+npm run dev
+```
+
+Le port local peut varier selon l'environnement Vite. L'URL locale utilisée doit être autorisée dans `Supabase > Authentication > URL Configuration`.
 
 ## Scripts npm
 
+- `npm run dev` : serveur de développement Vite
 - `npm run build` : build production
-- `npm run preview` : preview local du build
+- `npm run preview` : prévisualisation locale du build
 - `npm run lint` : lint ESLint
-- `npm run dev` : Vite seul (sans auth/API), reserve au debug UI ponctuel
+- `npm run deploy:cloudflare` : build local puis déploiement production sur Cloudflare Pages
+- `npm run deploy:cloudflare:preview` : build local puis déploiement preview sur la branche `preview`
 
-## Endpoints API (Netlify Functions)
+## Authentification
 
-Auth Twitch :
-- `GET /api/auth/twitch/login`
-- `GET /api/auth/twitch/callback`
-- `GET /api/auth/twitch/me`
-- `POST /api/auth/twitch/logout`
+- Connexion utilisateur via Twitch OAuth, portée par Supabase Auth
+- Gestion des permissions métier via Supabase (`profiles`, `capabilities`, `user_capabilities`)
+- Le super-admin est défini en base et non par le frontend
 
-Calendar :
-- `GET /api/calendar/revealed`
-- `POST /api/calendar/revealed` (admin uniquement)
+## Base de données
 
-Admin permissions :
-- `GET /api/admin/permissions` (super-admin uniquement)
-- `POST /api/admin/permissions` (super-admin uniquement)
+Le schéma SQL initial de migration se trouve dans :
 
-## Route interne
+- `supabase/sql/001_initial_schema.sql`
 
-- Panel permissions : `/admin/permissions` (super-admin)
+Les données actuellement branchées sur Supabase sont :
 
-## Structure projet
+- profils utilisateurs
+- permissions / capacités
+- calendrier des circuits révélés
+- pilotes
+- écuries
 
-- `src/components/sections` : pages/sections
-- `src/components/ui` : composants reutilisables
-- `src/data` : donnees frontend
-- `src/utils` : helpers + clients API
-- `netlify/functions` : endpoints serverless
+## Déploiement Cloudflare
 
-## Conventions de code
+### Première utilisation de Wrangler
 
-- 1 composant par dossier (`Component.jsx` + `Component.scss`)
-- import du style local en premier
-- composants en PascalCase
-- classes CSS type BEM
+Se connecter une fois à Cloudflare :
 
-## Securite
+```bash
+npx wrangler login
+```
 
-- Ne jamais commiter de secrets, tokens, ni cles de service account.
-- Les permissions d'ecriture API sont controlees cote serveur (Twitch login + whitelist admin).
+### Déploiement production
 
-## Deploiement
+```bash
+npm run deploy:cloudflare
+```
 
-- Plateforme : Netlify
+Cette commande :
+
+1. lance le build Vite
+2. déploie le dossier `dist` sur le projet Pages `les-fous-du-volant-3`
+
+### Déploiement preview
+
+```bash
+npm run deploy:cloudflare:preview
+```
+
+## Routes internes
+
+- `/calendar`
+- `/admin/permissions`
+
+## Structure du projet
+
+- `src/components/sections` : sections/pages
+- `src/components/ui` : composants réutilisables
+- `src/data` : données frontend statiques
+- `src/utils` : clients et helpers applicatifs
+- `supabase/sql` : scripts SQL de structure et de migration
+
+## Sécurité
+
+- Ne jamais commiter de secrets, tokens ou clés privées
+- Les droits d'écriture doivent être protégés côté Supabase par les policies et les capacités métier
+
+## Variables Cloudflare Pages
+
+Variables frontend à configurer côté Cloudflare :
+
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_PUBLISHABLE_KEY`

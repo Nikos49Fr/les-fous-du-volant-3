@@ -1,4 +1,4 @@
-import './GpStatusBar.scss';
+﻿import './GpStatusBar.scss';
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { getActiveGpDisplay } from '../../../utils/gpHelpers';
@@ -49,7 +49,7 @@ export default function GpStatusBar() {
         return (
             <div className="gp-status gp-status--season-ended">
                 <p className="gp-status__title">
-                    Donnees GP indisponibles pour le moment.
+                    Données GP indisponibles pour le moment.
                 </p>
             </div>
         );
@@ -69,7 +69,7 @@ export default function GpStatusBar() {
         return (
             <div className={`gp-status gp-status--${active.phase}`}>
                 <p className="gp-status__title">
-                    La saison 3 des fous du volant est terminée.{' '}
+                    La saison 3 des Fous du Volant est terminée.{' '}
                     <NavLink className="gp-status__link" to="/results">
                         Voir les résultats
                     </NavLink>
@@ -109,12 +109,9 @@ export default function GpStatusBar() {
             )}
 
             <p className="gp-status__race">
-                <span className="gp-status__country">{active.gpCountry}</span>
-                {' '}
+                <span className="gp-status__country">{active.gpCountry}</span>{' '}
                 {active.gp && active.gpFlag ? (
-                    <span
-                        className={`gp-status__flag fi fi-${active.gpFlag}`}
-                    />
+                    <span className={`gp-status__flag fi fi-${active.gpFlag}`} />
                 ) : null}
                 <span className="gp-status__name">{active.gpName}</span>
             </p>

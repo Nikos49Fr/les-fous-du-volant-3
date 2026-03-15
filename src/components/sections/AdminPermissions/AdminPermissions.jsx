@@ -73,7 +73,9 @@ export default function AdminPermissions() {
             } catch (error) {
                 if (!active) return;
                 if (error.status === 403) {
-                    setLoadError('Accès refusé. Section réservée au super-admin.');
+                    setLoadError(
+                        'Accès refusé. Section réservée au super-admin.',
+                    );
                 } else {
                     setLoadError(
                         "Chargement impossible. Vérifie l'authentification et réessaie.",
@@ -108,8 +110,8 @@ export default function AdminPermissions() {
 
     const orderedUsers = useMemo(() => {
         return [...users].sort((a, b) =>
-            (a.login || a.displayName || a.twitchId).localeCompare(
-                b.login || b.displayName || b.twitchId,
+            (a.login || a.displayName || a.userId).localeCompare(
+                b.login || b.displayName || b.userId,
             ),
         );
     }, [users]);
@@ -129,20 +131,20 @@ export default function AdminPermissions() {
     }
 
     async function toggleCapability(user, capabilityId, enabled) {
-        const cellKey = `${user.twitchId}:${capabilityId}`;
+        const cellKey = `${user.userId}:${capabilityId}`;
         setSaveError('');
         setSavingCells((current) => ({ ...current, [cellKey]: true }));
 
         try {
             const result = await setUserCapability({
-                targetUserId: user.twitchId,
+                targetUserId: user.userId,
                 capabilityId,
                 enabled,
             });
 
             setUsers((currentUsers) =>
                 currentUsers.map((item) => {
-                    if (item.twitchId !== user.twitchId) return item;
+                    if (item.userId !== user.userId) return item;
                     return upsertCapability(item, result.capability);
                 }),
             );
@@ -158,9 +160,7 @@ export default function AdminPermissions() {
             <Title title="Admin - Permissions" />
 
             <div className="app-admin-permissions__content">
-                {isLoading ? (
-                    <p>Chargement des permissions...</p>
-                ) : null}
+                {isLoading ? <p>Chargement des permissions...</p> : null}
 
                 {!isLoading && loadError ? (
                     <p className="app-admin-permissions__message app-admin-permissions__message--error">
@@ -210,25 +210,30 @@ export default function AdminPermissions() {
                                     <tr>
                                         <th>Utilisateur</th>
                                         {capabilityIds.map((capabilityId) => (
-                                            <th key={capabilityId}>{capabilityId}</th>
+                                            <th key={capabilityId}>
+                                                {capabilityId}
+                                            </th>
                                         ))}
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {orderedUsers.map((user) => (
-                                        <tr key={user.twitchId}>
+                                        <tr key={user.userId}>
                                             <td className="app-admin-permissions__user-cell">
                                                 <div className="app-admin-permissions__user">
                                                     {user.profileImageUrl ? (
                                                         <img
                                                             className="app-admin-permissions__avatar"
-                                                            src={user.profileImageUrl}
+                                                            src={
+                                                                user.profileImageUrl
+                                                            }
                                                             alt={`Avatar ${user.displayName || user.login}`}
                                                         />
                                                     ) : null}
                                                     <div className="app-admin-permissions__user-meta">
                                                         <span className="app-admin-permissions__user-name">
-                                                            {user.displayName || user.login}
+                                                            {user.displayName ||
+                                                                user.login}
                                                         </span>
                                                         {user.isSuperAdmin ? (
                                                             <span className="app-admin-permissions__badge">
@@ -239,37 +244,49 @@ export default function AdminPermissions() {
                                                 </div>
                                             </td>
 
-                                            {capabilityIds.map((capabilityId) => {
-                                                const cellKey = `${user.twitchId}:${capabilityId}`;
-                                                const checked = user.isSuperAdmin
-                                                    ? true
-                                                    : getCapabilityEnabled(
-                                                          user,
-                                                          capabilityId,
-                                                      );
-                                                const disabled =
-                                                    user.isSuperAdmin ||
-                                                    savingCells[cellKey] === true;
+                                            {capabilityIds.map(
+                                                (capabilityId) => {
+                                                    const cellKey = `${user.userId}:${capabilityId}`;
+                                                    const checked =
+                                                        user.isSuperAdmin
+                                                            ? true
+                                                            : getCapabilityEnabled(
+                                                                  user,
+                                                                  capabilityId,
+                                                              );
+                                                    const disabled =
+                                                        user.isSuperAdmin ||
+                                                        savingCells[cellKey] ===
+                                                            true;
 
-                                                return (
-                                                    <td key={cellKey}>
-                                                        <label className="app-admin-permissions__toggle">
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={checked}
-                                                                disabled={disabled}
-                                                                onChange={(event) =>
-                                                                    toggleCapability(
-                                                                        user,
-                                                                        capabilityId,
-                                                                        event.target.checked,
-                                                                    )
-                                                                }
-                                                            />
-                                                        </label>
-                                                    </td>
-                                                );
-                                            })}
+                                                    return (
+                                                        <td key={cellKey}>
+                                                            <label className="app-admin-permissions__toggle">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={
+                                                                        checked
+                                                                    }
+                                                                    disabled={
+                                                                        disabled
+                                                                    }
+                                                                    onChange={(
+                                                                        event,
+                                                                    ) =>
+                                                                        toggleCapability(
+                                                                            user,
+                                                                            capabilityId,
+                                                                            event
+                                                                                .target
+                                                                                .checked,
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </label>
+                                                        </td>
+                                                    );
+                                                },
+                                            )}
                                         </tr>
                                     ))}
                                 </tbody>

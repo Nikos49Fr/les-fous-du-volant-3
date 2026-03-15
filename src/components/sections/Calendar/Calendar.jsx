@@ -1,8 +1,11 @@
-import './Calendar.scss';
+﻿import './Calendar.scss';
 import { useEffect, useMemo, useState } from 'react';
 import { GP_NAMES } from '../../../data/dataGP';
 import { getGpSchedule } from '../../../utils/gpHelpers';
-import { fetchCalendarData, updateRevealedGpIds } from '../../../utils/calendarApi';
+import {
+    fetchCalendarData,
+    updateRevealedGpIds,
+} from '../../../utils/calendarApi';
 import Title from '../../ui/Title/Title';
 
 const GP_OPTIONS = [
@@ -97,23 +100,26 @@ export default function Calendar() {
     }
 
     const selectedOption = useMemo(() => {
-        return GP_OPTIONS.find((option) => option.id === selectedGpId) ?? GP_OPTIONS[0];
+        return (
+            GP_OPTIONS.find((option) => option.id === selectedGpId) ??
+            GP_OPTIONS[0]
+        );
     }, [selectedGpId]);
 
     return (
         <section className="app-section app-calendar">
-            <Title title="Calendrier des Grand Prix" />
+            <Title title="Calendrier des Grands Prix" />
             <div className="app-calendar-content">
                 <p>
-                    Chaque circuit sera revele a la fin du circuit precedent, par
-                    une enigme a resoudre.
+                    Chaque circuit sera révélé à la fin du circuit précédent,
+                    par une énigme à résoudre.
                 </p>
                 <p>
-                    Voici les dates des Grand Prix pour la saison 3 des fous du
-                    volant :
+                    Voici les dates des Grands Prix pour la saison 3 des Fous
+                    du Volant :
                 </p>
                 {hasError ? (
-                    <p>Donnees calendrier indisponibles pour le moment.</p>
+                    <p>Données calendrier indisponibles pour le moment.</p>
                 ) : null}
                 <ol className="app-calendar__gp-list">
                     {schedule.map((gp, index) => (
@@ -129,14 +135,16 @@ export default function Calendar() {
                                         className="app-calendar__edit-trigger"
                                         type="button"
                                         onClick={() => openModal(index)}
-                                        aria-label={`Editer le GP ${gp.id}`}
+                                        aria-label={`Éditer le GP ${gp.id}`}
                                     >
                                         <span className="app-calendar__edit-trigger-icon" />
                                     </button>
                                 </span>
                             ) : null}
 
-                            <span className="app-calendar__gp-item-number">{gp.id}</span>
+                            <span className="app-calendar__gp-item-number">
+                                {gp.id}
+                            </span>
                             <span className="app-calendar__gp-item-country">
                                 {gp.isKnown ? (
                                     <span className="app-calendar__gp-item-country-name">
@@ -158,7 +166,7 @@ export default function Calendar() {
                             >
                                 {gp.isKnown
                                     ? gp.name
-                                    : 'Circuit revele a la fin du precedent GP'}
+                                    : 'Circuit révélé à la fin du précédent GP'}
                             </span>
                             <time
                                 className="app-calendar__gp-item-date"
@@ -195,7 +203,9 @@ export default function Calendar() {
                                 <button
                                     className="app-calendar__modal-select-trigger"
                                     type="button"
-                                    onClick={() => setIsOptionListOpen((open) => !open)}
+                                    onClick={() =>
+                                        setIsOptionListOpen((open) => !open)
+                                    }
                                     aria-haspopup="listbox"
                                     aria-expanded={isOptionListOpen}
                                 >
@@ -214,7 +224,10 @@ export default function Calendar() {
                                 </button>
 
                                 {isOptionListOpen ? (
-                                    <ul className="app-calendar__modal-select-menu" role="listbox">
+                                    <ul
+                                        className="app-calendar__modal-select-menu"
+                                        role="listbox"
+                                    >
                                         {GP_OPTIONS.map((option) => (
                                             <li key={option.id}>
                                                 <button
