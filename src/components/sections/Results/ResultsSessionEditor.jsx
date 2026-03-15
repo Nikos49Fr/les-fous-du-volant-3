@@ -9,6 +9,13 @@ import {
     sessionSupportsFastestLap,
 } from '../../../utils/resultsHelpers';
 
+const STATUS_HELPERS = {
+    DNS: 'Did Not Start. Ex. : Déconnexion avant le début de session',
+    DNF: 'Did Not Finish. Ex. : accident, crash PC ou déconnexion pendant la session',
+    DSQ: "Disqualifié. n'a pas été autorisé à participer à la session.",
+    ABS: 'Absent. Indisponible pour la session.',
+};
+
 export default function ResultsSessionEditor({
     drivers,
     editorState,
@@ -101,10 +108,11 @@ export default function ResultsSessionEditor({
         const isFastestLap = editorState.fastestLapDriverId === driver.id;
         const fastestLapDisabled = !!currentStatus || !supportsFastestLap;
 
-        return (
+        const rowContent = (
             <div
-                key={driver.id}
-                className={`app-results-session-editor__driver-row app-results-session-editor__driver-row--team-${teamPresentation.colorModifier}`}
+                className={`app-results-session-editor__driver-row app-results-session-editor__driver-row--team-${teamPresentation.colorModifier}${
+                    draggable ? '' : ' app-results-session-editor__driver-row--status'
+                }`}
                 draggable={draggable}
                 onDragStart={() => draggable && setDraggingDriverId(driver.id)}
                 onDragEnd={() => setDraggingDriverId(null)}
@@ -114,19 +122,32 @@ export default function ResultsSessionEditor({
                 <span className="app-results-session-editor__driver-grip">
                     <GripIcon aria-hidden="true" focusable="false" />
                 </span>
-                <span className="app-results-session-editor__driver-position">
-                    {positionLabel}
-                </span>
-                <span className="app-results-session-editor__driver-number">
-                    {driver.racingNumber}
-                </span>
                 <span className="app-results-session-editor__driver-main">
+                    {supportsFastestLap && draggable ? (
+                        <button
+                            className={`app-results-session-editor__fastest-lap${
+                                isFastestLap
+                                    ? ' app-results-session-editor__fastest-lap--active'
+                                    : ''
+                            }`}
+                            type="button"
+                            onClick={() => updateFastestLap(driver.id)}
+                            disabled={fastestLapDisabled}
+                            aria-label={`Meilleur tour ${driver.displayName}`}
+                        >
+                            <StopwatchIcon aria-hidden="true" focusable="false" />
+                        </button>
+                    ) : null}
                     {teamPresentation.logoUrl ? (
-                        <img
-                            className="app-results-session-editor__driver-logo"
-                            src={teamPresentation.logoUrl}
-                            alt={driver.team.name}
-                        />
+                        <span
+                            className={`app-results-session-editor__driver-logo-pill app-results-session-editor__driver-logo-pill--team-${teamPresentation.colorModifier}`}
+                        >
+                            <img
+                                className="app-results-session-editor__driver-logo"
+                                src={teamPresentation.logoUrl}
+                                alt={driver.team.name}
+                            />
+                        </span>
                     ) : null}
                     <span className="app-results-session-editor__driver-name">
                         {driver.displayName}
@@ -143,65 +164,80 @@ export default function ResultsSessionEditor({
                             }`}
                             type="button"
                             onClick={() => updateStatus(driver.id, status)}
+                            title={STATUS_HELPERS[status]}
+                            aria-label={`${status}. ${STATUS_HELPERS[status]}`}
                         >
                             {status}
                         </button>
                     ))}
                 </div>
-                {supportsFastestLap ? (
-                    <button
-                        className={`app-results-session-editor__fastest-lap${
-                            isFastestLap
-                                ? ' app-results-session-editor__fastest-lap--active'
-                                : ''
-                        }`}
-                        type="button"
-                        onClick={() => updateFastestLap(driver.id)}
-                        disabled={fastestLapDisabled}
-                        aria-label={`Meilleur tour ${driver.displayName}`}
-                    >
-                        <StopwatchIcon aria-hidden="true" focusable="false" />
-                    </button>
-                ) : null}
+            </div>
+        );
+
+        if (!draggable) {
+            return <div key={driver.id}>{rowContent}</div>;
+        }
+
+        return (
+            <div key={driver.id} className="app-results-session-editor__row-shell">
+                <span className="app-results-session-editor__row-label">{positionLabel}</span>
+                {rowContent}
             </div>
         );
     }
 
     return (
         <div className="app-results-session-editor">
-            <div className="app-results-session-editor__header">
-                <span>POS.</span>
-                <span>NO.</span>
-                <span>DRIVER</span>
-                <span>STATUT</span>
-                {supportsFastestLap ? <span>MT</span> : null}
-            </div>
+            <div className="app-results-session-editor__panels">
+                <section className="app-results-session-editor__panel">
+                    <div className="app-results-session-editor__panel-header">
+                        <h4 className="app-results-session-editor__panel-title">
+                            Pilotes classés
+                        </h4>
+                    </div>
 
-            <div className="app-results-session-editor__section">
-                {classifiedDrivers.map((driver, index) =>
-                    renderDriverRow(driver, index + 1, true),
-                )}
-            </div>
+                    <div className="app-results-session-editor__section">
+                        {classifiedDrivers.map((driver, index) =>
+                            renderDriverRow(driver, index + 1, true),
+                        )}
+                    </div>
+                </section>
 
-            {statusGroups.length > 0 ? (
-                <div className="app-results-session-editor__statuses-wrap">
-                    {statusGroups.map((group) => (
-                        <div
-                            key={group.status}
-                            className="app-results-session-editor__status-group"
-                        >
-                            <h4 className="app-results-session-editor__status-group-title">
-                                {group.status}
-                            </h4>
-                            <div className="app-results-session-editor__section">
-                                {group.drivers.map((driver) =>
-                                    renderDriverRow(driver, group.status, false),
-                                )}
-                            </div>
+                <section className="app-results-session-editor__panel app-results-session-editor__panel--statuses">
+                    <div className="app-results-session-editor__panel-header">
+                        <h4 className="app-results-session-editor__panel-title">
+                            Pilotes non classés
+                        </h4>
+                    </div>
+
+                    {statusGroups.length > 0 ? (
+                        <div className="app-results-session-editor__statuses-wrap">
+                            {statusGroups.map((group) => (
+                                <div
+                                    key={group.status}
+                                    className="app-results-session-editor__status-group"
+                                >
+                                    <h4 className="app-results-session-editor__status-group-title">
+                                        <span>{group.status}</span>
+                                        <span className="app-results-session-editor__status-group-help">
+                                            {STATUS_HELPERS[group.status]}
+                                        </span>
+                                    </h4>
+                                    <div className="app-results-session-editor__section">
+                                        {group.drivers.map((driver) =>
+                                            renderDriverRow(driver, '', false),
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                    ))}
-                </div>
-            ) : null}
+                    ) : (
+                        <p className="app-results-session-editor__empty">
+                            Aucun pilote avec statut pour le moment.
+                        </p>
+                    )}
+                </section>
+            </div>
         </div>
     );
 }

@@ -350,6 +350,19 @@ export default function Results() {
                                     schedule={resultsData.schedule}
                                     sessionsByRound={resultsData.sessionsByRound}
                                     onSessionSaved={handleSessionSaved}
+                                    onGpDeleted={(gpRound) =>
+                                        setResultsData((current) => {
+                                            if (!current) return current;
+
+                                            return {
+                                                ...current,
+                                                sessionsByRound: {
+                                                    ...current.sessionsByRound,
+                                                    [gpRound]: {},
+                                                },
+                                            };
+                                        })
+                                    }
                                 />
                             ) : (
                                 <div className="app-results__stack">

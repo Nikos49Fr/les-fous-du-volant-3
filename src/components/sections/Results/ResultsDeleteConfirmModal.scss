@@ -1,0 +1,109 @@
+@use '../../../styles/variables' as *;
+
+.app-results-delete-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: $neutral-black-62;
+    padding: 1rem;
+
+    &__dialog {
+        width: min(34rem, 100%);
+        background-color: $surface-base;
+        border: 2px solid $action-primary;
+        border-radius: 10px;
+        padding: 1rem 1.1rem;
+        box-shadow: 0 16px 40px $neutral-black-30;
+        display: flex;
+        flex-direction: column;
+        gap: 0.9rem;
+    }
+
+    &__title {
+        margin: 0;
+        color: $action-primary;
+        font-family: 'Formula 1', sans-serif;
+        font-size: clamp(0.9rem, 1.7vw, 1.05rem);
+        line-height: 1.5;
+    }
+
+    &__flag {
+        margin-inline: 0.35rem;
+        font-size: 1rem;
+        line-height: 1;
+    }
+
+    &__message {
+        margin: 0;
+        color: $neutral-black;
+        font-size: 0.95rem;
+    }
+
+    &__hint {
+        margin: -0.2rem 0 0;
+        color: $neutral-black-62;
+        font-size: 0.82rem;
+    }
+
+    &__actions {
+        display: flex;
+        justify-content: center;
+        gap: 0.6rem;
+    }
+
+    &__button {
+        position: relative;
+        overflow: hidden;
+        min-width: 6rem;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        padding: 0.65rem 1rem;
+        font-family: 'Formula 1', sans-serif;
+        font-size: 0.78rem;
+        cursor: pointer;
+        transition:
+            background-color 150ms ease,
+            border-color 150ms ease,
+            color 150ms ease,
+            opacity 150ms ease;
+
+        & > span {
+            position: relative;
+            z-index: 1;
+        }
+
+        &:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        &--cancel {
+            background-color: $surface-nav;
+            border-color: $stroke-default;
+            color: $content-inverse;
+        }
+
+        &--confirm {
+            background-color: $neutral-white;
+            border-color: $action-primary;
+            color: $action-primary;
+
+            &::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background-color: $action-primary;
+                transform: scaleX(var(--hold-progress, 0));
+                transform-origin: left center;
+                will-change: transform;
+            }
+
+            &.app-results-delete-modal__button--confirm-holding > span {
+                color: $neutral-black;
+            }
+        }
+    }
+}

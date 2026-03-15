@@ -1,34 +1,122 @@
 @use '../../../styles/variables' as *;
 
 .app-results-panel {
-    border: 1px solid $stroke-default;
     background-color: $surface-contrast;
-    border-radius: 10px;
-    padding: clamp(0.75rem, 2vw, 1rem);
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
+    gap: 0;
 
-    &__toolbar {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
-        gap: 0;
+    &__tabs {
+        display: flex;
+        align-items: stretch;
+        width: 100%;
+        background-color: $surface-nav;
+        border-bottom: solid 1px $surface-elevated;
+    }
+
+    &__tabs-main {
+        display: flex;
+        align-items: stretch;
+        flex: 0 0 auto;
+        min-width: fit-content;
+    }
+
+    &__tab {
+        min-height: 2.7rem;
+        border: none;
+        background-color: transparent;
+        color: $neutral-white-60;
+        padding: 0 1.05rem;
+        font-family: 'Formula 1', sans-serif;
+        font-size: clamp(0.72rem, 1.3vw, 0.86rem);
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+            color 150ms ease,
+            border-bottom-color 150ms ease,
+            opacity 150ms ease;
+        border-bottom: 2px solid $surface-elevated;
+
+        &:hover {
+            color: $neutral-white;
+            border-bottom-color: $neutral-white-60;
+            opacity: 1;
+        }
+
+        &--active {
+        color: $content-inverse;
+            border-bottom-color: $action-primary;
+        }
+
+        &--action {
+            flex: 0 0 auto;
+            gap: 0.55rem;
+            color: $action-success;
+            padding-inline: 1rem;
+            font-size: clamp(0.68rem, 1.15vw, 0.8rem);
+            font-weight: 400;
+            border-bottom-color: $action-success;
+
+            &:hover {
+                color: $action-primary;
+                border-bottom-color: $action-primary;
+            }
+
+            &:disabled {
+                opacity: 0.45;
+                cursor: not-allowed;
+            }
+        }
+
+        &--danger {
+            margin-left: auto;
+            color: $action-primary;
+            border-bottom-color: $action-primary;
+
+            &:hover {
+                color: $neutral-white;
+                border-bottom-color: $action-primary;
+            }
+        }
+
+        & svg,
+        & svg path {
+            fill: currentColor;
+        }
+
+        & svg {
+            width: 1rem;
+            height: 1rem;
+        }
     }
 
     &__select {
         position: relative;
+        flex: 0 0 clamp(14rem, 22vw, 18rem);
+        min-width: 0;
 
         &-trigger {
             width: 100%;
-            min-height: 2.85rem;
-            border: 1px solid $surface-elevated;
-            border-right: none;
-            border-radius: 8px 0 0 8px;
-            background-color: $surface-base;
+            min-height: 2.7rem;
+            border: none;
+            border-bottom: 2px solid $surface-elevated;
+            background-color: transparent;
             color: $content-inverse;
-            padding: 0.45rem 0.8rem;
+            padding: 0 1rem;
             text-align: left;
             cursor: pointer;
+            transition:
+                color 150ms ease,
+                border-bottom-color 150ms ease,
+                background-color 150ms ease;
+
+            &:hover {
+                border-bottom-color: $neutral-white-60;
+            }
         }
 
         &-trigger-content,
@@ -37,6 +125,18 @@
             align-items: center;
             gap: 0.5rem;
             width: 100%;
+        }
+
+        &-trigger-content {
+            justify-content: space-between;
+        }
+
+        &-trigger-main {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 0;
+            overflow: hidden;
         }
 
         &-flag {
@@ -50,7 +150,20 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             font-family: 'Formula 1', sans-serif;
-            font-size: clamp(0.74rem, 1.4vw, 0.88rem);
+            font-size: clamp(0.72rem, 1.3vw, 0.86rem);
+            font-weight: 700;
+        }
+
+        &-chevron {
+            flex: 0 0 auto;
+            width: 1rem;
+            height: 1rem;
+            color: $neutral-white;
+
+            &,
+            & path {
+                fill: currentColor;
+            }
         }
 
         &-menu {
@@ -67,66 +180,22 @@
             border-radius: 8px;
             max-height: 14rem;
             overflow-y: auto;
+            box-shadow: 0 10px 24px $neutral-black-24;
         }
 
         &-option {
             border: none;
             border-radius: 6px;
             background: transparent;
-            color: $content-inverse;
+            color: $content-primary;
             padding: 0.45rem 0.55rem;
             cursor: pointer;
             text-align: left;
 
             &--active,
             &:hover {
-                background-color: $surface-elevated;
+                background-color: $surface-subtle;
             }
-        }
-    }
-
-    &__save {
-        width: 2.85rem;
-        min-height: 2.85rem;
-        border: 1px solid $surface-elevated;
-        border-radius: 0 8px 8px 0;
-        background-color: $surface-base;
-        color: $state-success-strong;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-
-        &:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        & svg {
-            width: 1.4rem;
-            height: 1.4rem;
-        }
-    }
-
-    &__session-tabs {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.45rem;
-    }
-
-    &__session-tab {
-        border: 1px solid $stroke-default;
-        border-radius: 999px;
-        background-color: $surface-base;
-        color: $content-primary;
-        padding: 0.45rem 0.8rem;
-        font-family: 'Formula 1', sans-serif;
-        font-size: clamp(0.72rem, 1.3vw, 0.84rem);
-        cursor: pointer;
-
-        &--active {
-            border-color: $action-primary;
-            color: $action-primary;
         }
     }
 
@@ -134,16 +203,53 @@
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
+        padding: clamp(0.8rem, 2vw, 1rem);
     }
 
     &__error {
         margin: 0;
+        padding: 0 clamp(0.8rem, 2vw, 1rem) clamp(0.8rem, 2vw, 1rem);
         color: $action-primary;
     }
 }
 
 @media (max-width: 768px) {
     .app-results-panel {
-        padding: 0.75rem;
+        &__tabs {
+            flex-wrap: wrap;
+        }
+
+        &__tabs-main {
+            flex: 1 1 100%;
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        &__select {
+            flex: 1 1 100%;
+            min-width: 9rem;
+
+            &-trigger {
+                width: 100%;
+                padding-inline: 0.7rem;
+            }
+        }
+
+        &__tab {
+            min-height: 2.8rem;
+            padding-inline: 0.7rem;
+
+            &--action {
+                padding-inline: 0.55rem;
+            }
+        }
+
+        &__content {
+            padding-inline: 0.5rem;
+        }
+
+        &__error {
+            padding-inline: 0.5rem;
+        }
     }
 }

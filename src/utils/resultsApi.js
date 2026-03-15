@@ -191,3 +191,25 @@ export async function saveResultsSession({
         })),
     };
 }
+
+export async function deleteResultsGp(gpRound) {
+    if (!Number.isInteger(gpRound) || gpRound < 1 || gpRound > 12) {
+        throw new Error('GP invalide');
+    }
+
+    const profile = await syncCurrentProfile();
+    if (!profile?.id) {
+        throw new Error('Authentification requise');
+    }
+
+    const { error } = await supabase
+        .from('result_sessions')
+        .delete()
+        .eq('gp_round', gpRound);
+
+    if (error) {
+        throw new Error(error.message ?? 'Suppression impossible');
+    }
+
+    return { gpRound };
+}
