@@ -1,10 +1,221 @@
-@use '../../../styles/variables' as *;
+﻿@use '../../../styles/variables' as *;
 
 .app-results {
-}
+    &__content {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
 
-@media (max-width: 1024px) {
+    &__panel {
+        padding: clamp(0.9rem, 2vw, 1.4rem) clamp(0.75rem, 2.5vw, 1.5rem);
+        display: flex;
+        flex-direction: column;
+        gap: clamp(1rem, 2vw, 1.5rem);
+    }
+
+    &__tabs {
+        display: flex;
+        align-items: stretch;
+        justify-content: space-between;
+        background-color: $surface-nav;
+        overflow: hidden;
+    }
+
+    &__tabs-main {
+        display: flex;
+        align-items: stretch;
+        flex: 0 1 auto;
+    }
+
+    &__tab {
+        min-height: 2.7rem;
+        border: none;
+        background-color: transparent;
+        color: $neutral-white-60;
+        padding: 0 1.1rem;
+        font-family: 'Formula 1', sans-serif;
+        font-size: clamp(0.74rem, 1.4vw, 0.9rem);
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+            color 150ms ease,
+            border-bottom-color 150ms ease,
+            opacity 150ms ease;
+        border-bottom: 2px solid $surface-elevated;
+
+        &--active {
+            border-bottom-color: $action-primary;
+            color: $content-inverse;
+        }
+
+        &:hover {
+            color: $neutral-white;
+            border-bottom-color: $neutral-white-60;
+            opacity: 1;
+        }
+
+        & svg,
+        & svg path {
+            fill: currentColor;
+        }
+
+        &--edit {
+            flex: 0 0 auto;
+            width: 3.2rem;
+            margin-left: auto;
+            color: $content-link-hover;
+            opacity: 1;
+            padding-inline: 0.75rem;
+
+            &:hover {
+                color: $content-link-hover;
+                filter: brightness(1.15);
+            }
+
+            & svg {
+                width: 1rem;
+                height: 1rem;
+            }
+        }
+    }
+
+    &__stack {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    &__error {
+        color: $action-primary;
+    }
+
+    &__entity {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        min-width: 0;
+    }
+
+    &__entity-logo {
+        width: 1.3rem;
+        height: 1.3rem;
+        object-fit: contain;
+        flex: 0 0 auto;
+    }
+
+    &__entity-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__grid {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.3rem;
+        min-width: 0;
+
+        & svg {
+            width: 0.9rem;
+            height: 0.9rem;
+        }
+
+        &--up {
+            color: $action-success;
+        }
+
+        &--down {
+            color: $action-primary;
+        }
+
+        &--flat {
+            color: $content-inverse;
+        }
+    }
+
+    &__status-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 3.2rem;
+        border: 1px solid $stroke-default;
+        border-radius: 999px;
+        padding: 0.15rem 0.55rem;
+        font-family: 'Formula 1', sans-serif;
+        font-size: 0.72rem;
+        color: $content-inverse;
+    }
+
+    &__muted {
+        color: $neutral-white-60;
+    }
+
+    &__fastest-lap-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        background-color: $surface-fastest-lap;
+        border: 1px solid $stroke-fastest-lap-strong;
+        color: $content-fastest-lap;
+        border-radius: 999px;
+        padding: 0.2rem 0.55rem;
+        font-size: 0.72rem;
+        white-space: nowrap;
+
+        & svg {
+            width: 0.9rem;
+            height: 0.9rem;
+        }
+    }
+
+    &__gp-header {
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    &__gp-title {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: 'Formula 1', sans-serif;
+        font-size: clamp(0.95rem, 2vw, 1.2rem);
+        margin: 0;
+    }
+
+    &__gp-flag {
+        font-size: 1.2rem;
+        line-height: 1;
+    }
 }
 
 @media (max-width: 768px) {
+    .app-results {
+        &__content {
+            width: 100%;
+        }
+
+        &__panel {
+            padding-inline: 0.5rem;
+        }
+
+        &__tab {
+            min-height: 2.8rem;
+            padding-inline: 0.7rem;
+
+            &--edit {
+                width: 2.9rem;
+                padding-inline: 0.55rem;
+            }
+        }
+
+        &__tabs-main {
+            min-width: 0;
+        }
+    }
 }

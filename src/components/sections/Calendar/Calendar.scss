@@ -27,8 +27,8 @@
         grid-template-areas: 'edit number country name date';
         align-items: center;
         column-gap: 1rem;
-        background-color: $color-bg-alt2;
-        border: 1px solid $color-border;
+        background-color: $surface-contrast;
+        border: 1px solid $stroke-default;
         border-radius: 6px;
         padding: 0.75rem clamp(0.5rem, 1.5vw, 1rem);
 
@@ -119,7 +119,7 @@
             width: 1.3rem;
             height: 1.3rem;
             display: inline-block;
-            background-color: $color-accent-hover;
+            background-color: $action-success;
             mask: url('../../../assets/icons/pen-to-square-regular-full.svg')
                 center / contain no-repeat;
             -webkit-mask: url('../../../assets/icons/pen-to-square-regular-full.svg')
@@ -128,7 +128,7 @@
 
         &:hover {
             & .app-calendar__edit-trigger-icon {
-                background-color: $color-accent;
+                background-color: $action-primary;
             }
         }
     }
@@ -136,7 +136,7 @@
     &__modal-backdrop {
         position: fixed;
         inset: 0;
-        background-color: rgba(0, 0, 0, 0.55);
+        background-color: $neutral-black-55;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -147,11 +147,11 @@
     &__modal {
         position: relative;
         width: min(500px, 95vw);
-        background-color: $color-bg;
-        color: $color-text;
-        border: 1px solid $color-bg-alt3;
+        background-color: $surface-base;
+        color: $content-primary;
+        border: 1px solid $surface-elevated;
         border-radius: 8px;
-        box-shadow: 0 14px 34px rgba(0, 0, 0, 0.24);
+        box-shadow: 0 14px 34px $neutral-black-24;
         padding: 2.2rem 1rem 1rem;
 
         &-close {
@@ -172,7 +172,7 @@
                 width: 1rem;
                 height: 1rem;
                 display: inline-block;
-                background-color: $color-text;
+                background-color: $content-primary;
                 mask: url('../../../assets/icons/xmark-solid-full.svg')
                     center / contain no-repeat;
                 -webkit-mask: url('../../../assets/icons/xmark-solid-full.svg')
@@ -181,7 +181,7 @@
 
             &:hover {
                 & .app-calendar__modal-close-icon {
-                    background-color: $color-accent;
+                    background-color: $action-primary;
                 }
             }
         }
@@ -204,11 +204,11 @@
                 height: 2.45rem;
                 font-family: 'Titillium Web', sans-serif;
                 font-size: 0.95rem;
-                border: 1px solid $color-bg-alt3;
+                border: 1px solid $surface-elevated;
                 border-right: none;
                 border-radius: 6px 0 0 6px;
-                background-color: $color-bg-alt2;
-                color: $color-text-alt;
+                background-color: $surface-contrast;
+                color: $content-inverse;
                 padding: 0.45rem 0.7rem;
                 cursor: pointer;
                 text-align: left;
@@ -243,13 +243,13 @@
                 margin: 0;
                 padding: 0.35rem;
                 list-style: none;
-                border: 1px solid $color-bg-alt3;
+                border: 1px solid $surface-elevated;
                 border-radius: 6px;
-                background-color: $color-bg-alt2;
+                background-color: $surface-contrast;
                 max-height: 14rem;
                 overflow-y: auto;
                 z-index: 20;
-                box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+                box-shadow: 0 10px 24px $neutral-black-30;
             }
 
             &-option {
@@ -257,7 +257,7 @@
                 border: none;
                 border-radius: 4px;
                 background-color: transparent;
-                color: $color-text-alt;
+                color: $content-inverse;
                 padding: 0.35rem 0.45rem;
                 cursor: pointer;
                 text-align: left;
@@ -266,21 +266,21 @@
                 gap: 0.5rem;
 
                 &:hover {
-                    background-color: $color-bg-alt3;
+                    background-color: $surface-elevated;
                 }
             }
 
             &-option.app-calendar__modal-select-option--active {
-                background-color: rgba(255, 255, 255, 0.12);
+                background-color: $neutral-white-12;
             }
         }
 
         &-save {
             width: 2.45rem;
             height: 2.45rem;
-            border: 1px solid $color-bg-alt3;
+            border: 1px solid $surface-elevated;
             border-radius: 0 6px 6px 0;
-            background-color: $color-bg-alt2;
+            background-color: $surface-contrast;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
@@ -296,7 +296,7 @@
                 width: 1.7rem;
                 height: 1.7rem;
                 display: inline-block;
-                background-color: $color-accent-hover;
+                background-color: $action-success;
                 mask: url('../../../assets/icons/floppy-disk-regular-full.svg')
                     center / contain no-repeat;
                 -webkit-mask: url('../../../assets/icons/floppy-disk-regular-full.svg')
@@ -310,7 +310,7 @@
 
         &-error {
             margin-top: 0.7rem;
-            color: $color-accent;
+            color: $action-primary;
             font-size: 0.85rem;
             text-align: left;
         }

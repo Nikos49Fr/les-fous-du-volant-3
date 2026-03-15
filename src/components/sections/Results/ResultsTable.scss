@@ -1,0 +1,230 @@
+﻿@use '../../../styles/variables' as *;
+
+.app-results-table {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+
+    &__title {
+        margin: 0;
+        font-family: 'Formula 1', sans-serif;
+        font-size: clamp(0.88rem, 1.7vw, 1.05rem);
+    }
+
+    &__frame {
+        background-color: $surface-contrast;
+        border: 1px solid $stroke-default;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    &__head,
+    &__row-grid {
+        display: grid;
+        gap: 0.75rem;
+        align-items: center;
+        padding: 0 0.85rem;
+    }
+
+    &__head {
+        min-height: 3rem;
+        border-bottom: 1px solid $stroke-default;
+        font-family: 'Formula 1', sans-serif;
+        font-size: clamp(0.7rem, 1.4vw, 0.82rem);
+    }
+
+    &__head-cell {
+        color: $neutral-white-78;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        min-width: 0;
+
+        & + & {
+            border-top: 1px solid $neutral-white-06;
+        }
+
+        &--team-mclaren {
+            background: linear-gradient(90deg, rgba($team-mclaren, 0.18), $surface-transparent);
+        }
+
+        &--team-red-bull {
+            background: linear-gradient(90deg, rgba($team-red-bull, 0.18), $surface-transparent);
+        }
+
+        &--team-mercedes {
+            background: linear-gradient(90deg, rgba($team-mercedes, 0.18), $surface-transparent);
+        }
+
+        &--team-ferrari {
+            background: linear-gradient(90deg, rgba($team-ferrari, 0.18), $surface-transparent);
+        }
+
+        &--team-williams {
+            background: linear-gradient(90deg, rgba($team-williams, 0.18), $surface-transparent);
+        }
+
+        &--team-aston-martin {
+            background: linear-gradient(90deg, rgba($team-aston-martin, 0.18), $surface-transparent);
+        }
+
+        &--team-kick-sauber {
+            background: linear-gradient(90deg, rgba($team-kick-sauber, 0.18), $surface-transparent);
+        }
+
+        &--team-haas {
+            background: linear-gradient(90deg, rgba($team-haas, 0.18), $surface-transparent);
+        }
+
+        &--team-alpine {
+            background: linear-gradient(90deg, rgba($team-alpine, 0.18), $surface-transparent);
+        }
+
+        &--team-racing-bulls {
+            background: linear-gradient(90deg, rgba($team-racing-bulls, 0.18), $surface-transparent);
+        }
+    }
+
+    &__row-grid {
+        min-height: 3.3rem;
+    }
+
+    &__cell {
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: clamp(0.82rem, 1.55vw, 0.95rem);
+        color: $content-inverse;
+    }
+
+    &__cell:first-child,
+    &__head-cell:first-child,
+    &__cell:last-child,
+    &__head-cell:last-child {
+        justify-content: center;
+    }
+
+    &__cell:nth-child(4),
+    &__cell:nth-child(5) {
+        justify-content: flex-start;
+    }
+
+    &__tag-wrap {
+        padding-right: 0.85rem;
+        padding-left: 0.4rem;
+    }
+
+    &__empty {
+        margin: 0;
+        padding: 1rem;
+        color: $neutral-white-70;
+    }
+}
+
+.app-results-carousel {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 0.55rem;
+    align-items: center;
+
+    &__nav {
+        width: 2.2rem;
+        height: 2.2rem;
+        border: 1px solid $stroke-default;
+        border-radius: 999px;
+        background-color: $surface-contrast;
+        color: $content-inverse;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+
+        &:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        & svg {
+            width: 0.9rem;
+            height: 0.9rem;
+        }
+
+        &--prev svg {
+            transform: rotate(90deg);
+        }
+
+        &--next svg {
+            transform: rotate(-90deg);
+        }
+    }
+
+    &__track {
+        display: flex;
+        gap: 0.45rem;
+        overflow-x: auto;
+        padding-bottom: 0.25rem;
+        scrollbar-width: thin;
+    }
+
+    &__item {
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        border: 1px solid $stroke-default;
+        border-radius: 999px;
+        background-color: $surface-contrast;
+        color: $content-inverse;
+        padding: 0.5rem 0.85rem;
+        cursor: pointer;
+        white-space: nowrap;
+
+        &--active {
+            border-color: $action-primary;
+            color: $action-success;
+        }
+    }
+
+    &__flag {
+        font-size: 1rem;
+        line-height: 1;
+    }
+
+    &__label {
+        font-family: 'Formula 1', sans-serif;
+        font-size: clamp(0.7rem, 1.4vw, 0.84rem);
+    }
+}
+
+@media (max-width: 768px) {
+    .app-results-table {
+        &__head,
+        &__row-grid {
+            gap: 0.5rem;
+            padding-inline: 0.5rem;
+        }
+
+        &__row {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        &__tag-wrap {
+            padding: 0 0.5rem 0.65rem;
+        }
+    }
+
+    .app-results-carousel {
+        grid-template-columns: auto minmax(0, 1fr) auto;
+    }
+}

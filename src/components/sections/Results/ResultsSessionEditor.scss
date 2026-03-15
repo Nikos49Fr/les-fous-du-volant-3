@@ -1,0 +1,241 @@
+﻿@use '../../../styles/variables' as *;
+
+.app-results-session-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+
+    &__header,
+    &__driver-row {
+        display: grid;
+        grid-template-columns: 1.5rem 4.5rem 4rem minmax(16rem, 1fr) minmax(16rem, 1.2fr) auto;
+        align-items: center;
+        gap: 0.7rem;
+    }
+
+    &__header {
+        color: $neutral-black-62;
+        font-family: 'Formula 1', sans-serif;
+        font-size: clamp(0.68rem, 1.2vw, 0.8rem);
+        padding: 0 0.85rem;
+    }
+
+    &__section {
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+    }
+
+    &__statuses-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+        margin-top: 0.2rem;
+    }
+
+    &__status-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+
+    &__status-group-title {
+        margin: 0;
+        font-family: 'Formula 1', sans-serif;
+        font-size: clamp(0.72rem, 1.25vw, 0.84rem);
+        color: $action-primary;
+    }
+
+    &__driver-row {
+        min-height: 4rem;
+        border: 1px solid $neutral-black-08;
+        border-radius: 10px;
+        padding: 0.45rem 0.85rem;
+        background-color: $neutral-white-88;
+
+        &--team-mclaren {
+            background: linear-gradient(90deg, rgba($team-mclaren, 0.22), $neutral-white-94);
+        }
+
+        &--team-red-bull {
+            background: linear-gradient(90deg, rgba($team-red-bull, 0.22), $neutral-white-94);
+        }
+
+        &--team-mercedes {
+            background: linear-gradient(90deg, rgba($team-mercedes, 0.22), $neutral-white-94);
+        }
+
+        &--team-ferrari {
+            background: linear-gradient(90deg, rgba($team-ferrari, 0.22), $neutral-white-94);
+        }
+
+        &--team-williams {
+            background: linear-gradient(90deg, rgba($team-williams, 0.22), $neutral-white-94);
+        }
+
+        &--team-aston-martin {
+            background: linear-gradient(90deg, rgba($team-aston-martin, 0.22), $neutral-white-94);
+        }
+
+        &--team-kick-sauber {
+            background: linear-gradient(90deg, rgba($team-kick-sauber, 0.22), $neutral-white-94);
+        }
+
+        &--team-haas {
+            background: linear-gradient(90deg, rgba($team-haas, 0.22), $neutral-white-94);
+        }
+
+        &--team-alpine {
+            background: linear-gradient(90deg, rgba($team-alpine, 0.22), $neutral-white-94);
+        }
+
+        &--team-racing-bulls {
+            background: linear-gradient(90deg, rgba($team-racing-bulls, 0.22), $neutral-white-94);
+        }
+    }
+
+    &__driver-grip {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: $neutral-black-45;
+
+        & svg {
+            width: 0.85rem;
+            height: 0.85rem;
+        }
+    }
+
+    &__driver-position,
+    &__driver-number {
+        font-family: 'Formula 1', sans-serif;
+        font-size: clamp(0.78rem, 1.4vw, 0.92rem);
+        text-align: center;
+    }
+
+    &__driver-main {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        min-width: 0;
+    }
+
+    &__driver-logo {
+        width: 1.2rem;
+        height: 1.2rem;
+        object-fit: contain;
+        flex: 0 0 auto;
+    }
+
+    &__driver-name {
+        font-family: 'Titillium Web', sans-serif;
+        font-size: clamp(0.88rem, 1.5vw, 1rem);
+        font-weight: 600;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__driver-statuses {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+    }
+
+    &__status-toggle,
+    &__fastest-lap {
+        border: 1px solid $neutral-black-15;
+        background-color: $neutral-white-85;
+        border-radius: 999px;
+        min-height: 2rem;
+        color: $content-secondary;
+        cursor: pointer;
+    }
+
+    &__status-toggle {
+        padding: 0.25rem 0.65rem;
+        font-family: 'Formula 1', sans-serif;
+        font-size: 0.72rem;
+
+        &--active {
+            background-color: $surface-contrast;
+            color: $content-inverse;
+            border-color: $surface-contrast;
+        }
+    }
+
+    &__fastest-lap {
+        width: 2.2rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: $state-fastest-lap;
+
+        & svg {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        &:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        &--active {
+            background-color: $surface-fastest-lap-soft;
+            border-color: $stroke-fastest-lap;
+            color: $state-fastest-lap;
+        }
+    }
+}
+
+@media (max-width: 1024px) {
+    .app-results-session-editor {
+        &__header,
+        &__driver-row {
+            grid-template-columns: 1.3rem 4rem 3.5rem minmax(10rem, 1fr) minmax(10rem, 1fr) auto;
+            gap: 0.45rem;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .app-results-session-editor {
+        &__header {
+            display: none;
+        }
+
+        &__driver-row {
+            grid-template-columns: 1.2rem 3.7rem 3.3rem 1fr;
+            grid-template-areas:
+                'grip pos number main'
+                'statuses statuses statuses fastest';
+            row-gap: 0.55rem;
+        }
+
+        &__driver-grip {
+            grid-area: grip;
+        }
+
+        &__driver-position {
+            grid-area: pos;
+        }
+
+        &__driver-number {
+            grid-area: number;
+        }
+
+        &__driver-main {
+            grid-area: main;
+        }
+
+        &__driver-statuses {
+            grid-area: statuses;
+        }
+
+        &__fastest-lap {
+            grid-area: fastest;
+            justify-self: end;
+        }
+    }
+}

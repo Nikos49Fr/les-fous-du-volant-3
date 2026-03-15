@@ -5,34 +5,34 @@
     justify-content: space-around;
     align-items: center;
     gap: clamp(0.5rem, 1vw, 2rem);
-    background-color: $color-accent;
-    color: $color-text;
+    background-color: $action-primary;
+    color: $content-primary;
     padding: 0 0.5rem;
 
     &--upcoming {
-        background-color: $color-bg-alt2;
-        color: $color-text-alt;
+        background-color: $surface-contrast;
+        color: $content-inverse;
     }
 
     &--today {
-        background-color: $color-accent-hover;
-        color: $color-text-muted;
+        background-color: $action-success;
+        color: $content-secondary;
     }
 
     &--live {
-        background-color: $color-accent;
-        color: $color-text;
+        background-color: $action-primary;
+        color: $content-primary;
     }
 
     &--season-ended {
-        background-color: $color-bg-alt4;
-        color: $color-text-alt;
+        background-color: $surface-strong;
+        color: $content-inverse;
     }
 
     &__link {
-        color: $color-link-hover;
+        color: $content-link-hover;
         &:hover {
-            color: $color-link;
+            color: $content-link;
         }
     }
 
@@ -46,7 +46,7 @@
     }
 
     &__flag {
-        border: 1px solid $color-bg;
+        border: 1px solid $surface-base;
     }
 
     &__time,
@@ -73,8 +73,8 @@
         gap: 0.4rem;
         margin-left: 0.6rem;
         padding: 0.2rem 0.6rem;
-        background-color: $color-text-alt;
-        color: $color-text;
+        background-color: $content-inverse;
+        color: $content-primary;
         border-radius: 999px;
         font-family: 'Formula 1', sans-serif;
         font-size: clamp(10px, 1.3vw, 16px);
@@ -86,7 +86,7 @@
             width: 0.45em;
             height: 0.45em;
             border-radius: 50%;
-            background-color: $color-accent;
+            background-color: $action-primary;
             display: inline-block;
         }
     }

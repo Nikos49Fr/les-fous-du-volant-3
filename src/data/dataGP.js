@@ -1,4 +1,4 @@
-export const GP_NAMES = [
+﻿export const GP_NAMES = [
     { id: 0, country: '', flag: '', name: '' },
     {
         id: 1,

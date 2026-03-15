@@ -27,9 +27,9 @@
         &-input {
             flex: 1 1 auto;
             min-width: 0;
-            border: 1px solid $color-border;
-            background-color: $color-bg-alt2;
-            color: $color-text-alt;
+            border: 1px solid $stroke-default;
+            background-color: $surface-contrast;
+            color: $content-inverse;
             border-radius: 6px;
             padding: clamp(0.45rem, 1.3vw, 0.6rem) clamp(0.6rem, 1.5vw, 0.8rem);
             font-family: 'Titillium Web', sans-serif;
@@ -37,9 +37,9 @@
         }
 
         &-button {
-            border: 1px solid $color-border;
-            background-color: $color-bg-alt3;
-            color: $color-text-alt;
+            border: 1px solid $stroke-default;
+            background-color: $surface-elevated;
+            color: $content-inverse;
             border-radius: 6px;
             padding: clamp(0.45rem, 1.3vw, 0.6rem) clamp(0.75rem, 1.8vw, 1rem);
             font-family: 'Formula 1', sans-serif;
@@ -47,16 +47,16 @@
             cursor: pointer;
 
             &:hover {
-                border-color: $color-accent;
+                border-color: $action-primary;
             }
         }
     }
 
     &__table-wrap {
         overflow-x: auto;
-        border: 1px solid $color-border;
+        border: 1px solid $stroke-default;
         border-radius: 8px;
-        background-color: $color-bg-alt2;
+        background-color: $surface-contrast;
     }
 
     &__table {
@@ -66,7 +66,7 @@
 
         & th,
         & td {
-            border-bottom: 1px solid $color-border;
+            border-bottom: 1px solid $stroke-default;
             padding: 0.55rem 0.6rem;
         }
 
@@ -103,7 +103,7 @@
         height: 2rem;
         border-radius: 999px;
         object-fit: cover;
-        border: 1px solid $color-border;
+        border: 1px solid $stroke-default;
     }
 
     &__user-meta {
@@ -116,15 +116,15 @@
     &__user-name {
         font-family: 'Titillium Web', sans-serif;
         font-weight: 600;
-        color: $color-text-alt;
+        color: $content-inverse;
         font-size: clamp(0.88rem, 1.8vw, 1rem);
     }
 
     &__badge {
         display: inline-flex;
         width: fit-content;
-        border: 1px solid $color-accent;
-        color: $color-accent;
+        border: 1px solid $action-primary;
+        color: $action-primary;
         border-radius: 999px;
         font-size: clamp(0.64rem, 1.2vw, 0.76rem);
         padding: 0.08rem 0.45rem;
@@ -140,7 +140,7 @@
         & input {
             width: clamp(1rem, 1.8vw, 1.15rem);
             height: clamp(1rem, 1.8vw, 1.15rem);
-            accent-color: $color-accent;
+            accent-color: $action-primary;
             cursor: pointer;
 
             &:disabled {
@@ -157,7 +157,7 @@
         font-size: clamp(0.85rem, 1.6vw, 0.95rem);
 
         &--error {
-            color: $color-accent;
+            color: $action-primary;
         }
     }
 }

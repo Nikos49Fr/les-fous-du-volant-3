@@ -1,4 +1,4 @@
-import './AdminPermissions.scss';
+﻿import './AdminPermissions.scss';
 import { useEffect, useMemo, useState } from 'react';
 import Title from '../../ui/Title/Title';
 import {
@@ -6,7 +6,7 @@ import {
     setUserCapability,
 } from '../../../utils/adminPermissionsApi';
 
-const BASE_CAPABILITIES = ['calendar.write'];
+const BASE_CAPABILITIES = ['calendar.write', 'results.write'];
 
 function normalizeCapabilityId(value) {
     return String(value ?? '')
@@ -74,11 +74,11 @@ export default function AdminPermissions() {
                 if (!active) return;
                 if (error.status === 403) {
                     setLoadError(
-                        'Accès refusé. Section réservée au super-admin.',
+                        'AccÃ¨s refusÃ©. Section rÃ©servÃ©e au super-admin.',
                     );
                 } else {
                     setLoadError(
-                        "Chargement impossible. Vérifie l'authentification et réessaie.",
+                        "Chargement impossible. VÃ©rifie l'authentification et rÃ©essaie.",
                     );
                 }
             } finally {
@@ -149,7 +149,7 @@ export default function AdminPermissions() {
                 }),
             );
         } catch (error) {
-            setSaveError(error.message ?? 'Modification refusée');
+            setSaveError(error.message ?? 'Modification refusÃ©e');
         } finally {
             setSavingCells((current) => ({ ...current, [cellKey]: false }));
         }
@@ -175,7 +175,7 @@ export default function AdminPermissions() {
                                 className="app-admin-permissions__toolbar-label"
                                 htmlFor="new-capability"
                             >
-                                Ajouter une capacité
+                                Ajouter une capacitÃ©
                             </label>
                             <div className="app-admin-permissions__toolbar-row">
                                 <input
@@ -298,3 +298,4 @@ export default function AdminPermissions() {
         </section>
     );
 }
+

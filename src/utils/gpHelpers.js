@@ -1,4 +1,4 @@
-import { GP_DATES, GP_NAMES } from '../data/dataGP';
+﻿import { GP_DATES, GP_NAMES } from '../data/dataGP';
 
 const DATE_FORMAT_OPTIONS = {
     day: 'numeric',
@@ -32,20 +32,16 @@ function normalizeRevealedIds(revealedIds) {
     return valid ? normalized : null;
 }
 
-// Returns a formatted label like "8 mars 20h30".
 function formatGpDate(dateTime, locale = 'fr-FR') {
     const date = new Date(dateTime);
-    const datePart = new Intl.DateTimeFormat(
-        locale,
-        DATE_FORMAT_OPTIONS,
-    ).format(date);
-    const timePart = new Intl.DateTimeFormat(
-        locale,
-        TIME_FORMAT_OPTIONS,
-    ).format(date);
-    const formatted = `${datePart} ${timePart.replace(':', 'h')}`;
+    const datePart = new Intl.DateTimeFormat(locale, DATE_FORMAT_OPTIONS).format(
+        date,
+    );
+    const timePart = new Intl.DateTimeFormat(locale, TIME_FORMAT_OPTIONS).format(
+        date,
+    );
 
-    return formatted.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return `${datePart} ${timePart.replace(':', 'h')}`;
 }
 
 function isSameDay(a, b) {
@@ -120,10 +116,7 @@ function getCountdown(now, gpStartDateTime) {
     return { days, hours, minutes, seconds };
 }
 
-export function getActiveGpDisplay(
-    now = new Date(),
-    revealedIds,
-) {
+export function getActiveGpDisplay(now = new Date(), revealedIds) {
     const { gp, status } = getActiveGp(now, revealedIds);
 
     if (!gp) {
@@ -150,26 +143,26 @@ export function getActiveGpDisplay(
         countdown.days > 0
             ? `${countdown.days}j ${countdown.hours}h ${countdown.minutes}min ${countdown.seconds}s`
             : countdown.hours > 0
-            ? `${countdown.hours}h ${countdown.minutes}min ${countdown.seconds}s`
-            : countdown.minutes > 0
-            ? `${countdown.minutes}min ${countdown.seconds}s`
-            : `${countdown.seconds}s`;
+              ? `${countdown.hours}h ${countdown.minutes}min ${countdown.seconds}s`
+              : countdown.minutes > 0
+                ? `${countdown.minutes}min ${countdown.seconds}s`
+                : `${countdown.seconds}s`;
 
     const statusLabel =
         status === 'live'
             ? 'Grand Prix en cours'
             : status === 'unknown'
-            ? 'Saison terminée'
-            : countdownLabel;
+              ? 'Saison terminée'
+              : countdownLabel;
 
     const phase =
         status === 'live'
             ? 'live'
             : status === 'unknown'
-            ? 'season-ended'
-            : isSameDay(now, start)
-            ? 'today'
-            : 'upcoming';
+              ? 'season-ended'
+              : isSameDay(now, start)
+                ? 'today'
+                : 'upcoming';
 
     return {
         gp,

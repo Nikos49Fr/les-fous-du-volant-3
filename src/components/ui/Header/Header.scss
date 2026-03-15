@@ -11,7 +11,7 @@
         position: relative;
         width: 100%;
         aspect-ratio: 1920 / 159;
-        background-color: $color-text;
+        background-color: $content-primary;
         overflow: hidden;
 
         &-bg {
@@ -31,9 +31,9 @@
             top: 20%;
             max-width: 23.3%;
             width: 100%;
-            color: $color-bg;
-            color: $color-text;
-            color: $color-border;
+            color: $surface-base;
+            color: $content-primary;
+            color: $stroke-default;
             text-align: center;
             display: flex;
             flex-direction: column;

@@ -1,8 +1,8 @@
 @use '../../../styles/variables' as *;
 
 .app-title {
-    background-color: $color-bg-alt2;
-    color: $color-text-alt;
+    background-color: $surface-contrast;
+    color: $content-inverse;
     width: 100%;
     height: 48px;
     max-height: 6vw;
@@ -11,7 +11,7 @@
     justify-content: center;
     overflow: hidden;
     gap: 0.5rem;
-    border-bottom: 2px solid $color-border;
+    border-bottom: 2px solid $stroke-default;
 
     &__content {
         padding: 0 2rem;
@@ -22,7 +22,7 @@
     &__slash {
         width: 3%;
         height: 3rem;
-        background: linear-gradient(180deg, $color-bg-alt2, $color-bg-alt4);
+        background: linear-gradient(180deg, $surface-contrast, $surface-strong);
         transform: skewX(-20deg);
         display: inline-block;
     }

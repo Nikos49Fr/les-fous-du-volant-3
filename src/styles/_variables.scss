@@ -1,26 +1,93 @@
-$color-bg: #ffffff;
-$color-bg-alt: #e0dedc;
-$color-bg-alt2: #1c1c25;
-$color-bg-alt3: #303037;
-$color-bg-alt4: #47464c;
+﻿// $color-bg: #ffffff;
+// $color-bg-alt: #e0dedc;
+// $color-bg-alt2: #1c1c25;
+// $color-bg-alt3: #303037;
+// $color-bg-alt4: #47464c;
 
-$color-text: #000000;
-$color-text-muted: #15151e;
-$color-text-alt: #ffffff;
-$color-text-alt2: #e0dedc;
+// $color-text: #000000;
+// $color-text-muted: #15151e;
+// $color-text-alt: #ffffff;
+// $color-text-alt2: #e0dedc;
 
-$color-accent: #e10600;
-$color-accent-hover: #00e6a8;
+// $color-accent: #e10600;
+// $color-accent-hover: #00e6a8;
 
-$color-link: #404bdd;
-$color-link-hover: #00e6a8;
-$color-link-border: #e10600;
+// $color-link: #404bdd;
+// $color-link-hover: #00e6a8;
+// $color-link-border: #e10600;
 
-$color-border: #303037;
+// $color-border: #303037;
 
-$color-twitch: #9146ff;
+// $color-twitch: #9146ff;
 
-// Team colors
+// // Team colors
+// $color-team-mclaren: #f47600;
+// $color-team-red-bull: #4781d7;
+// $color-team-mercedes: #00d7b6;
+// $color-team-ferrari: #ed1131;
+// $color-team-williams: #1868db;
+// $color-team-aston-martin: #229971;
+// $color-team-kick-sauber: #01c00e;
+// $color-team-haas: #9c9fa2;
+// $color-team-alpine: #00a1e8;
+// $color-team-racing-bulls: #6c98ff;
+
+// Semantic colors
+$surface-base: #ffffff;
+$surface-subtle: #e0dedc;
+$surface-contrast: #1c1c25;
+$surface-elevated: #303037;
+$surface-strong: #47464c;
+$surface-nav: #050505;
+$surface-nav-active: #222222;
+$surface-fastest-lap-soft: rgba(145, 70, 255, 0.18);
+$surface-fastest-lap: rgba(145, 70, 255, 0.22);
+
+$content-primary: #000000;
+$content-secondary: #15151e;
+$content-inverse: #ffffff;
+$content-soft: #e0dedc;
+$content-link: #404bdd;
+$content-link-hover: #00e6a8;
+$content-fastest-lap: #d9c2ff;
+
+$stroke-default: #303037;
+$stroke-link: #e10600;
+$stroke-divider: rgba(255, 255, 255, 0.14);
+$stroke-active: rgba(255, 255, 255, 0.75);
+$stroke-fastest-lap: rgba(145, 70, 255, 0.55);
+$stroke-fastest-lap-strong: rgba(145, 70, 255, 0.65);
+
+$action-primary: #e10600;
+$action-success: #00e6a8;
+$state-success-strong: #3ec06b;
+$state-fastest-lap: #6e39d6;
+$brand-twitch: #9146ff;
+
+$neutral-black: #000000;
+$neutral-black-08: rgba(0, 0, 0, 0.08);
+$neutral-black-15: rgba(0, 0, 0, 0.15);
+$neutral-black-24: rgba(0, 0, 0, 0.24);
+$neutral-black-30: rgba(0, 0, 0, 0.3);
+$neutral-black-45: rgba(0, 0, 0, 0.45);
+$neutral-black-55: rgba(0, 0, 0, 0.55);
+$neutral-black-62: rgba(0, 0, 0, 0.62);
+
+$neutral-white: #ffffff;
+$neutral-white-06: rgba(255, 255, 255, 0.06);
+$neutral-white-12: rgba(255, 255, 255, 0.12);
+$neutral-white-14: rgba(255, 255, 255, 0.14);
+$neutral-white-60: rgba(255, 255, 255, 0.6);
+$neutral-white-70: rgba(255, 255, 255, 0.7);
+$neutral-white-75: rgba(255, 255, 255, 0.75);
+$neutral-white-78: rgba(255, 255, 255, 0.78);
+$neutral-white-85: rgba(255, 255, 255, 0.85);
+$neutral-white-88: rgba(255, 255, 255, 0.88);
+$neutral-white-94: rgba(255, 255, 255, 0.94);
+
+$shadow-accent-success-glow: rgba(#00e6a8, 0.35);
+$surface-transparent: rgba(0, 0, 0, 0);
+
 $team-mclaren: #f47600;
 $team-red-bull: #4781d7;
 $team-mercedes: #00d7b6;

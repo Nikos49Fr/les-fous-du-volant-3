@@ -1,8 +1,8 @@
 @use '../../../styles/variables' as *;
 
 .app-header__nav {
-    background-color: $color-text;
-    color: $color-bg;
+    background-color: $content-primary;
+    color: $surface-base;
     box-sizing: border-box;
     display: flex;
     justify-content: space-around;
@@ -10,16 +10,16 @@
     padding: 0.5rem 0;
     font-family: 'Formula 1', sans-serif;
     font-size: clamp(8px, 1.2vw, 16px);
-    border-bottom: solid 2px $color-border;
+    border-bottom: solid 2px $stroke-default;
 
     &-link {
         border-bottom: solid 2px transparent;
 
         &--active {
-            border-bottom: solid 2px $color-accent;
+            border-bottom: solid 2px $action-primary;
         }
         &:hover {
-            border-bottom: solid 2px $color-accent;
+            border-bottom: solid 2px $action-primary;
         }
     }
 }

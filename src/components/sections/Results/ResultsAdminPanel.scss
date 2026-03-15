@@ -1,0 +1,149 @@
+@use '../../../styles/variables' as *;
+
+.app-results-panel {
+    border: 1px solid $stroke-default;
+    background-color: $surface-contrast;
+    border-radius: 10px;
+    padding: clamp(0.75rem, 2vw, 1rem);
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+
+    &__toolbar {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 0;
+    }
+
+    &__select {
+        position: relative;
+
+        &-trigger {
+            width: 100%;
+            min-height: 2.85rem;
+            border: 1px solid $surface-elevated;
+            border-right: none;
+            border-radius: 8px 0 0 8px;
+            background-color: $surface-base;
+            color: $content-inverse;
+            padding: 0.45rem 0.8rem;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        &-trigger-content,
+        &-option {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        &-flag {
+            flex: 0 0 auto;
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        &-label {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-family: 'Formula 1', sans-serif;
+            font-size: clamp(0.74rem, 1.4vw, 0.88rem);
+        }
+
+        &-menu {
+            position: absolute;
+            top: calc(100% + 0.3rem);
+            left: 0;
+            right: 0;
+            z-index: 30;
+            margin: 0;
+            padding: 0.35rem;
+            list-style: none;
+            background-color: $surface-base;
+            border: 1px solid $surface-elevated;
+            border-radius: 8px;
+            max-height: 14rem;
+            overflow-y: auto;
+        }
+
+        &-option {
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            color: $content-inverse;
+            padding: 0.45rem 0.55rem;
+            cursor: pointer;
+            text-align: left;
+
+            &--active,
+            &:hover {
+                background-color: $surface-elevated;
+            }
+        }
+    }
+
+    &__save {
+        width: 2.85rem;
+        min-height: 2.85rem;
+        border: 1px solid $surface-elevated;
+        border-radius: 0 8px 8px 0;
+        background-color: $surface-base;
+        color: $state-success-strong;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        & svg {
+            width: 1.4rem;
+            height: 1.4rem;
+        }
+    }
+
+    &__session-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+    }
+
+    &__session-tab {
+        border: 1px solid $stroke-default;
+        border-radius: 999px;
+        background-color: $surface-base;
+        color: $content-primary;
+        padding: 0.45rem 0.8rem;
+        font-family: 'Formula 1', sans-serif;
+        font-size: clamp(0.72rem, 1.3vw, 0.84rem);
+        cursor: pointer;
+
+        &--active {
+            border-color: $action-primary;
+            color: $action-primary;
+        }
+    }
+
+    &__content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    &__error {
+        margin: 0;
+        color: $action-primary;
+    }
+}
+
+@media (max-width: 768px) {
+    .app-results-panel {
+        padding: 0.75rem;
+    }
+}

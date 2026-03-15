@@ -2,8 +2,8 @@
 
 @mixin hover-accent {
     &:hover {
-        color: $color-accent-hover;
-        text-shadow: 0 0 6px rgba($color-accent-hover, 0.35);
+        color: $action-success;
+        text-shadow: 0 0 6px $shadow-accent-success-glow;
         transition: color 150ms ease, text-shadow 150ms ease;
     }
 }

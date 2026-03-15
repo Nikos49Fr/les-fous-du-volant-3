@@ -18,27 +18,27 @@
         background: transparent;
         margin: 0;
         font-size: $auth-font-size;
-        color: $color-bg;
+        color: $surface-base;
         cursor: pointer;
         border: none;
 
         &:hover {
-            color: $color-accent-hover;
+            color: $action-success;
         }
         &:hover .app-auth__icon {
             fill: currentColor;
         }
         &:hover .app-auth__icon--twitch {
-            fill: $color-twitch;
+            fill: $brand-twitch;
         }
         &:hover .app-auth__icon--logout {
-            fill: $color-accent;
+            fill: $action-primary;
         }
     }
 
     &__button--logout {
         &:hover {
-            color: $color-accent;
+            color: $action-primary;
         }
     }
 
@@ -47,26 +47,26 @@
         align-items: center;
         gap: clamp(0.35rem, 1vw, 0.55rem);
         min-height: $chip-height;
-        background: $color-bg-alt3;
+        background: $surface-elevated;
         padding: 0 clamp(0.6rem, 1.4vw, 0.75rem);
         border-radius: 999px;
         box-sizing: border-box;
     }
 
     &__chip--login:hover {
-        background: $color-bg-alt4;
+        background: $surface-strong;
     }
 
     &__chip--logout:hover {
-        background: $color-bg-alt2;
+        background: $surface-contrast;
     }
 
     &__chip--admin:hover {
-        background: $color-bg-alt4;
+        background: $surface-strong;
     }
 
     &__chip--user {
-        background: $color-bg-alt2;
+        background: $surface-contrast;
     }
 
     &__icon {
@@ -76,7 +76,7 @@
         fill: currentColor;
 
         &--twitch {
-            fill: $color-twitch;
+            fill: $brand-twitch;
         }
     }
 
@@ -84,14 +84,14 @@
         width: clamp(1.15rem, 1.7vw, 1.35rem);
         height: clamp(1.15rem, 1.7vw, 1.35rem);
         border-radius: 50%;
-        border: 1px solid $color-bg;
+        border: 1px solid $surface-base;
         object-fit: cover;
     }
 
     &__name,
     &__status {
         font-size: $auth-font-size;
-        color: $color-bg;
+        color: $surface-base;
     }
 
     &--connected {
