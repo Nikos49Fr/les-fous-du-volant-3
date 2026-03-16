@@ -12,6 +12,7 @@
         display: flex;
         flex-direction: column;
         gap: clamp(1rem, 2vw, 1.5rem);
+        padding: clamp(0.1rem, 2vw, 1.25rem);
     }
 
     &__tabs {
@@ -98,6 +99,13 @@
         gap: 1rem;
     }
 
+    &__tables-grid {
+        display: grid;
+        grid-template-columns: auto auto;
+        justify-content: center;
+        gap: clamp(1rem, 2vw, 4rem);
+    }
+
     &__error {
         color: $action-primary;
     }
@@ -105,21 +113,87 @@
     &__entity {
         display: inline-flex;
         align-items: center;
-        gap: 0.6rem;
+        // gap: 0.6rem;
         min-width: 0;
     }
 
+    &__entity-driver-thumb {
+        width: 4rem;
+        height: 3rem;
+        overflow: hidden;
+        border-radius: 6px 6px 0 0;
+        flex: 0 0 auto;
+        align-self: flex-end;
+    }
+
+    &__entity-driver-thumb-image {
+        display: block;
+        height: 6rem;
+        width: 4rem;
+    }
+
     &__entity-logo {
-        width: 1.3rem;
-        height: 1.3rem;
+        width: 0.95rem;
+        height: 0.95rem;
         object-fit: contain;
         flex: 0 0 auto;
+    }
+
+    &__entity-logo-pill {
+        width: 1.5rem;
+        height: 1.5rem;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+
+        &--team-mclaren {
+            background-color: $team-mclaren;
+        }
+
+        &--team-red-bull {
+            background-color: $team-red-bull;
+        }
+
+        &--team-mercedes {
+            background-color: $team-mercedes;
+        }
+
+        &--team-ferrari {
+            background-color: $team-ferrari;
+        }
+
+        &--team-williams {
+            background-color: $team-williams;
+        }
+
+        &--team-aston-martin {
+            background-color: $team-aston-martin;
+        }
+
+        &--team-kick-sauber {
+            background-color: $team-kick-sauber;
+        }
+
+        &--team-haas {
+            background-color: $team-haas;
+        }
+
+        &--team-alpine {
+            background-color: $team-alpine;
+        }
+
+        &--team-racing-bulls {
+            background-color: $team-racing-bulls;
+        }
     }
 
     &__entity-text {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        font-size: clamp(0.76rem, 1.35vw, 0.95rem);
     }
 
     &__grid {
@@ -156,7 +230,7 @@
         border-radius: 999px;
         padding: 0.15rem 0.55rem;
         font-family: 'Formula 1', sans-serif;
-        font-size: 0.72rem;
+        font-size: clamp(0.64rem, 1.1vw, 0.72rem);
         color: $content-inverse;
     }
 
@@ -173,7 +247,7 @@
         color: $content-fastest-lap;
         border-radius: 999px;
         padding: 0.2rem 0.55rem;
-        font-size: 0.72rem;
+        font-size: clamp(0.64rem, 1.1vw, 0.72rem);
         white-space: nowrap;
 
         & svg {
@@ -223,6 +297,11 @@
 
         &__tabs-main {
             min-width: 0;
+        }
+
+        &__tables-grid {
+            grid-template-columns: auto;
+            justify-items: center;
         }
     }
 }

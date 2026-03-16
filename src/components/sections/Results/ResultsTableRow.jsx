@@ -1,22 +1,17 @@
-﻿export default function ResultsTableRow({ row, columns, gridTemplateColumns }) {
+export default function ResultsTableRow({ row, columns, hasTagColumn }) {
     return (
-        <div
-            className={`app-results-table__row app-results-table__row--team-${row.teamModifier ?? 'neutral'}`}
-        >
-            <div
-                className="app-results-table__row-grid"
-                style={{ gridTemplateColumns }}
-            >
-                {columns.map((column) => (
-                    <div
-                        key={`${row.id}-${column.key}`}
-                        className={`app-results-table__cell ${column.className ?? ''} ${row.cellClassNames?.[column.key] ?? ''}`.trim()}
-                    >
-                        {row.cells[column.key]}
-                    </div>
-                ))}
-            </div>
-            {row.tag ? <div className="app-results-table__tag-wrap">{row.tag}</div> : null}
-        </div>
+        <tr className={`app-results-table__row app-results-table__row--team-${row.teamModifier ?? 'neutral'}`}>
+            {columns.map((column) => (
+                <td
+                    key={`${row.id}-${column.key}`}
+                    className={`app-results-table__cell ${column.className ?? ''} ${row.cellClassNames?.[column.key] ?? ''}`.trim()}
+                >
+                    {row.cells[column.key]}
+                </td>
+            ))}
+            {hasTagColumn ? (
+                <td className="app-results-table__tag-wrap">{row.tag ?? null}</td>
+            ) : null}
+        </tr>
     );
 }

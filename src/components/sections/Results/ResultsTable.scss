@@ -1,14 +1,23 @@
-﻿@use '../../../styles/variables' as *;
+@use '../../../styles/variables' as *;
 
 .app-results-table {
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
+    align-items: center;
+    width: fit-content;
+    max-width: 100%;
+    font-family: 'Formula 1', sans-serif;
 
     &__title {
         margin: 0;
-        font-family: 'Formula 1', sans-serif;
+        min-height: 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 1rem;
+        border-bottom: 1px solid $stroke-default;
         font-size: clamp(0.88rem, 1.7vw, 1.05rem);
+        text-align: center;
     }
 
     &__frame {
@@ -16,119 +25,165 @@
         border: 1px solid $stroke-default;
         border-radius: 10px;
         overflow: hidden;
+        width: fit-content;
+        max-width: 100%;
     }
 
-    &__head,
-    &__row-grid {
-        display: grid;
-        gap: 0.75rem;
-        align-items: center;
-        padding: 0 0.85rem;
+    &__table {
+        border-collapse: collapse;
+        table-layout: fixed;
+        width: auto;
+        max-width: 100%;
+
+        col {
+            width: var(--column-width, auto);
+        }
     }
 
-    &__head {
-        min-height: 3rem;
+    &__tag-col {
+        width: auto;
+    }
+
+    thead tr {
         border-bottom: 1px solid $stroke-default;
-        font-family: 'Formula 1', sans-serif;
-        font-size: clamp(0.7rem, 1.4vw, 0.82rem);
+    }
+
+    tbody tr + tr {
+        border-top: 1px solid $neutral-white-06;
+    }
+
+    &__head-cell,
+    &__cell,
+    &__tag-wrap {
+        padding: clamp(0.45rem, 1.3vw, 0.85rem);
+        font-size: clamp(0.82rem, 1.55vw, 0.95rem);
+        color: $content-inverse;
+        vertical-align: middle;
     }
 
     &__head-cell {
+        min-height: 3rem;
         color: $neutral-white-78;
-        text-transform: uppercase;
+        font-size: clamp(0.7rem, 1.4vw, 0.82rem);
         letter-spacing: 0.02em;
+        text-align: center;
+        font-weight: 400;
+        white-space: nowrap;
     }
 
-    &__body {
-        display: flex;
-        flex-direction: column;
+    &__head-cell--tag {
+        width: 0.1rem;
+        padding-inline: 0.4rem 0.85rem;
     }
 
     &__row {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
-        align-items: center;
-        min-width: 0;
-
-        & + & {
-            border-top: 1px solid $neutral-white-06;
-        }
-
         &--team-mclaren {
-            background: linear-gradient(90deg, rgba($team-mclaren, 0.18), $surface-transparent);
+            background: linear-gradient(
+                90deg,
+                $team-mclaren,
+                $surface-transparent
+            );
         }
 
         &--team-red-bull {
-            background: linear-gradient(90deg, rgba($team-red-bull, 0.18), $surface-transparent);
+            background: linear-gradient(
+                90deg,
+                $team-red-bull,
+                $surface-transparent
+            );
         }
 
         &--team-mercedes {
-            background: linear-gradient(90deg, rgba($team-mercedes, 0.18), $surface-transparent);
+            background: linear-gradient(
+                90deg,
+                $team-mercedes,
+                $surface-transparent
+            );
         }
 
         &--team-ferrari {
-            background: linear-gradient(90deg, rgba($team-ferrari, 0.18), $surface-transparent);
+            background: linear-gradient(
+                90deg,
+                $team-ferrari,
+                $surface-transparent
+            );
         }
 
         &--team-williams {
-            background: linear-gradient(90deg, rgba($team-williams, 0.18), $surface-transparent);
+            background: linear-gradient(
+                90deg,
+                $team-williams,
+                $surface-transparent
+            );
         }
 
         &--team-aston-martin {
-            background: linear-gradient(90deg, rgba($team-aston-martin, 0.18), $surface-transparent);
+            background: linear-gradient(
+                90deg,
+                $team-aston-martin,
+                $surface-transparent
+            );
         }
 
         &--team-kick-sauber {
-            background: linear-gradient(90deg, rgba($team-kick-sauber, 0.18), $surface-transparent);
+            background: linear-gradient(
+                90deg,
+                $team-kick-sauber,
+                $surface-transparent
+            );
         }
 
         &--team-haas {
-            background: linear-gradient(90deg, rgba($team-haas, 0.18), $surface-transparent);
+            background: linear-gradient(
+                90deg,
+                $team-haas,
+                $surface-transparent
+            );
         }
 
         &--team-alpine {
-            background: linear-gradient(90deg, rgba($team-alpine, 0.18), $surface-transparent);
+            background: linear-gradient(
+                90deg,
+                $team-alpine,
+                $surface-transparent
+            );
         }
 
         &--team-racing-bulls {
-            background: linear-gradient(90deg, rgba($team-racing-bulls, 0.18), $surface-transparent);
+            background: linear-gradient(
+                90deg,
+                $team-racing-bulls,
+                $surface-transparent
+            );
         }
-    }
-
-    &__row-grid {
-        min-height: 3.3rem;
     }
 
     &__cell {
         min-width: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: clamp(0.82rem, 1.55vw, 0.95rem);
-        color: $content-inverse;
+        text-align: center;
     }
 
-    &__cell:first-child,
-    &__head-cell:first-child,
-    &__cell:last-child,
-    &__head-cell:last-child {
-        justify-content: center;
-    }
-
-    &__cell:nth-child(4),
-    &__cell:nth-child(5) {
-        justify-content: flex-start;
+    &__cell--align-left {
+        text-align: left;
     }
 
     &__tag-wrap {
-        padding-right: 0.85rem;
         padding-left: 0.4rem;
+        padding-right: 0.85rem;
+        white-space: nowrap;
     }
 
     &__empty {
         margin: 0;
         padding: 1rem;
         color: $neutral-white-70;
+        font-size: clamp(0.78rem, 1.35vw, 0.9rem);
+    }
+
+    &--drivers {
+        .app-results-table__cell {
+            padding-block: 0;
+        }
     }
 }
 
@@ -209,18 +264,36 @@
 
 @media (max-width: 768px) {
     .app-results-table {
-        &__head,
-        &__row-grid {
-            gap: 0.5rem;
-            padding-inline: 0.5rem;
+        width: 100%;
+
+        &__frame {
+            width: 100%;
         }
 
-        &__row {
-            grid-template-columns: minmax(0, 1fr);
+        &__table {
+            width: 100%;
+
+            col {
+                width: var(--column-width-mobile, var(--column-width, auto));
+            }
         }
 
+        &__head-cell,
+        &__cell,
         &__tag-wrap {
-            padding: 0 0.5rem 0.65rem;
+            padding: clamp(0.35rem, 1vw, 0.5rem);
+        }
+
+        &__cell--team-logo-only-mobile {
+            text-align: center;
+
+            .app-results__entity {
+                justify-content: center;
+            }
+
+            .app-results__entity-text {
+                display: none;
+            }
         }
     }
 

@@ -22,41 +22,85 @@ import {
 } from '../../../utils/resultsHelpers';
 
 const RESULTS_MAIN_TAB_ADMIN = 'admin';
+const DRIVER_PROFILE_IMAGES = import.meta.glob(
+    '../../../assets/images/profils/*.webp',
+    {
+        eager: true,
+        import: 'default',
+    },
+);
+const DRIVER_PROFILE_IMAGE_BY_ID = Object.fromEntries(
+    Object.entries(DRIVER_PROFILE_IMAGES).map(([path, url]) => [
+        path.split('/').pop().replace('.webp', ''),
+        url,
+    ]),
+);
 
 const DRIVER_STANDINGS_COLUMNS = [
-    { key: 'position', label: 'POS.', width: '4.5rem' },
-    { key: 'number', label: 'NO.', width: '4.5rem' },
-    { key: 'driver', label: 'DRIVER', width: 'minmax(13rem, 1.35fr)' },
-    { key: 'team', label: 'TEAM', width: 'minmax(10rem, 1fr)' },
-    { key: 'points', label: 'PTS.', width: '5rem' },
+    { key: 'position', label: 'POS.', width: 'clamp(2.1rem, 4vw, 4.5rem)' },
+    { key: 'number', label: 'NO.', width: 'clamp(2.1rem, 4vw, 4.5rem)' },
+    {
+        key: 'driver',
+        label: 'Driver',
+        width: 'clamp(10.5rem, 23vw, 16rem)',
+        className: 'app-results-table__cell--align-left',
+    },
+    {
+        key: 'team',
+        label: 'Écurie',
+        width: 'clamp(8rem, 16vw, 11rem)',
+        mobileWidth: '2.5rem',
+        className:
+            'app-results-table__cell--align-left app-results-table__cell--team-logo-only-mobile',
+    },
+    { key: 'points', label: 'PTS.', width: 'clamp(2.4rem, 4.5vw, 5rem)' },
 ];
 
 const TEAM_STANDINGS_COLUMNS = [
-    { key: 'position', label: 'POS.', width: '4.5rem' },
-    { key: 'team', label: 'TEAM', width: 'minmax(12rem, 1fr)' },
-    { key: 'points', label: 'PTS.', width: '5rem' },
+    { key: 'position', label: 'POS.', width: 'clamp(2.1rem, 4vw, 4.5rem)' },
+    {
+        key: 'team',
+        label: 'Écurie',
+        width: 'clamp(9rem, 19vw, 12rem)',
+        className: 'app-results-table__cell--align-left',
+    },
+    { key: 'points', label: 'PTS.', width: 'clamp(2.4rem, 4.5vw, 5rem)' },
 ];
 
 const GP_RESULTS_COLUMNS = [
-    { key: 'position', label: 'POS.', width: '5.25rem' },
-    { key: 'grid', label: 'GRILLE', width: '6.5rem' },
-    { key: 'number', label: 'NO.', width: '4.5rem' },
-    { key: 'driver', label: 'DRIVER', width: 'minmax(13rem, 1.35fr)' },
-    { key: 'team', label: 'TEAM', width: 'minmax(10rem, 1fr)' },
-    { key: 'points', label: 'PTS.', width: '5rem' },
+    { key: 'position', label: 'POS.', width: 'clamp(2.2rem, 4.2vw, 5.25rem)' },
+    { key: 'grid', label: 'GRILLE', width: 'clamp(3.8rem, 7vw, 6.5rem)' },
+    { key: 'number', label: 'NO.', width: 'clamp(2.1rem, 4vw, 4.5rem)' },
+    { key: 'driver', label: 'DRIVER', width: 'clamp(10rem, 22vw, 13rem)' },
+    { key: 'team', label: 'TEAM', width: 'clamp(8rem, 15vw, 10rem)' },
+    { key: 'points', label: 'PTS.', width: 'clamp(2.4rem, 4.5vw, 5rem)' },
 ];
 
-function DriverCell({ driver }) {
+function DriverCell({ driver, showTeamLogo = true }) {
     const teamPresentation = getTeamPresentation(driver.team);
+    const driverProfileUrl = DRIVER_PROFILE_IMAGE_BY_ID[driver.id];
 
     return (
         <span className="app-results__entity">
-            {teamPresentation.logoUrl ? (
-                <img
-                    className="app-results__entity-logo"
-                    src={teamPresentation.logoUrl}
-                    alt={driver.team.name}
-                />
+            {driverProfileUrl ? (
+                <span className="app-results__entity-driver-thumb">
+                    <img
+                        className="app-results__entity-driver-thumb-image"
+                        src={driverProfileUrl}
+                        alt={driver.displayName}
+                    />
+                </span>
+            ) : null}
+            {showTeamLogo && teamPresentation.logoUrl ? (
+                <span
+                    className={`app-results__entity-logo-pill app-results__entity-logo-pill--team-${teamPresentation.colorModifier}`}
+                >
+                    <img
+                        className="app-results__entity-logo"
+                        src={teamPresentation.logoUrl}
+                        alt={driver.team.name}
+                    />
+                </span>
             ) : null}
             <span className="app-results__entity-text">{driver.displayName}</span>
         </span>
@@ -69,11 +113,15 @@ function TeamCell({ team }) {
     return (
         <span className="app-results__entity">
             {teamPresentation.logoUrl ? (
-                <img
-                    className="app-results__entity-logo"
-                    src={teamPresentation.logoUrl}
-                    alt={team.name}
-                />
+                <span
+                    className={`app-results__entity-logo-pill app-results__entity-logo-pill--team-${teamPresentation.colorModifier}`}
+                >
+                    <img
+                        className="app-results__entity-logo"
+                        src={teamPresentation.logoUrl}
+                        alt={team.name}
+                    />
+                </span>
             ) : null}
             <span className="app-results__entity-text">{team.name}</span>
         </span>
@@ -183,7 +231,7 @@ export default function Results() {
             cells: {
                 position: row.position,
                 number: row.driver.racingNumber,
-                driver: <DriverCell driver={row.driver} />,
+                driver: <DriverCell driver={row.driver} showTeamLogo={false} />,
                 team: <TeamCell team={row.driver.team} />,
                 points: row.points,
             },
@@ -332,14 +380,13 @@ export default function Results() {
                     {!isLoading && !loadError && resultsData ? (
                         <>
                             {activeTab === RESULTS_MAIN_TAB_TOURNAMENT ? (
-                                <div className="app-results__stack">
+                                <div className="app-results__tables-grid">
                                     <ResultsTable
-                                        title="Classement pilotes"
+                                        className="app-results-table--drivers"
                                         columns={DRIVER_STANDINGS_COLUMNS}
                                         rows={driverStandingsRows}
                                     />
                                     <ResultsTable
-                                        title="Classement écuries"
                                         columns={TEAM_STANDINGS_COLUMNS}
                                         rows={teamStandingsRows}
                                     />
