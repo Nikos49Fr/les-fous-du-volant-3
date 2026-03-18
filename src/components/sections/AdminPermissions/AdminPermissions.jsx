@@ -1,29 +1,22 @@
 ﻿import './AdminPermissions.scss';
 import { useEffect, useMemo, useState } from 'react';
 import Title from '../../ui/Title/Title';
+import AdminCapabilitiesPanel from './AdminCapabilitiesPanel';
+import AdminDriverLinksPanel from './AdminDriverLinksPanel';
 import {
     fetchAdminPermissions,
+    linkDriverToUser,
     setUserCapability,
 } from '../../../utils/adminPermissionsApi';
 
 const BASE_CAPABILITIES = ['calendar.write', 'results.write'];
+const ADMIN_TAB_CAPABILITIES = 'capabilities';
+const ADMIN_TAB_DRIVERS = 'drivers';
 
 function normalizeCapabilityId(value) {
     return String(value ?? '')
         .trim()
         .toLowerCase();
-}
-
-function getCapabilityEnabled(user, capabilityId) {
-    if (!Array.isArray(user.capabilities)) {
-        return false;
-    }
-
-    const capability = user.capabilities.find(
-        (item) => item.capabilityId === capabilityId,
-    );
-
-    return capability?.enabled === true;
 }
 
 function upsertCapability(user, capability) {
@@ -52,12 +45,16 @@ function upsertCapability(user, capability) {
 
 export default function AdminPermissions() {
     const [users, setUsers] = useState([]);
+    const [drivers, setDrivers] = useState([]);
     const [customCapabilities, setCustomCapabilities] = useState([]);
     const [newCapability, setNewCapability] = useState('');
+    const [activeTab, setActiveTab] = useState(ADMIN_TAB_CAPABILITIES);
     const [isLoading, setIsLoading] = useState(true);
     const [loadError, setLoadError] = useState('');
     const [saveError, setSaveError] = useState('');
+    const [linkError, setLinkError] = useState('');
     const [savingCells, setSavingCells] = useState({});
+    const [linkingDriverId, setLinkingDriverId] = useState('');
 
     useEffect(() => {
         let active = true;
@@ -70,15 +67,14 @@ export default function AdminPermissions() {
                 const data = await fetchAdminPermissions();
                 if (!active) return;
                 setUsers(Array.isArray(data.users) ? data.users : []);
+                setDrivers(Array.isArray(data.drivers) ? data.drivers : []);
             } catch (error) {
                 if (!active) return;
                 if (error.status === 403) {
-                    setLoadError(
-                        'AccÃ¨s refusÃ©. Section rÃ©servÃ©e au super-admin.',
-                    );
+                    setLoadError('Accès refusé. Section réservée.');
                 } else {
                     setLoadError(
-                        "Chargement impossible. VÃ©rifie l'authentification et rÃ©essaie.",
+                        "Chargement impossible. Vérifie l'authentification et réessaie.",
                     );
                 }
             } finally {
@@ -116,6 +112,12 @@ export default function AdminPermissions() {
         );
     }, [users]);
 
+    const orderedDrivers = useMemo(() => {
+        return [...drivers].sort((a, b) =>
+            a.displayName.localeCompare(b.displayName),
+        );
+    }, [drivers]);
+
     function addCapabilityColumn() {
         const capabilityId = normalizeCapabilityId(newCapability);
         if (!capabilityId) {
@@ -149,9 +151,34 @@ export default function AdminPermissions() {
                 }),
             );
         } catch (error) {
-            setSaveError(error.message ?? 'Modification refusÃ©e');
+            setSaveError(error.message ?? 'Modification refusée');
         } finally {
             setSavingCells((current) => ({ ...current, [cellKey]: false }));
+        }
+    }
+
+    async function handleLinkDriver(driverId, linkedUserId) {
+        setLinkError('');
+        setLinkingDriverId(driverId);
+
+        try {
+            const result = await linkDriverToUser({ driverId, linkedUserId });
+
+            setDrivers((currentDrivers) =>
+                currentDrivers.map((driver) =>
+                    driver.driverId === driverId
+                        ? {
+                              ...driver,
+                              linkedUserId: result.linkedUserId,
+                              linkedUserDisplayName: result.linkedUserDisplayName,
+                          }
+                        : driver,
+                ),
+            );
+        } catch (error) {
+            setLinkError(error.message ?? 'Liaison impossible');
+        } finally {
+            setLinkingDriverId('');
         }
     }
 
@@ -170,127 +197,52 @@ export default function AdminPermissions() {
 
                 {!isLoading && !loadError ? (
                     <>
-                        <div className="app-admin-permissions__toolbar">
-                            <label
-                                className="app-admin-permissions__toolbar-label"
-                                htmlFor="new-capability"
+                        <div className="app-admin-permissions__tabs">
+                            <button
+                                className={`app-admin-permissions__tab${
+                                    activeTab === ADMIN_TAB_CAPABILITIES
+                                        ? ' app-admin-permissions__tab--active'
+                                        : ''
+                                }`}
+                                type="button"
+                                onClick={() => setActiveTab(ADMIN_TAB_CAPABILITIES)}
                             >
-                                Ajouter une capacitÃ©
-                            </label>
-                            <div className="app-admin-permissions__toolbar-row">
-                                <input
-                                    id="new-capability"
-                                    className="app-admin-permissions__toolbar-input"
-                                    type="text"
-                                    placeholder="ex: results.write"
-                                    value={newCapability}
-                                    onChange={(event) =>
-                                        setNewCapability(event.target.value)
-                                    }
-                                />
-                                <button
-                                    className="app-admin-permissions__toolbar-button"
-                                    type="button"
-                                    onClick={addCapabilityColumn}
-                                >
-                                    Ajouter
-                                </button>
-                            </div>
+                                Permissions
+                            </button>
+                            <button
+                                className={`app-admin-permissions__tab${
+                                    activeTab === ADMIN_TAB_DRIVERS
+                                        ? ' app-admin-permissions__tab--active'
+                                        : ''
+                                }`}
+                                type="button"
+                                onClick={() => setActiveTab(ADMIN_TAB_DRIVERS)}
+                            >
+                                Lier un pilote au profil Twitch
+                            </button>
                         </div>
 
-                        {saveError ? (
-                            <p className="app-admin-permissions__message app-admin-permissions__message--error">
-                                {saveError}
-                            </p>
-                        ) : null}
-
-                        <div className="app-admin-permissions__table-wrap">
-                            <table className="app-admin-permissions__table">
-                                <thead>
-                                    <tr>
-                                        <th>Utilisateur</th>
-                                        {capabilityIds.map((capabilityId) => (
-                                            <th key={capabilityId}>
-                                                {capabilityId}
-                                            </th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {orderedUsers.map((user) => (
-                                        <tr key={user.userId}>
-                                            <td className="app-admin-permissions__user-cell">
-                                                <div className="app-admin-permissions__user">
-                                                    {user.profileImageUrl ? (
-                                                        <img
-                                                            className="app-admin-permissions__avatar"
-                                                            src={
-                                                                user.profileImageUrl
-                                                            }
-                                                            alt={`Avatar ${user.displayName || user.login}`}
-                                                        />
-                                                    ) : null}
-                                                    <div className="app-admin-permissions__user-meta">
-                                                        <span className="app-admin-permissions__user-name">
-                                                            {user.displayName ||
-                                                                user.login}
-                                                        </span>
-                                                        {user.isSuperAdmin ? (
-                                                            <span className="app-admin-permissions__badge">
-                                                                super-admin
-                                                            </span>
-                                                        ) : null}
-                                                    </div>
-                                                </div>
-                                            </td>
-
-                                            {capabilityIds.map(
-                                                (capabilityId) => {
-                                                    const cellKey = `${user.userId}:${capabilityId}`;
-                                                    const checked =
-                                                        user.isSuperAdmin
-                                                            ? true
-                                                            : getCapabilityEnabled(
-                                                                  user,
-                                                                  capabilityId,
-                                                              );
-                                                    const disabled =
-                                                        user.isSuperAdmin ||
-                                                        savingCells[cellKey] ===
-                                                            true;
-
-                                                    return (
-                                                        <td key={cellKey}>
-                                                            <label className="app-admin-permissions__toggle">
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={
-                                                                        checked
-                                                                    }
-                                                                    disabled={
-                                                                        disabled
-                                                                    }
-                                                                    onChange={(
-                                                                        event,
-                                                                    ) =>
-                                                                        toggleCapability(
-                                                                            user,
-                                                                            capabilityId,
-                                                                            event
-                                                                                .target
-                                                                                .checked,
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </label>
-                                                        </td>
-                                                    );
-                                                },
-                                            )}
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                        <div className="app-admin-permissions__panel">
+                            {activeTab === ADMIN_TAB_CAPABILITIES ? (
+                                <AdminCapabilitiesPanel
+                                    users={orderedUsers}
+                                    capabilityIds={capabilityIds}
+                                    newCapability={newCapability}
+                                    saveError={saveError}
+                                    savingCells={savingCells}
+                                    onCapabilityInputChange={setNewCapability}
+                                    onAddCapability={addCapabilityColumn}
+                                    onToggleCapability={toggleCapability}
+                                />
+                            ) : (
+                                <AdminDriverLinksPanel
+                                    drivers={orderedDrivers}
+                                    users={orderedUsers}
+                                    linkError={linkError}
+                                    linkingDriverId={linkingDriverId}
+                                    onLinkDriver={handleLinkDriver}
+                                />
+                            )}
                         </div>
                     </>
                 ) : null}
@@ -298,4 +250,3 @@ export default function AdminPermissions() {
         </section>
     );
 }
-

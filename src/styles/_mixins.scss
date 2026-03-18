@@ -7,3 +7,20 @@
         transition: color 150ms ease, text-shadow 150ms ease;
     }
 }
+
+
+@mixin fluid-type($size, $line-height: null, $weight: null) {
+    font-size: $size;
+
+    @if $line-height != null {
+        line-height: $line-height;
+    }
+
+    @if $weight != null {
+        font-weight: $weight;
+    }
+}
+
+@mixin fluid-space($property, $value) {
+    #{$property}: $value;
+}

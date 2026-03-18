@@ -5,7 +5,7 @@ import { getActiveGpDisplay } from '../../../utils/gpHelpers';
 import { fetchRevealedGpIds } from '../../../utils/calendarApi';
 
 const USE_MOCK_NOW = false;
-const MOCK_NOW_ISO = '2026-03-22T23:30:01+01:00';
+const MOCK_NOW_ISO = '2026-03-22T20:30:01+01:00';
 
 export default function GpStatusBar() {
     const [now, setNow] = useState(

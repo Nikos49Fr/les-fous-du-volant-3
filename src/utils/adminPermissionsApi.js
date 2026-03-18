@@ -1,4 +1,4 @@
-import { supabase } from './supabaseClient';
+﻿import { supabase } from './supabaseClient';
 import { fetchCurrentViewer, syncCurrentProfile } from './authApi';
 
 function mapUserProfile(profile, capabilities) {
@@ -15,26 +15,50 @@ function mapUserProfile(profile, capabilities) {
     };
 }
 
-export async function fetchAdminPermissions() {
+function mapDriverRow(driver) {
+    return {
+        driverId: driver.id,
+        displayName: driver.display_name ?? '',
+        racingNumber: driver.racing_number ?? '',
+        linkedUserId: driver.linked_user_id ?? null,
+        linkedUserDisplayName: driver.profiles?.display_name ?? '',
+        teamId: driver.team_id,
+        teamName: driver.teams?.name ?? '',
+    };
+}
+
+async function requireSuperAdmin() {
     const viewer = await fetchCurrentViewer();
     if (!viewer?.isSuperAdmin) {
         const error = new Error('Forbidden');
         error.status = 403;
         throw error;
     }
+}
 
-    const [{ data: profiles, error: profilesError }, { data: capabilities, error: capabilitiesError }] =
-        await Promise.all([
-            supabase
-                .from('profiles')
-                .select(
-                    'id, provider_user_id, provider_login, display_name, avatar_url, created_at, updated_at, is_super_admin',
-                )
-                .order('display_name', { ascending: true }),
-            supabase
-                .from('user_capabilities')
-                .select('user_id, capability_id, enabled, created_at, created_by, updated_at, updated_by'),
-        ]);
+export async function fetchAdminPermissions() {
+    await requireSuperAdmin();
+
+    const [
+        { data: profiles, error: profilesError },
+        { data: capabilities, error: capabilitiesError },
+        { data: drivers, error: driversError },
+    ] = await Promise.all([
+        supabase
+            .from('profiles')
+            .select(
+                'id, provider_user_id, provider_login, display_name, avatar_url, created_at, updated_at, is_super_admin',
+            )
+            .order('display_name', { ascending: true }),
+        supabase
+            .from('user_capabilities')
+            .select('user_id, capability_id, enabled, created_at, created_by, updated_at, updated_by'),
+        supabase
+            .from('drivers')
+            .select('id, display_name, racing_number, linked_user_id, team_id, teams(name), profiles:linked_user_id(display_name)')
+            .eq('is_active', true)
+            .order('display_name', { ascending: true }),
+    ]);
 
     if (profilesError) {
         const error = new Error(profilesError.message);
@@ -44,6 +68,12 @@ export async function fetchAdminPermissions() {
 
     if (capabilitiesError) {
         const error = new Error(capabilitiesError.message);
+        error.status = 500;
+        throw error;
+    }
+
+    if (driversError) {
+        const error = new Error(driversError.message);
         error.status = 500;
         throw error;
     }
@@ -72,16 +102,12 @@ export async function fetchAdminPermissions() {
                 ),
             ),
         ),
+        drivers: (drivers ?? []).map(mapDriverRow),
     };
 }
 
 export async function setUserCapability({ targetUserId, capabilityId, enabled }) {
-    const viewer = await fetchCurrentViewer();
-    if (!viewer?.isSuperAdmin) {
-        const error = new Error('Forbidden');
-        error.status = 403;
-        throw error;
-    }
+    await requireSuperAdmin();
 
     const actorProfile = await syncCurrentProfile();
     if (!actorProfile?.id) {
@@ -151,5 +177,32 @@ export async function setUserCapability({ targetUserId, capabilityId, enabled })
             updatedAt: data.updated_at ?? null,
             updatedBy: data.updated_by ?? null,
         },
+    };
+}
+
+export async function linkDriverToUser({ driverId, linkedUserId }) {
+    await requireSuperAdmin();
+
+    const payload = {
+        linked_user_id: linkedUserId,
+    };
+
+    const { data, error } = await supabase
+        .from('drivers')
+        .update(payload)
+        .eq('id', driverId)
+        .select('id, linked_user_id, profiles:linked_user_id(display_name)')
+        .single();
+
+    if (error) {
+        const normalizedError = new Error(error.message ?? 'Liaison impossible');
+        normalizedError.status = 500;
+        throw normalizedError;
+    }
+
+    return {
+        driverId: data.id,
+        linkedUserId: data.linked_user_id ?? null,
+        linkedUserDisplayName: data.profiles?.display_name ?? '',
     };
 }

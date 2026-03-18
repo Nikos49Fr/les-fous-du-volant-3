@@ -1,4 +1,11 @@
 ﻿@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+$results-table-tab-font-size: $font-fluid-sm;
+$results-entity-font-size: $font-fluid-xs;
+$results-grid-font-size: $font-fluid-xs;
+$results-status-font-size: $font-fluid-2xs;
+$results-muted-font-size: $font-fluid-xs;
 
 .app-results {
     &__content {
@@ -11,8 +18,8 @@
     &__panel {
         display: flex;
         flex-direction: column;
-        gap: clamp(1rem, 2vw, 1.5rem);
-        padding: clamp(0.1rem, 2vw, 1.25rem);
+        gap: clamp(0.85rem, 1.5vw, 1.25rem);
+        padding: clamp(0.1rem, 1.2vw, 0.75rem);
     }
 
     &__tabs {
@@ -37,7 +44,7 @@
         color: $neutral-white-60;
         padding: 0 1.1rem;
         font-family: 'Formula 1', sans-serif;
-        font-size: clamp(0.74rem, 1.4vw, 0.9rem);
+        @include fluid-type($results-table-tab-font-size);
         font-weight: 700;
         cursor: pointer;
         display: inline-flex;
@@ -72,7 +79,7 @@
             opacity: 1;
             gap: 0.55rem;
             padding-inline: 1rem;
-            font-size: clamp(0.68rem, 1.15vw, 0.8rem);
+            @include fluid-type($results-table-tab-font-size, null, 400);
             font-weight: 400;
             border-bottom-color: $content-link;
 
@@ -103,7 +110,14 @@
         display: grid;
         grid-template-columns: auto auto;
         justify-content: center;
-        gap: clamp(1rem, 2vw, 4rem);
+        gap: clamp(0.75rem, 1.3vw, 1.5rem);
+
+        &--gp {
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: center;
+            align-items: flex-start;
+        }
     }
 
     &__error {
@@ -113,7 +127,7 @@
     &__entity {
         display: inline-flex;
         align-items: center;
-        // gap: 0.6rem;
+        gap: 0.35rem;
         min-width: 0;
     }
 
@@ -193,7 +207,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        font-size: clamp(0.76rem, 1.35vw, 0.95rem);
+        @include fluid-type($results-entity-font-size);
     }
 
     &__grid {
@@ -202,18 +216,24 @@
         justify-content: center;
         gap: 0.3rem;
         min-width: 0;
+        @include fluid-type($results-grid-font-size);
 
         & svg {
             width: 0.9rem;
             height: 0.9rem;
         }
 
+        & svg,
+        & svg path {
+            fill: currentColor;
+        }
+
         &--up {
-            color: $action-success;
+            color: $state-positive;
         }
 
         &--down {
-            color: $action-primary;
+            color: $state-negative;
         }
 
         &--flat {
@@ -230,49 +250,48 @@
         border-radius: 999px;
         padding: 0.15rem 0.55rem;
         font-family: 'Formula 1', sans-serif;
-        font-size: clamp(0.64rem, 1.1vw, 0.72rem);
+        @include fluid-type($results-status-font-size);
         color: $content-inverse;
     }
 
     &__muted {
         color: $neutral-white-60;
+        @include fluid-type($results-grid-font-size);
     }
 
     &__fastest-lap-tag {
         display: inline-flex;
         align-items: center;
-        gap: 0.35rem;
         background-color: $surface-fastest-lap;
         border: 1px solid $stroke-fastest-lap-strong;
         color: $content-fastest-lap;
         border-radius: 999px;
-        padding: 0.2rem 0.55rem;
-        font-size: clamp(0.64rem, 1.1vw, 0.72rem);
+        justify-content: center;
+        width: 2rem;
+        height: 2rem;
+        padding: 0;
         white-space: nowrap;
 
         & svg {
-            width: 0.9rem;
-            height: 0.9rem;
+            width: 1rem;
+            height: 1rem;
+        }
+
+        & svg,
+        & svg path {
+            fill: currentColor;
         }
     }
 
-    &__gp-header {
-        display: flex;
-        justify-content: flex-start;
-    }
+}
 
-    &__gp-title {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-family: 'Formula 1', sans-serif;
-        font-size: clamp(0.95rem, 2vw, 1.2rem);
-        margin: 0;
-    }
-
-    &__gp-flag {
-        font-size: 1.2rem;
-        line-height: 1;
+@media (max-width: 1023px) {
+    .app-results {
+        &__tables-grid {
+            &--gp {
+                flex-wrap: wrap;
+            }
+        }
     }
 }
 

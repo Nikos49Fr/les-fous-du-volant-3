@@ -1,9 +1,55 @@
-@use '../../../styles/variables' as *;
+﻿@use '../../../styles/variables' as *;
 
 .app-admin-permissions {
     &__content {
         width: min(1240px, 100%);
         padding: clamp(0.9rem, 2.8vw, 1.8rem) clamp(0.8rem, 2.5vw, 1.6rem);
+        display: flex;
+        flex-direction: column;
+        gap: 0.9rem;
+    }
+
+    &__tabs {
+        display: flex;
+        align-items: stretch;
+        width: 100%;
+        background-color: $surface-nav;
+        border-bottom: 1px solid $surface-elevated;
+        overflow: hidden;
+    }
+
+    &__tab {
+        min-height: 2.7rem;
+        border: none;
+        background-color: transparent;
+        color: $neutral-white-60;
+        padding: 0 1.1rem;
+        font-family: 'Formula 1', sans-serif;
+        font-size: clamp(0.74rem, 1.4vw, 0.9rem);
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+            color 150ms ease,
+            border-bottom-color 150ms ease,
+            opacity 150ms ease;
+        border-bottom: 2px solid $surface-elevated;
+
+        &:hover {
+            color: $neutral-white;
+            border-bottom-color: $neutral-white-60;
+            opacity: 1;
+        }
+
+        &--active {
+            color: $content-inverse;
+            border-bottom-color: $action-primary;
+        }
+    }
+
+    &__panel {
         display: flex;
         flex-direction: column;
         gap: 0.9rem;
@@ -80,14 +126,20 @@
         & td {
             text-align: center;
             font-size: clamp(0.8rem, 1.5vw, 0.92rem);
+            color: $content-inverse;
         }
 
         & tbody tr:last-child td {
             border-bottom: none;
         }
+
+        &--drivers {
+            min-width: 760px;
+        }
     }
 
-    &__user-cell {
+    &__user-cell,
+    &__driver-cell {
         text-align: left !important;
         min-width: 240px;
     }
@@ -106,18 +158,25 @@
         border: 1px solid $stroke-default;
     }
 
-    &__user-meta {
+    &__user-meta,
+    &__driver-meta {
         display: inline-flex;
         flex-direction: column;
         line-height: 1.15;
         gap: 0.15rem;
     }
 
-    &__user-name {
+    &__user-name,
+    &__driver-name {
         font-family: 'Titillium Web', sans-serif;
         font-weight: 600;
         color: $content-inverse;
         font-size: clamp(0.88rem, 1.8vw, 1rem);
+    }
+
+    &__driver-number {
+        font-size: clamp(0.68rem, 1.25vw, 0.8rem);
+        color: $neutral-white-60;
     }
 
     &__badge {
@@ -150,6 +209,59 @@
         }
     }
 
+    &__select {
+        min-width: 18rem;
+        border: 1px solid $stroke-default;
+        background-color: $neutral-white;
+        color: $neutral-black;
+        border-radius: 6px;
+        padding: 0.5rem 0.6rem;
+        font-family: 'Titillium Web', sans-serif;
+        font-size: clamp(0.82rem, 1.5vw, 0.92rem);
+    }
+
+    &__link-action {
+        border: none;
+        background: transparent;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.2rem;
+        cursor: pointer;
+        transition: filter 150ms ease, opacity 150ms ease;
+
+        & svg,
+        & svg path {
+            fill: currentColor;
+        }
+
+        & svg {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        &:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        &:hover:not(:disabled) {
+            filter: brightness(1.15);
+        }
+
+        &--link-idle {
+            color: $neutral-white-60;
+        }
+
+        &--link-ready {
+            color: $action-success;
+        }
+
+        &--unlink {
+            color: $action-primary;
+        }
+    }
+
     &__message {
         text-align: left !important;
         width: 100%;
@@ -174,8 +286,20 @@
             }
         }
 
+        &__tabs {
+            flex-wrap: wrap;
+        }
+
+        &__tab {
+            flex: 1 1 auto;
+        }
+
         &__table {
             min-width: 640px;
+
+            &--drivers {
+                min-width: 640px;
+            }
         }
     }
 }

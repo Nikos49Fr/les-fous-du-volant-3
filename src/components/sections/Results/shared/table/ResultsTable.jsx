@@ -21,11 +21,7 @@ export default function ResultsTable({
                             {columns.map((column) => (
                                 <col
                                     key={column.key}
-                                    style={{
-                                        '--column-width': column.width ?? 'auto',
-                                        '--column-width-mobile':
-                                            column.mobileWidth ?? column.width ?? 'auto',
-                                    }}
+                                    className={`app-results-table__col ${column.colClassName ?? `app-results-table__col--${column.key}`}`.trim()}
                                 />
                             ))}
                             {hasTags ? <col className="app-results-table__tag-col" /> : null}

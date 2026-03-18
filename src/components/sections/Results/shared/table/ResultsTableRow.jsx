@@ -1,6 +1,8 @@
 export default function ResultsTableRow({ row, columns, hasTagColumn }) {
     return (
-        <tr className={`app-results-table__row app-results-table__row--team-${row.teamModifier ?? 'neutral'}`}>
+        <tr
+            className={`app-results-table__row app-results-table__row--team-${row.teamModifier ?? 'neutral'} ${row.rowClassName ?? ''}`.trim()}
+        >
             {columns.map((column) => (
                 <td
                     key={`${row.id}-${column.key}`}

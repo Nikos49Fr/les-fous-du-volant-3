@@ -236,3 +236,5 @@ pm run deploy:cloudflare.
 pm run deploy:cloudflare:preview.
 - On évite le build distant par intégration Git pour garder un contrôle total du déploiement et limiter les surprises de plateforme.
 
+
+- Tous les textes affichables (labels, titres, boutons, alt, info-bulles, messages) doivent rester en UTF-8 propre, avec accents français corrects.

@@ -131,3 +131,8 @@ Variables frontend à configurer côté Cloudflare :
 
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_PUBLISHABLE_KEY`
+
+## Qualité UI
+
+- Tous les textes affichés dans l'interface doivent conserver les accents français corrects et un encodage UTF-8 propre.
+

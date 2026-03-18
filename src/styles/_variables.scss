@@ -1,37 +1,4 @@
-﻿// $color-bg: #ffffff;
-// $color-bg-alt: #e0dedc;
-// $color-bg-alt2: #1c1c25;
-// $color-bg-alt3: #303037;
-// $color-bg-alt4: #47464c;
-
-// $color-text: #000000;
-// $color-text-muted: #15151e;
-// $color-text-alt: #ffffff;
-// $color-text-alt2: #e0dedc;
-
-// $color-accent: #e10600;
-// $color-accent-hover: #00e6a8;
-
-// $color-link: #404bdd;
-// $color-link-hover: #00e6a8;
-// $color-link-border: #e10600;
-
-// $color-border: #303037;
-
-// $color-twitch: #9146ff;
-
-// // Team colors
-// $color-team-mclaren: #f47600;
-// $color-team-red-bull: #4781d7;
-// $color-team-mercedes: #00d7b6;
-// $color-team-ferrari: #ed1131;
-// $color-team-williams: #1868db;
-// $color-team-aston-martin: #229971;
-// $color-team-kick-sauber: #01c00e;
-// $color-team-haas: #9c9fa2;
-// $color-team-alpine: #00a1e8;
-// $color-team-racing-bulls: #6c98ff;
-
+﻿
 // Semantic colors
 $surface-base: #ffffff;
 $surface-subtle: #e0dedc;
@@ -60,6 +27,8 @@ $stroke-fastest-lap-strong: rgba(145, 70, 255, 0.65);
 
 $action-primary: #e10600;
 $action-success: #00e6a8;
+$state-positive: #34c759;
+$state-negative: #ff3b30;
 $state-success-strong: #3ec06b;
 $state-fastest-lap: #6e39d6;
 $brand-twitch: #9146ff;
@@ -87,6 +56,23 @@ $neutral-white-94: rgba(255, 255, 255, 0.94);
 
 $shadow-accent-success-glow: rgba(#00e6a8, 0.35);
 $surface-transparent: rgba(0, 0, 0, 0);
+
+
+// Fluid type scale
+$font-fluid-2xs: clamp(0.5rem, 1.6vw, 0.625rem);
+$font-fluid-xs: clamp(0.5625rem, 1.85vw, 0.6875rem);
+$font-fluid-sm: clamp(0.625rem, 2vw, 0.75rem);
+$font-fluid-md: clamp(0.6875rem, 2.2vw, 0.875rem);
+$font-fluid-lg: clamp(0.75rem, 2.5vw, 1rem);
+$font-fluid-xl: clamp(0.8125rem, 2.8vw, 1.125rem);
+
+// Fluid spacing scale
+$space-fluid-2xs: clamp(0.125rem, 0.45vw, 0.25rem);
+$space-fluid-xs: clamp(0.25rem, 0.7vw, 0.375rem);
+$space-fluid-sm: clamp(0.375rem, 1vw, 0.5rem);
+$space-fluid-md: clamp(0.5rem, 1.4vw, 0.75rem);
+$space-fluid-lg: clamp(0.75rem, 2vw, 1rem);
+$space-fluid-xl: clamp(1rem, 2.8vw, 1.5rem);
 
 $team-mclaren: #f47600;
 $team-red-bull: #4781d7;
