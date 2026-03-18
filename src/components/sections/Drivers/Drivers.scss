@@ -1,15 +1,270 @@
 @use '../../../styles/variables' as *;
 
 .app-drivers {
-    &-content {
-        height: 100%;
+    &__tabs {
         display: flex;
-        align-items: flex-start;
+        align-items: stretch;
+        width: 100vw;
+        margin-left: calc(50% - 50vw);
+        background-color: $surface-nav;
+        border-bottom: 1px solid $surface-elevated;
+    }
+
+    &__tab {
+        flex: 1 1 0;
+        min-height: 2.7rem;
+        border: none;
+        background-color: transparent;
+        color: $neutral-white-60;
+        padding: 0 1rem;
+        font-family: 'Formula 1', sans-serif;
+        font-size: clamp(0.72rem, 1.3vw, 0.86rem);
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+            color 150ms ease,
+            border-bottom-color 150ms ease,
+            opacity 150ms ease;
+        border-bottom: 2px solid $surface-elevated;
+
+        &--active {
+            color: $content-inverse;
+            border-bottom-color: $action-primary;
+        }
+
+        &:hover {
+            color: $neutral-white;
+            border-bottom-color: $neutral-white-60;
+        }
+    }
+
+    &-content {
+        display: flex;
+        flex-direction: column;
+        gap: clamp(0.8rem, 2vw, 1.25rem);
+        padding: clamp(0.75rem, 2vw, 1.25rem);
+    }
+
+    &__list {
+        display: flex;
+        flex-direction: column;
+        gap: clamp(0.9rem, 2vw, 1.4rem);
+    }
+
+    &__casters {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: clamp(0.75rem, 1.5vw, 1rem);
+    }
+
+    &__casters-title {
+        margin: 0;
+        font-family: 'Formula 1', sans-serif;
+        font-size: clamp(0.95rem, 1.8vw, 1.25rem);
+        color: $content-inverse;
+        text-align: center;
+    }
+
+    &__casters-image {
+        display: block;
+        width: min(100%, 32rem);
+        height: auto;
+        object-fit: contain;
+    }
+
+    &__empty-panel {
+        min-height: 8rem;
     }
 }
 
-@media (max-width: 1024px) {
-}
+.app-drivers-card {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: center;
+    gap: clamp(0.75rem, 2vw, 1.5rem);
+    width: 100%;
+    padding: clamp(0.9rem, 2vw, 1.4rem);
+    border: 1px solid $stroke-default;
+    border-radius: 14px;
+    background-color: $surface-contrast;
+    overflow: hidden;
 
-@media (max-width: 768px) {
+    &--team-mclaren {
+        background: linear-gradient(
+            90deg,
+            rgba($team-mclaren, 0.1) 0%,
+            rgba($team-mclaren, 0.18) 50%,
+            rgba($team-mclaren, 0.1) 100%
+        );
+    }
+
+    &--team-red-bull {
+        background: linear-gradient(
+            90deg,
+            rgba($team-red-bull, 0.1) 0%,
+            rgba($team-red-bull, 0.18) 50%,
+            rgba($team-red-bull, 0.1) 100%
+        );
+    }
+
+    &--team-mercedes {
+        background: linear-gradient(
+            90deg,
+            rgba($team-mercedes, 0.1) 0%,
+            rgba($team-mercedes, 0.18) 50%,
+            rgba($team-mercedes, 0.1) 100%
+        );
+    }
+
+    &--team-ferrari {
+        background: linear-gradient(
+            90deg,
+            rgba($team-ferrari, 0.1) 0%,
+            rgba($team-ferrari, 0.18) 50%,
+            rgba($team-ferrari, 0.1) 100%
+        );
+    }
+
+    &--team-williams {
+        background: linear-gradient(
+            90deg,
+            rgba($team-williams, 0.1) 0%,
+            rgba($team-williams, 0.18) 50%,
+            rgba($team-williams, 0.1) 100%
+        );
+    }
+
+    &--team-aston-martin {
+        background: linear-gradient(
+            90deg,
+            rgba($team-aston-martin, 0.1) 0%,
+            rgba($team-aston-martin, 0.18) 50%,
+            rgba($team-aston-martin, 0.1) 100%
+        );
+    }
+
+    &--team-kick-sauber {
+        background: linear-gradient(
+            90deg,
+            rgba($team-kick-sauber, 0.1) 0%,
+            rgba($team-kick-sauber, 0.18) 50%,
+            rgba($team-kick-sauber, 0.1) 100%
+        );
+    }
+
+    &--team-haas {
+        background: linear-gradient(
+            90deg,
+            rgba($team-haas, 0.1) 0%,
+            rgba($team-haas, 0.18) 50%,
+            rgba($team-haas, 0.1) 100%
+        );
+    }
+
+    &--team-alpine {
+        background: linear-gradient(
+            90deg,
+            rgba($team-alpine, 0.1) 0%,
+            rgba($team-alpine, 0.18) 50%,
+            rgba($team-alpine, 0.1) 100%
+        );
+    }
+
+    &--team-racing-bulls {
+        background: linear-gradient(
+            90deg,
+            rgba($team-racing-bulls, 0.1) 0%,
+            rgba($team-racing-bulls, 0.18) 50%,
+            rgba($team-racing-bulls, 0.1) 100%
+        );
+    }
+
+    &__center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: clamp(0.75rem, 1.5vw, 1rem);
+        min-width: 0;
+        width: 100%;
+    }
+
+    &__team {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.35rem;
+        text-align: center;
+    }
+
+    &__team-logo {
+        width: clamp(5rem, 10vw, 7rem);
+        height: auto;
+        object-fit: contain;
+    }
+
+    &__team-name {
+        margin: 0;
+        font-family: 'Formula 1', sans-serif;
+        font-size: clamp(0.9rem, 1.8vw, 1.2rem);
+        color: $content-inverse;
+    }
+
+    &__car {
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+    }
+
+    &__driver {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: clamp(0.35rem, 0.8vw, 0.6rem);
+        min-width: 0;
+        width: 100%;
+
+        &--left {
+            justify-content: flex-start;
+            text-align: center;
+        }
+
+        &--right {
+            justify-content: flex-end;
+            text-align: center;
+        }
+    }
+
+    &__driver-image {
+        width: clamp(7.5rem, 16vw, 12rem);
+        height: auto;
+        object-fit: contain;
+        flex: 0 0 auto;
+    }
+
+    &__driver-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        min-width: 0;
+        align-items: center;
+    }
+
+    &__driver-name {
+        font-family: 'Formula 1', sans-serif;
+        font-size: clamp(0.8rem, 1.5vw, 1rem);
+        color: $content-inverse;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__driver-number {
+        font-family: '7-segment', sans-serif;
+        font-size: clamp(1rem, 1.8vw, 1.3rem);
+        color: $content-inverse;
+    }
 }

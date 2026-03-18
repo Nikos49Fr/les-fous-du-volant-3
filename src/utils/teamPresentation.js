@@ -13,11 +13,24 @@ const TEAM_LOGO_ASSET_PATHS = {
     williams: '/src/assets/icons/2025williamslogowhite.avif',
 };
 
+const TEAM_CAR_ASSET_PATHS = {
+    alpine: '/src/assets/images/cars/alpine.webp',
+    'aston-martin': '/src/assets/images/cars/aston-martin.webp',
+    ferrari: '/src/assets/images/cars/ferrari.webp',
+    haas: '/src/assets/images/cars/haas.webp',
+    'kick-sauber': '/src/assets/images/cars/kick-sauber.webp',
+    mclaren: '/src/assets/images/cars/mclaren.webp',
+    mercedes: '/src/assets/images/cars/mercedes.webp',
+    'red-bull': '/src/assets/images/cars/red-bull.webp',
+    williams: '/src/assets/images/cars/williams.webp',
+};
+
 export function getTeamPresentation(team) {
     if (!team) {
         return {
             colorModifier: 'neutral',
             logoUrl: '',
+            carUrl: '',
         };
     }
 
@@ -25,9 +38,11 @@ export function getTeamPresentation(team) {
         .trim()
         .toLowerCase();
     const logoUrl = resolveJsonAsset(TEAM_LOGO_ASSET_PATHS[team.logoKey] ?? '');
+    const carUrl = resolveJsonAsset(TEAM_CAR_ASSET_PATHS[colorModifier] ?? '');
 
     return {
         colorModifier,
         logoUrl,
+        carUrl,
     };
 }
