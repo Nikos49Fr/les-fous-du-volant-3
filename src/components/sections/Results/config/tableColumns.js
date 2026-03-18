@@ -1,4 +1,4 @@
-export const DRIVER_STANDINGS_COLUMNS = [
+﻿export const DRIVER_STANDINGS_COLUMNS = [
     { key: 'position', label: 'POS.', colClassName: 'app-results-table__col--position' },
     { key: 'number', label: 'NO.', colClassName: 'app-results-table__col--number' },
     {

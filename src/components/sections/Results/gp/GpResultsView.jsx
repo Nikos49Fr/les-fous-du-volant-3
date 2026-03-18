@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+﻿import { useMemo } from 'react';
 import ResultsGpCarousel from '../ResultsGpCarousel';
 import ResultsTable from '../shared/table/ResultsTable';
 import DriverCell from '../shared/cells/DriverCell';
@@ -34,13 +34,24 @@ function buildGpDisplayRows(drivers, session, qualifyingSession, sessionType) {
             ),
             number: row.driver.racingNumber,
             driver: <DriverCell driver={row.driver} showTeamLogo={false} />,
-            team: <TeamCell team={row.driver.team} />,
+            team: (
+                <TeamCell
+                    team={row.driver.team}
+                    showFastestLap={row.entry.hasFastestLap === true}
+                />
+            ),
             points: row.points,
         },
     }));
 }
 
-export default function GpResultsView({ schedule, sessionsByRound, drivers, activeGpRound, onSelectGpRound }) {
+export default function GpResultsView({
+    schedule,
+    sessionsByRound,
+    drivers,
+    activeGpRound,
+    onSelectGpRound,
+}) {
     const activeRoundSessions = sessionsByRound?.[activeGpRound] ?? {};
 
     const sprintRows = useMemo(

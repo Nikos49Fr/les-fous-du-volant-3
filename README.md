@@ -130,14 +130,6 @@ Le projet utilise `wrangler` installé localement dans les dépendances de déve
 - `src/assets` : images, icônes, drapeaux locaux, médias
 - `supabase/sql` : scripts SQL de structure et de migration
 
-## Décisions techniques importantes
-
-- Le shell applicatif reste chargé immédiatement, les pages sont lazy-loadées par route.
-- Les drapeaux ne dépendent plus de `flag-icons` : ils sont stockés localement dans `src/assets/images/flags`.
-- Le module `Résultats` a été découpé par responsabilités : vues, tableaux partagés, cellules, onglets, admin.
-- Les styles doivent rester hors JSX ; seules les classes et la structure restent dans les composants.
-- Les media queries servent aux changements de layout ; tailles, espacements et typographies doivent privilégier `clamp(...)`.
-
 ## Variables Cloudflare Pages
 
 Variables frontend à configurer côté Cloudflare :

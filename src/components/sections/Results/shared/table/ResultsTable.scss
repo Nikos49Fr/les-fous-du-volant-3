@@ -457,6 +457,10 @@ $table-team-padding-block: $space-fluid-md;
             .app-results-table__cell {
                 overflow: hidden;
             }
+
+            .app-results-table__cell--align-left {
+                overflow: visible;
+            }
         }
     }
 

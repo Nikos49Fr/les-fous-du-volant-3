@@ -155,13 +155,7 @@ Règles validées :
 
 - Les drapeaux sont stockés localement dans `src/assets/images/flags`.
 - Le composant partagé est `src/components/ui/Flag/Flag.jsx`.
-- Il remplace tous les anciens usages des classes `fi fi-*`.
-- Les drapeaux sont actuellement utilisés dans :
-  - la barre d'info GP
-  - le calendrier
-  - le carrousel de résultats
-  - la saisie et la suppression des résultats
-- À l'avenir, ils seront aussi utilisés dans `Circuits`.
+- À réutiliser pour tout nouvel affichage de drapeau, notamment dans `Circuits`.
 
 ## Performances et build
 
