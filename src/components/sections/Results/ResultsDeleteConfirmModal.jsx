@@ -1,5 +1,6 @@
-import './ResultsDeleteConfirmModal.scss';
+﻿import './ResultsDeleteConfirmModal.scss';
 import { useEffect, useRef, useState } from 'react';
+import Flag from '../../ui/Flag/Flag';
 
 const HOLD_DURATION_MS = 2500;
 
@@ -111,8 +112,10 @@ export default function ResultsDeleteConfirmModal({
                 >
                     ATTENTION ! Êtes-vous sûr de vouloir effacer les résultats du GP{' '}
                     {gp?.flag ? (
-                        <span
-                            className={`app-results-delete-modal__flag fi fi-${gp.flag}`}
+                        <Flag
+                            code={gp.flag}
+                            className="app-results-delete-modal__flag"
+                            decorative
                         />
                     ) : null}
                     <span>{gp?.country ?? ''}</span> ?

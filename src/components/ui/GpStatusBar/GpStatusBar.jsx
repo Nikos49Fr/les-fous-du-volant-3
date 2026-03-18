@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { getActiveGpDisplay } from '../../../utils/gpHelpers';
 import { fetchRevealedGpIds } from '../../../utils/calendarApi';
+import Flag from '../Flag/Flag';
 
 const USE_MOCK_NOW = false;
 const MOCK_NOW_ISO = '2026-03-22T20:30:01+01:00';
@@ -111,7 +112,11 @@ export default function GpStatusBar() {
             <p className="gp-status__race">
                 <span className="gp-status__country">{active.gpCountry}</span>{' '}
                 {active.gp && active.gpFlag ? (
-                    <span className={`gp-status__flag fi fi-${active.gpFlag}`} />
+                    <Flag
+                        code={active.gpFlag}
+                        className="gp-status__flag"
+                        decorative
+                    />
                 ) : null}
                 <span className="gp-status__name">{active.gpName}</span>
             </p>

@@ -64,8 +64,9 @@
 
         &-flag {
             display: inline-block;
+            width: 1.4rem;
+            height: auto;
             line-height: 1;
-            font-size: 1.1em;
         }
 
         &-country-name {
@@ -231,7 +232,7 @@
             &-flag {
                 width: 1.25rem;
                 line-height: 1;
-                display: inline-flex;
+                display: inline-block;
                 flex: 0 0 auto;
             }
 

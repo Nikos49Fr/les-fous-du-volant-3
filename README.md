@@ -1,12 +1,16 @@
 ﻿# Les Fous du Volant - Saison 3
 
-Frontend React pour le site de la saison 3 des Fous du Volant, avec authentification Twitch et données persistées via Supabase.
+Frontend React du site de la saison 3 des Fous du Volant.
 
 ## Statut
 
-- Stack applicative actuelle : React + Vite + Supabase
-- Déploiement cible : Cloudflare Pages
-- Projet Cloudflare Pages créé : `les-fous-du-volant-3`
+- Stack actuelle : React + Vite + Supabase
+- Hébergement actuel : Cloudflare Pages
+- Projet Cloudflare Pages : `les-fous-du-volant-3`
+- Auth Twitch via Supabase : en place
+- Module `Résultats` : en place
+- Saisie admin des résultats : en place
+- Déploiement reproductible via `wrangler` local : en place
 
 ## Stack technique
 
@@ -17,7 +21,7 @@ Frontend React pour le site de la saison 3 des Fous du Volant, avec authentifica
 - Supabase Auth (Twitch)
 - Supabase Postgres
 - Cloudflare Pages
-- flag-icons
+- Wrangler
 
 ## Prérequis
 
@@ -63,28 +67,29 @@ Le port local peut varier selon l'environnement Vite. L'URL locale utilisée doi
 ## Authentification
 
 - Connexion utilisateur via Twitch OAuth, portée par Supabase Auth
-- Gestion des permissions métier via Supabase (`profiles`, `capabilities`, `user_capabilities`)
-- Le super-admin est défini en base et non par le frontend
+- Synchronisation des profils dans `profiles`
+- Gestion des permissions métier via Supabase
+- Le super-admin est défini en base, pas côté frontend
 
 ## Base de données
 
-Le schéma SQL initial de migration se trouve dans :
+Scripts SQL versionnés :
 
 - `supabase/sql/001_initial_schema.sql`
+- `supabase/sql/002_results_schema.sql`
 
-Les données actuellement branchées sur Supabase sont :
+Données actuellement branchées sur Supabase :
 
 - profils utilisateurs
 - permissions / capacités
 - calendrier des circuits révélés
 - pilotes
 - écuries
+- résultats GP
 
 ## Déploiement Cloudflare
 
 ### Première utilisation de Wrangler
-
-Se connecter une fois à Cloudflare :
 
 ```bash
 npx wrangler login
@@ -96,34 +101,42 @@ npx wrangler login
 npm run deploy:cloudflare
 ```
 
-Cette commande :
-
-1. lance le build Vite
-2. déploie le dossier `dist` sur le projet Pages `les-fous-du-volant-3`
-
 ### Déploiement preview
 
 ```bash
 npm run deploy:cloudflare:preview
 ```
 
-## Routes internes
+Le projet utilise `wrangler` installé localement dans les dépendances de développement, pour éviter les téléchargements implicites au moment du déploiement.
 
+## Routes internes principales
+
+- `/drivers`
 - `/calendar`
+- `/circuits`
+- `/results`
+- `/multi-twitch`
+- `/lobby-setup`
 - `/admin/permissions`
+- `/contact`
+- `/credits`
 
 ## Structure du projet
 
 - `src/components/sections` : sections/pages
-- `src/components/ui` : composants réutilisables
+- `src/components/ui` : composants UI réutilisables
 - `src/data` : données frontend statiques
-- `src/utils` : clients et helpers applicatifs
+- `src/utils` : clients API, helpers, résolution d'assets
+- `src/assets` : images, icônes, drapeaux locaux, médias
 - `supabase/sql` : scripts SQL de structure et de migration
 
-## Sécurité
+## Décisions techniques importantes
 
-- Ne jamais commiter de secrets, tokens ou clés privées
-- Les droits d'écriture doivent être protégés côté Supabase par les policies et les capacités métier
+- Le shell applicatif reste chargé immédiatement, les pages sont lazy-loadées par route.
+- Les drapeaux ne dépendent plus de `flag-icons` : ils sont stockés localement dans `src/assets/images/flags`.
+- Le module `Résultats` a été découpé par responsabilités : vues, tableaux partagés, cellules, onglets, admin.
+- Les styles doivent rester hors JSX ; seules les classes et la structure restent dans les composants.
+- Les media queries servent aux changements de layout ; tailles, espacements et typographies doivent privilégier `clamp(...)`.
 
 ## Variables Cloudflare Pages
 
@@ -132,7 +145,12 @@ Variables frontend à configurer côté Cloudflare :
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_PUBLISHABLE_KEY`
 
+## Sécurité
+
+- Ne jamais commiter de secrets, tokens ou clés privées
+- Les droits d'écriture doivent être protégés côté Supabase par les policies et les capacités métier
+
 ## Qualité UI
 
 - Tous les textes affichés dans l'interface doivent conserver les accents français corrects et un encodage UTF-8 propre.
-
+- Cette règle vaut aussi pour les boutons, titres, labels, messages, info-bulles, `aria-label` et `alt`.

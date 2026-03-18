@@ -1,8 +1,9 @@
-import './shared/table/ResultsTable.scss';
+﻿import './shared/table/ResultsTable.scss';
 import AngleLeftIcon from '../../../assets/icons/angle-left-solid-full.svg?react';
 import AngleRightIcon from '../../../assets/icons/angle-right-solid-full.svg?react';
 import AnglesLeftIcon from '../../../assets/icons/angles-left-solid-full.svg?react';
 import AnglesRightIcon from '../../../assets/icons/angles-right-solid-full.svg?react';
+import Flag from '../../ui/Flag/Flag';
 
 export default function ResultsGpCarousel({
     schedule,
@@ -40,7 +41,11 @@ export default function ResultsGpCarousel({
             <div className="app-results-carousel__current" aria-live="polite">
                 <div className="app-results-carousel__line app-results-carousel__line--top">
                     {activeGp?.flag ? (
-                        <span className={`app-results-carousel__flag fi fi-${activeGp.flag}`} />
+                        <Flag
+                            code={activeGp.flag}
+                            className="app-results-carousel__flag"
+                            decorative
+                        />
                     ) : null}
                     <span className="app-results-carousel__country">
                         {activeGp?.country || `GP ${activeGpRound}`}

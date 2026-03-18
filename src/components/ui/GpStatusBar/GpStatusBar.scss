@@ -46,6 +46,7 @@
     }
 
     &__flag {
+        width: clamp(1.1rem, 1.8vw, 1.35rem);
         border: 1px solid $surface-base;
     }
 

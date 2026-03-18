@@ -1,4 +1,4 @@
-import './ResultsAdminPanel.scss';
+﻿import './ResultsAdminPanel.scss';
 import { useEffect, useMemo, useState } from 'react';
 import ChevronDownIcon from '../../../assets/icons/chevron-down-solid-full.svg?react';
 import FloppyDiskIcon from '../../../assets/icons/floppy-disk-regular-full.svg?react';
@@ -6,6 +6,7 @@ import PenToSquareIcon from '../../../assets/icons/pen-to-square-regular-full.sv
 import XmarkIcon from '../../../assets/icons/xmark-solid-full.svg?react';
 import ResultsDeleteConfirmModal from './ResultsDeleteConfirmModal';
 import ResultsSessionEditor from './ResultsSessionEditor';
+import Flag from '../../ui/Flag/Flag';
 import { deleteResultsGp, saveResultsSession } from '../../../utils/resultsApi';
 import {
     buildEditorPayload,
@@ -120,7 +121,11 @@ export default function ResultsAdminPanel({
 
     return (
         <div className="app-results-panel">
-            <div className="app-results-panel__tabs" role="tablist" aria-label="Saisie des résultats">
+            <div
+                className="app-results-panel__tabs"
+                role="tablist"
+                aria-label="Saisie des résultats"
+            >
                 <div className="app-results-panel__tabs-main">
                     {RESULTS_SESSION_TYPES.map((sessionType) => (
                         <button
@@ -151,8 +156,10 @@ export default function ResultsAdminPanel({
                         <span className="app-results-panel__select-trigger-content">
                             <span className="app-results-panel__select-trigger-main">
                                 {selectedGp?.flag ? (
-                                    <span
-                                        className={`app-results-panel__select-flag fi fi-${selectedGp.flag}`}
+                                    <Flag
+                                        code={selectedGp.flag}
+                                        className="app-results-panel__select-flag"
+                                        decorative
                                     />
                                 ) : null}
                                 <span className="app-results-panel__select-label">
@@ -184,8 +191,10 @@ export default function ResultsAdminPanel({
                                         }}
                                     >
                                         {gp.flag ? (
-                                            <span
-                                                className={`app-results-panel__select-flag fi fi-${gp.flag}`}
+                                            <Flag
+                                                code={gp.flag}
+                                                className="app-results-panel__select-flag"
+                                                decorative
                                             />
                                         ) : null}
                                         <span className="app-results-panel__select-label">

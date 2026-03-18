@@ -6,21 +6,25 @@ Mémoire de travail du projet pour garder les décisions, contraintes et priorit
 
 ## État actuel
 
-- Auth Twitch migrée vers Supabase Auth.
-- Permissions migrées vers Supabase (`profiles`, `capabilities`, `user_capabilities`).
-- Calendar migré vers Supabase (`calendar_settings`).
-- Le panel admin des permissions fonctionne localement.
-- Le mode de développement courant est `npm run dev`.
-- Le déploiement Cloudflare Pages n'est pas encore configuré.
+- Auth Twitch migrée vers Supabase Auth et validée.
+- Permissions migrées vers Supabase et panel admin fonctionnel.
+- Calendar migré vers Supabase et panel d'édition fonctionnel.
+- Hébergement migré vers Cloudflare Pages et validé.
+- Déploiement CLI Cloudflare via `wrangler` local validé.
+- Module `Résultats` public en place.
+- Saisie admin des résultats GP en place.
+- Drapeaux migrés depuis `flag-icons` vers des SVG locaux.
 
 ## Choix techniques verrouillés
 
 - Frontend : React + Vite.
+- Routing : React Router 7.
 - Auth : Supabase Auth avec Twitch.
 - Base de données : Supabase Postgres.
-- Déploiement cible : Cloudflare Pages.
-- Région Supabase actuelle : Paris (`eu-west-3`).
-- Pas de dépendance résiduelle à Netlify ou Firebase dans le code applicatif.
+- Hébergement : Cloudflare Pages.
+- Déploiement : build local + upload Cloudflare via Wrangler.
+- Pas de dépendance résiduelle à Netlify, Firebase ou `flag-icons` dans le code applicatif.
+- Le shell applicatif reste chargé immédiatement ; les pages sont lazy-loadées par route.
 
 ## Variables d'environnement frontend
 
@@ -32,7 +36,7 @@ Aucune clé `secret` ou `service_role` ne doit être injectée dans le frontend.
 ## Auth et profils
 
 - Les utilisateurs sont synchronisés dans `profiles` à la connexion.
-- Données utiles de profil :
+- Champs utiles de `profiles` :
   - `id`
   - `provider`
   - `provider_user_id`
@@ -43,19 +47,37 @@ Aucune clé `secret` ou `service_role` ne doit être injectée dans le frontend.
 - `provider_login` correspond au login Twitch.
 - `display_name` correspond au nom d'affichage Twitch avec sa casse.
 
-## Permissions - vision validée
+## Permissions
 
-- Modèle par capacités, évolutif.
-- Capacités initiales validées :
+### Modèle validé
+
+- Modèle par capacités, extensible.
+- Capacités actuellement utilisées :
   - `admin.permissions.manage`
   - `calendar.write`
 - Le super-admin a tous les droits par défaut.
 - Les droits du super-admin ne sont modifiables via aucune interface du site.
-- Le backend logique de sécurité repose sur Supabase (RLS + vérifications applicatives), pas sur le frontend.
+- La sécurité réelle repose sur Supabase, pas sur le masquage frontend.
 
-## Schéma SQL actuellement posé
+### Admin permissions
 
-### Tables en place
+- Route : `/admin/permissions`
+- Accès réservé au super-admin.
+- La page est organisée en onglets.
+- Deux blocs métier actuels :
+  - gestion des capacités utilisateur
+  - liaison manuelle entre un pilote et un profil Twitch
+- La liaison pilote/profil remplit `drivers.linked_user_id`.
+- Le tri ou l'affichage dans cette page ne doit pas être modifié hors besoin explicite.
+
+## Schéma SQL en place
+
+### Scripts versionnés
+
+- `supabase/sql/001_initial_schema.sql`
+- `supabase/sql/002_results_schema.sql`
+
+### Tables principales actuellement utilisées
 
 - `profiles`
 - `capabilities`
@@ -63,178 +85,103 @@ Aucune clé `secret` ou `service_role` ne doit être injectée dans le frontend.
 - `teams`
 - `drivers`
 - `calendar_settings`
-
-### Scripts SQL versionnés
-
-- `supabase/sql/001_initial_schema.sql`
+- tables liées aux résultats GP introduites par `002_results_schema.sql`
 
 ## Calendar
 
 - Ligne Supabase : `calendar_settings.id = 'season3'`.
-- Champ principal : `revealed` (tableau de 12 entiers `0..24`).
-  - index = slot GP saison côté UI
-  - valeur = id circuit (`0` = circuit non révélé)
-- Métadonnées conservées :
-  - `updated_at`
-  - `updated_by`
-- Pas de fallback local statique pour les données dynamiques.
+- Champ principal : `revealed`.
+- Le calendrier reste la source de vérité pour les GP révélés.
+- Le panneau d'édition ouvre une modale locale avec sélection de circuit.
 
-## Panel admin permissions
+## Résultats GP
 
-- Route frontend : `/admin/permissions`.
-- Visibilité réservée au super-admin.
-- Le panel permet :
-  - de lister les utilisateurs enregistrés
-  - d'afficher les capacités connues
-  - d'ajouter une capacité côté UI
-  - d'activer ou désactiver une capacité par utilisateur
-- Le backend reste source de vérité.
+### Données métier validées
 
-## Priorités produit
-
-1. Finaliser la migration d'hébergement vers Cloudflare Pages.
-2. Structurer les données du module Résultats.
-3. Construire la saisie des résultats GP.
-4. Étendre ensuite les permissions par fonctionnalité.
-
-## Résultats GP - besoins confirmés
-
-- 12 GP, chacun avec sprint + course.
-- Classement pilotes + classement écuries.
-- Statuts : `ABS`, `DNF`, `DSQ`, `DC`.
-- Barèmes custom sprint/course + meilleur tour.
-- Sanctions post-course : retrait de points, déclassement, pénalité de temps, disqualification, bannissement.
-- Qualifs distinctes pour sprint et course.
-- Possibilité de saisir le temps du vainqueur et les écarts.
-- Pour un `DNF`, conservation du tour d'abandon envisagée dès le départ.
-
-## Contrat métier validé - résultats
-
-### Users
-
-- `users` au sens métier ne doivent pas structurer les résultats.
-- L'identité applicative passe par `profiles`, mais les résultats ne doivent pas dépendre de l'utilisateur connecté.
-
-### Drivers
-
-- Collection logique cible : `drivers/{driverId}`.
-- Champs validés :
-  - `displayName`
-  - `linkedTwitchId`
-  - `racingNumber`
-  - `teamId`
-  - `isStreamer`
-  - `isActive`
-- Le nom affiché d'un pilote est son pseudo Twitch courant.
-
-### Teams
-
-- Collection logique cible : `teams/{teamId}`.
-- Champs validés :
-  - `name`
-  - `shortName`
-  - `colorKey`
-  - `logoKey`
-
-### Points rules
-
-- Collection logique cible : `pointsRules/{ruleSetId}`.
-- Règles distinctes pour `sprint` et `race`.
-- Barème prévu jusqu'à la 20e place.
-- Statuts standardisés à conserver :
-  - `ABS`
-  - `DNF`
-  - `DSQ`
-  - `DC`
-- Le bonus meilleur tour reste séparé du barème de position.
-
-### GP et sessions
-
-- Collection logique cible : `gps/{gpId}`.
-- La révélation des circuits reste gérée uniquement par `calendar_settings`.
-- Chaque GP contient 4 sessions métier :
-  - `sprint-qualifying`
+- 12 GP affichés actuellement côté produit, 24 potentiels au total côté assets drapeaux.
+- Chaque GP contient 4 sessions :
+  - `sprint_qualifying`
   - `sprint`
-  - `race-qualifying`
+  - `race_qualifying`
   - `race`
-- Collection logique cible : `gps/{gpId}/sessions/{sessionId}`.
-- Champs attendus :
-  - `sessionType`
-  - `pointsType` (`none`, `sprint`, `race`)
-  - `status`
+- Les temps complets ne sont pas gérés.
+- Le meilleur tour est géré comme donnée métier, mais son affichage public peut évoluer.
+- Les statuts métier utilisés sont :
+  - `DNS`
+  - `DNF`
+  - `ABS`
+  - `DSQ`
 
-### Entries de session
+### Saisie admin des résultats
 
-- Collection logique cible : `gps/{gpId}/sessions/{sessionId}/entries/{driverId}`.
-- Champs à anticiper :
-  - `driverId`
-  - `classificationType`
-  - `rank`
-  - `bestTime`
-  - `gapToLeader`
-  - `dnfLap`
-  - `gridPenaltyPlaces`
-  - `notes`
-- Règles de structure :
-  - `classificationType` est la source principale d'état métier
-  - `rank` sert au classement officiel quand le pilote est classé
-  - pas de duplication de statut métier dans des champs booléens parallèles
-  - `gridPenaltyPlaces` n'est autorisé que pour une pénalité native du jeu en qualification
-  - les sanctions humaines ne vivent pas dans l'entry brute
+- La saisie n'est plus une modale : c'est un onglet dédié dans `Résultats`.
+- La barre supérieure `Résultats` fonctionne en onglets.
+- La barre interne de saisie contient :
+  - onglets de session
+  - sélecteur de GP
+  - actions `Effacer` / `Sauvegarder`
+- L'effacement d'un GP passe par une modale de confirmation avec maintien du bouton `Oui` pendant 2,5 secondes.
+- La saisie partielle est autorisée.
 
-### Sanctions
+### Affichage public des résultats
 
-- Les sanctions ne doivent pas écraser destructivement le résultat brut saisi après la course.
-- Collection logique cible : `sanctions/{sanctionId}`.
-- Portée à anticiper :
-  - `session`
-  - `gp`
-  - `season`
-- Types à anticiper :
-  - `time_penalty`
-  - `position_drop`
-  - `points_deduction`
-  - `disqualification`
-  - `ban`
+- `Tournoi` et `Par course` sont deux onglets distincts.
+- Le rendu `Tournoi` est considéré stable : ne pas le casser lors des ajustements `Par course`.
+- Le rendu `Par course` a ses propres variantes SCSS ; les changements doivent rester ciblés.
+- Le carrousel de GP n'affiche qu'un GP actif à la fois.
+- Par défaut, l'onglet `Par course` se positionne sur le dernier GP ayant des résultats disponibles en mémoire locale.
 
-## Hypothèses de charge hautes
+### Architecture frontend de Results
 
-- 20 à 100 utilisateurs authentifiés par mois.
-- Environ 1 000 consultations mensuelles sur la partie Résultats.
-- Écritures faibles, concentrées autour des GP et de l'administration.
+Le dossier `src/components/sections/Results` est découpé par responsabilités :
 
-## Direction technique validée
+- `config/` : structure des colonnes
+- `tabs/` : barre d'onglets principale
+- `tournament/` : vue `Tournoi`
+- `gp/` : vue `Par course`
+- `shared/cells/` : cellules spécialisées
+- `shared/table/` : table partagée et son SCSS
+- composants admin spécifiques dans le dossier racine `Results`
 
-- Supabase reste la solution retenue pour l'auth, la base et les permissions.
-- Cloudflare Pages reste la cible d'hébergement retenue.
-- Les écritures directes depuis le frontend sont acceptées, à condition d'être protégées côté Supabase.
-- Le modèle relationnel est considéré plus naturel pour le projet que l'ancien modèle Firestore.
+Règles validées :
 
-## Prochaines étapes
+- pas de CSS inline dans le JSX
+- classes seulement dans le JSX
+- styles dans les fichiers SCSS
+- media queries réservées aux changements de layout
+- tailles, marges, paddings et gaps à privilégier via `clamp(...)`
 
-1. Configurer le projet Cloudflare Pages.
-2. Injecter les variables d'environnement Supabase côté Cloudflare.
-3. Valider le build Vite en préproduction hébergée.
-4. Nettoyer ensuite les derniers éléments de configuration historiques inutiles.
+## Assets drapeaux
+
+- Les drapeaux sont stockés localement dans `src/assets/images/flags`.
+- Le composant partagé est `src/components/ui/Flag/Flag.jsx`.
+- Il remplace tous les anciens usages des classes `fi fi-*`.
+- Les drapeaux sont actuellement utilisés dans :
+  - la barre d'info GP
+  - le calendrier
+  - le carrousel de résultats
+  - la saisie et la suppression des résultats
+- À l'avenir, ils seront aussi utilisés dans `Circuits`.
+
+## Performances et build
+
+- Les pages sont lazy-loadées pour réduire le bundle initial.
+- `wrangler` est installé localement pour éviter les téléchargements implicites au déploiement.
+- Le gros poste restant côté assets est désormais constitué des SVG/medias réels, pas d'une dépendance CSS globale de drapeaux.
+
+## Déploiement Cloudflare - procédure courante
+
+- Projet Pages : `les-fous-du-volant-3`
+- Connexion initiale : `npx wrangler login`
+- Déploiement production : `npm run deploy:cloudflare`
+- Déploiement preview : `npm run deploy:cloudflare:preview`
+- Le mode retenu est le build local puis upload explicite, pas le build distant Git.
 
 ## Règles de collaboration
 
 - Un sujet à la fois sauf dépendance technique explicite.
 - Si dépendance : détailler les impacts avant implémentation.
 - Ne pas faire de changements structurels hors scope demandé.
-- Tous les textes UI affichés en français doivent garder les accents corrects.
-
-## Déploiement Cloudflare - procédure courante
-
-- Projet Pages actuel : les-fous-du-volant-3.
-- Mode retenu : Direct Upload via Wrangler après build local.
-- Commande de connexion initiale : 
-px wrangler login.
-- Commande de déploiement production : 
-pm run deploy:cloudflare.
-- Commande de déploiement preview : 
-pm run deploy:cloudflare:preview.
-- On évite le build distant par intégration Git pour garder un contrôle total du déploiement et limiter les surprises de plateforme.
-
-
-- Tous les textes affichables (labels, titres, boutons, alt, info-bulles, messages) doivent rester en UTF-8 propre, avec accents français corrects.
+- Mettre à jour `PROJECT_CONTEXT.md` et `README.md` après toute décision technique globale ou durable.
+- Tous les textes affichables doivent rester en UTF-8 propre avec accents français corrects.
+- Cette règle vaut aussi pour les `aria-label`, `alt`, info-bulles et messages de fallback.

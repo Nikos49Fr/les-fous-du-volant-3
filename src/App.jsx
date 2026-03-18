@@ -1,17 +1,20 @@
+import { lazy, Suspense, useLayoutEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Header from './components/ui/Header/Header.jsx';
 import Footer from './components/ui/Footer/Footer.jsx';
-import Home from './components/sections/Home/Home.jsx';
-import Drivers from './components/sections/Drivers/Drivers.jsx';
-import Calendar from './components/sections/Calendar/Calendar.jsx';
-import Circuits from './components/sections/Circuits/Circuits.jsx';
-import Results from './components/sections/Results/Results.jsx';
-import MultiTwitch from './components/sections/MultiTwitch/MultiTwitch.jsx';
-import LobbySetup from './components/sections/LobbySetup/LobbySetup.jsx';
-import AdminPermissions from './components/sections/AdminPermissions/AdminPermissions.jsx';
-import Contact from './components/sections/Contact/Contact.jsx';
-import Credits from './components/sections/Credits/Credits.jsx';
-import { useLayoutEffect, useRef } from 'react';
+
+const Home = lazy(() => import('./components/sections/Home/Home.jsx'));
+const Drivers = lazy(() => import('./components/sections/Drivers/Drivers.jsx'));
+const Calendar = lazy(() => import('./components/sections/Calendar/Calendar.jsx'));
+const Circuits = lazy(() => import('./components/sections/Circuits/Circuits.jsx'));
+const Results = lazy(() => import('./components/sections/Results/Results.jsx'));
+const MultiTwitch = lazy(() => import('./components/sections/MultiTwitch/MultiTwitch.jsx'));
+const LobbySetup = lazy(() => import('./components/sections/LobbySetup/LobbySetup.jsx'));
+const AdminPermissions = lazy(
+    () => import('./components/sections/AdminPermissions/AdminPermissions.jsx'),
+);
+const Contact = lazy(() => import('./components/sections/Contact/Contact.jsx'));
+const Credits = lazy(() => import('./components/sections/Credits/Credits.jsx'));
 
 export default function App() {
     const headerRef = useRef(null);
@@ -50,19 +53,24 @@ export default function App() {
             <div className="app-layout">
                 <Header ref={headerRef} />
                 <main className="app-main">
-                    <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/drivers" element={<Drivers />} />
-                        <Route path="/calendar" element={<Calendar />} />
-                        <Route path="/circuits" element={<Circuits />} />
-                        <Route path="/results" element={<Results />} />
-                        <Route path="/multi-twitch" element={<MultiTwitch />} />
-                        <Route path="/lobby-setup" element={<LobbySetup />} />
-                        <Route path="/admin/permissions" element={<AdminPermissions />} />
-                        <Route path="/contact" element={<Contact />} />
-                        <Route path="/credits" element={<Credits />} />
-                        <Route path="*" element={<Home />} />
-                    </Routes>
+                    <Suspense fallback={<div className="app-route-loading">Chargement...</div>}>
+                        <Routes>
+                            <Route path="/" element={<Home />} />
+                            <Route path="/drivers" element={<Drivers />} />
+                            <Route path="/calendar" element={<Calendar />} />
+                            <Route path="/circuits" element={<Circuits />} />
+                            <Route path="/results" element={<Results />} />
+                            <Route path="/multi-twitch" element={<MultiTwitch />} />
+                            <Route path="/lobby-setup" element={<LobbySetup />} />
+                            <Route
+                                path="/admin/permissions"
+                                element={<AdminPermissions />}
+                            />
+                            <Route path="/contact" element={<Contact />} />
+                            <Route path="/credits" element={<Credits />} />
+                            <Route path="*" element={<Home />} />
+                        </Routes>
+                    </Suspense>
                 </main>
                 <Footer ref={footerRef} />
             </div>

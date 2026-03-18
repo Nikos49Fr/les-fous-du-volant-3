@@ -7,6 +7,7 @@ import {
     updateRevealedGpIds,
 } from '../../../utils/calendarApi';
 import Title from '../../ui/Title/Title';
+import Flag from '../../ui/Flag/Flag';
 
 const GP_OPTIONS = [
     { id: 0, country: '', flag: '', name: 'Circuit non révélé' },
@@ -152,8 +153,10 @@ export default function Calendar() {
                                     </span>
                                 ) : null}
                                 {gp.isKnown && gp.flag ? (
-                                    <span
-                                        className={`app-calendar__gp-item-flag fi fi-${gp.flag}`}
+                                    <Flag
+                                        code={gp.flag}
+                                        className="app-calendar__gp-item-flag"
+                                        decorative
                                     />
                                 ) : null}
                             </span>
@@ -211,8 +214,10 @@ export default function Calendar() {
                                 >
                                     <span className="app-calendar__modal-select-trigger-content">
                                         {selectedOption.id > 0 ? (
-                                            <span
-                                                className={`app-calendar__modal-select-flag fi fi-${selectedOption.flag}`}
+                                            <Flag
+                                                code={selectedOption.flag}
+                                                className="app-calendar__modal-select-flag"
+                                                decorative
                                             />
                                         ) : null}
                                         <span className="app-calendar__modal-select-label">
@@ -245,8 +250,10 @@ export default function Calendar() {
                                                     }}
                                                 >
                                                     {option.id > 0 ? (
-                                                        <span
-                                                            className={`app-calendar__modal-select-flag fi fi-${option.flag}`}
+                                                        <Flag
+                                                            code={option.flag}
+                                                            className="app-calendar__modal-select-flag"
+                                                            decorative
                                                         />
                                                     ) : null}
                                                     <span className="app-calendar__modal-select-label">
