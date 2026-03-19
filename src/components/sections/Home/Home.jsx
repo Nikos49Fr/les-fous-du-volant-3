@@ -9,7 +9,7 @@ const TRAILER_EMBED_URL = 'https://www.youtube-nocookie.com/embed/81RPgyxn-Pk';
 export default function Home() {
     return (
         <section className="app-section app-home">
-            <Title title="Les Fous du volant" subtitle="Saison 3" />
+            <Title title="Les Fous du volant - Saison 3" />
 
             <div className="app-home__trailer">
                 <div className="app-home__trailer-frame">

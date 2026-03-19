@@ -83,7 +83,8 @@
     $accent-soft,
     $opacity: 1,
     $edge-darkness: null,
-    $edge-softness: null
+    $edge-softness: null,
+    $density: 1
 ) {
     $layers:
         linear-gradient(
@@ -103,6 +104,39 @@
             transparent 92%,
             transparent 100%
         );
+
+    @if $density == 2 and $edge-darkness == null and $edge-softness == null {
+        $layers:
+            linear-gradient(
+                $angle,
+                transparent 0%,
+                transparent 4%,
+                $white-strong 4.4%,
+                transparent 4.8%,
+                transparent 16%,
+                $accent-strong 16.5%,
+                transparent 17%,
+                transparent 33%,
+                $accent-soft 33.5%,
+                transparent 34%,
+                transparent 46%,
+                $white-soft 46.4%,
+                transparent 46.8%,
+                transparent 53.2%,
+                $white-soft 53.6%,
+                transparent 54%,
+                transparent 66%,
+                $accent-soft 66.5%,
+                transparent 67%,
+                transparent 83%,
+                $accent-strong 83.5%,
+                transparent 84%,
+                transparent 95.2%,
+                $white-strong 95.6%,
+                transparent 96%,
+                transparent 100%
+            );
+    }
 
     @if $edge-darkness != null and $edge-softness != null {
         $layers:
