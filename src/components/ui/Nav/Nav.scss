@@ -1,4 +1,4 @@
-@use '../../../styles/variables' as *;
+﻿@use '../../../styles/variables' as *;
 
 .app-header__nav {
     background-color: $content-primary;
@@ -10,13 +10,21 @@
     font-family: 'Formula 1', sans-serif;
     font-size: clamp(8px, 1.2vw, 16px);
 
+    &-links {
+        display: flex;
+        flex: 1 1 auto;
+        min-width: 0;
+        align-items: stretch;
+    }
+
     &-link {
         flex: 1 1 0;
         display: flex;
         align-items: center;
         justify-content: center;
         min-height: 3.7rem;
-        padding: clamp(0.35rem, 0.8vw, 0.5rem) clamp(0.25rem, 0.8vw, 0.75rem);
+        padding: clamp(0.35rem, 0.8vw, 0.5rem)
+            clamp(0.25rem, 0.8vw, 0.75rem);
         color: $neutral-white-60;
         border-bottom: 2px solid transparent;
         transition:
@@ -32,6 +40,47 @@
         &:hover {
             color: $neutral-white;
             border-bottom-color: $neutral-white-60;
+        }
+    }
+
+    &-toggle {
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 3.7rem;
+        padding: clamp(0.35rem, 0.8vw, 0.5rem)
+            clamp(0.4rem, 0.9vw, 0.7rem);
+        border: none;
+        border-bottom: 2px solid transparent;
+        background-color: transparent;
+        color: $neutral-white-60;
+        cursor: pointer;
+        transition:
+            color 150ms ease,
+            border-bottom-color 150ms ease,
+            opacity 150ms ease;
+
+        & svg {
+            width: clamp(0.75rem, 1.1vw, 1rem);
+            height: clamp(0.75rem, 1.1vw, 1rem);
+            fill: currentColor;
+            transform: rotate(0deg);
+            transition: transform 220ms ease;
+        }
+
+        &--expanded svg {
+            transform: rotate(180deg);
+        }
+
+        &:hover {
+            color: $neutral-white;
+            border-bottom-color: transparent;
+        }
+
+        &:focus-visible {
+            outline: none;
+            box-shadow: none;
         }
     }
 }

@@ -1,4 +1,4 @@
-@use '../../../styles/variables' as *;
+﻿@use '../../../styles/variables' as *;
 
 .app-header {
     position: fixed;
@@ -7,9 +7,24 @@
     right: 0;
     z-index: 10;
 
+    &__brand-shell {
+        max-height: 8.28125vw;
+        overflow: hidden;
+        transition:
+            max-height 220ms ease,
+            opacity 220ms ease;
+        opacity: 1;
+
+        &--collapsed {
+            max-height: 0;
+            opacity: 0;
+        }
+    }
+
     &__brand {
         position: relative;
         width: 100%;
+        min-height: 0;
         aspect-ratio: 1920 / 159;
         background-color: $content-primary;
         overflow: hidden;
@@ -31,8 +46,6 @@
             top: 20%;
             max-width: 23.3%;
             width: 100%;
-            color: $surface-base;
-            color: $content-primary;
             color: $stroke-default;
             text-align: center;
             display: flex;
@@ -43,7 +56,6 @@
                 font-family: 'Formula 1', sans-serif;
                 font-size: clamp(8px, 2vw, 32px);
                 line-height: 1;
-                // text-transform: uppercase;
                 margin: 0;
             }
 

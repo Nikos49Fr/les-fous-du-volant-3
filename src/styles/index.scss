@@ -46,10 +46,10 @@ textarea:focus-visible {
 
 .app-main {
     position: fixed;
-    left: 0;
-    right: 0;
-    top: var(--header-h, 0px);
-    bottom: var(--footer-h, 0px);
+    inset: 0;
+    padding-top: var(--header-h, 0px);
+    padding-bottom: var(--footer-h, 0px);
+    box-sizing: border-box;
     overflow-y: auto;
 
     display: flex;
