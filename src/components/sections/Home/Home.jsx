@@ -1,6 +1,8 @@
 import './Home.scss';
 import { NavLink } from 'react-router-dom';
 import logo from '../../../assets/brand/Logo_FDV.webp';
+import seasonPoster from '../../../assets/brand/fou_du_volant_SAISON_3_affiche.webp';
+import rosterPoster from '../../../assets/brand/ChatGPT_Image_21_janv._2026_13_17_54.webp';
 import Title from '../../ui/Title/Title';
 
 const TRAILER_URL = 'https://www.youtube.com/watch?v=81RPgyxn-Pk';
@@ -32,9 +34,19 @@ export default function Home() {
             </div>
             <div className="app-home__logo">
                 <img
+                    className="app-home__logo-poster app-home__logo-poster--left"
+                    src={rosterPoster}
+                    alt="Affiche de la saison 3 avec tous les pilotes"
+                />
+                <img
                     className="app-home__logo-image"
                     src={logo}
                     alt="Logo Les Fous du Volant Saison 3"
+                />
+                <img
+                    className="app-home__logo-poster app-home__logo-poster--right"
+                    src={seasonPoster}
+                    alt="Affiche simple de la saison 3"
                 />
             </div>
             <article className="app-home__article">

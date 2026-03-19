@@ -65,7 +65,7 @@ textarea:focus-visible {
 }
 
 .nav-link {
-    color: $content-link;
+    color: $content-link-hover;
     &:hover {
         border-bottom: 1px solid $stroke-link;
     }
