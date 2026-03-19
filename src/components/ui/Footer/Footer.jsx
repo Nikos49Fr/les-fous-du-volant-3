@@ -1,7 +1,10 @@
-import { forwardRef } from 'react';
+﻿import { forwardRef } from 'react';
 import './Footer.scss';
 import { NavLink } from 'react-router-dom';
 import AuthButton from '../AuthButton/AuthButton.jsx';
+
+const getFooterNavLinkClass = ({ isActive }) =>
+    `app-footer__nav-link${isActive ? ' app-footer__nav-link--active' : ''}`;
 
 const Footer = forwardRef(function Footer(_props, ref) {
     return (
@@ -11,10 +14,10 @@ const Footer = forwardRef(function Footer(_props, ref) {
                     <AuthButton />
                 </div>
                 <div className="app-footer__nav">
-                    <NavLink className="app-footer__nav-link" to="/contact">
+                    <NavLink className={getFooterNavLinkClass} to="/contact">
                         Contact
                     </NavLink>
-                    <NavLink className="app-footer__nav-link" to="/credits">
+                    <NavLink className={getFooterNavLinkClass} to="/credits">
                         Crédits
                     </NavLink>
                 </div>
@@ -24,3 +27,4 @@ const Footer = forwardRef(function Footer(_props, ref) {
 });
 
 export default Footer;
+

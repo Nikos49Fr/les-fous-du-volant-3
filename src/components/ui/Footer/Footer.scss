@@ -1,7 +1,6 @@
 @use '../../../styles/variables' as *;
 
 .app-footer {
-    $footer-space-inline: clamp(0.75rem, 2.4vw, 2rem);
     $footer-gap-inline: clamp(0.55rem, 1.8vw, 1.25rem);
 
     position: fixed;
@@ -19,29 +18,49 @@
         box-sizing: border-box;
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        padding: 0.5rem $footer-space-inline;
+        align-items: stretch;
+        padding: 0;
         border-top: solid 2px $stroke-default;
         gap: $footer-gap-inline;
     }
 
     &__auth {
         min-width: 0;
+        display: flex;
+        align-items: center;
+        padding: clamp(0.35rem, 0.8vw, 0.5rem)
+            clamp(0.35rem, 1.1vw, 0.9rem);
     }
 
     &__nav {
         display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: $footer-gap-inline;
+        align-items: stretch;
+        justify-content: stretch;
+        gap: 0;
 
         &-link {
-            border-bottom: solid 1px transparent;
+            flex: 1 1 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 2.2rem;
             margin: 0;
+            padding: clamp(0.35rem, 0.8vw, 0.5rem) clamp(0.25rem, 0.8vw, 0.65rem);
+            color: $neutral-white-60;
+            border-bottom: 2px solid transparent;
+            transition:
+                color 150ms ease,
+                border-bottom-color 150ms ease,
+                opacity 150ms ease;
+
+            &--active {
+                color: $content-inverse;
+                border-bottom-color: $action-primary;
+            }
 
             &:hover {
-                box-sizing: border-box;
-                border-bottom: solid 1px $action-primary;
+                color: $neutral-white;
+                border-bottom-color: $neutral-white-60;
             }
         }
     }
