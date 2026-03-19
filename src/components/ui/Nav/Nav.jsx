@@ -1,4 +1,4 @@
-import './Nav.scss';
+﻿import './Nav.scss';
 import { NavLink } from 'react-router-dom';
 
 const getNavLinkClass = ({ isActive }) =>
@@ -11,7 +11,7 @@ export default function Nav() {
                 Accueil
             </NavLink>
             <NavLink className={getNavLinkClass} to="/drivers">
-                Pilotes
+                Participants
             </NavLink>
             <NavLink className={getNavLinkClass} to="/calendar">
                 Calendrier
@@ -31,3 +31,4 @@ export default function Nav() {
         </nav>
     );
 }
+

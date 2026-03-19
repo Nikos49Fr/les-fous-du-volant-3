@@ -179,3 +179,4 @@ Règles validées :
 - Mettre à jour `PROJECT_CONTEXT.md` et `README.md` après toute décision technique globale ou durable.
 - Tous les textes affichables doivent rester en UTF-8 propre avec accents français corrects.
 - Cette règle vaut aussi pour les `aria-label`, `alt`, info-bulles et messages de fallback.
+- Factoriser le SCSS avec des mixins dès qu'un motif visuel ou une logique de style se répète de façon pertinente.

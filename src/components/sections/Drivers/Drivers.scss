@@ -1,4 +1,5 @@
-@use '../../../styles/variables' as *;
+﻿@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
 
 .app-drivers {
     &__tabs {
@@ -81,106 +82,115 @@
     }
 }
 
+$drivers-card-center-column: 50%;
+$drivers-card-variant-a-color-strength: 1;
+$drivers-card-variant-a-halo-inset-x: 14%;
+$drivers-card-variant-a-halo-inset-y: 8%;
+$drivers-card-variant-a-halo-blur: 40px;
+$drivers-card-variant-a-edge-darkness: 0.22;
+$drivers-card-variant-a-edge-softness: 0.06;
+
 .app-drivers-card {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    align-items: center;
-    gap: clamp(0.75rem, 2vw, 1.5rem);
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    padding: clamp(0.9rem, 2vw, 1.4rem);
     border: 1px solid $stroke-default;
     border-radius: 14px;
     background-color: $surface-contrast;
     overflow: hidden;
 
     &--team-mclaren {
-        background: linear-gradient(
-            90deg,
-            rgba($team-mclaren, 0.1) 0%,
-            rgba($team-mclaren, 0.18) 50%,
-            rgba($team-mclaren, 0.1) 100%
-        );
+        --drivers-card-band-color: #{rgba($team-mclaren, 0.98)};
+        --drivers-card-band-glow: #{rgba($team-mclaren, 0.4)};
+        --drivers-card-band-border: #{rgba($team-mclaren, 0.28)};
+        @include team-base-gradient($team-mclaren);
     }
 
     &--team-red-bull {
-        background: linear-gradient(
-            90deg,
-            rgba($team-red-bull, 0.1) 0%,
-            rgba($team-red-bull, 0.18) 50%,
-            rgba($team-red-bull, 0.1) 100%
-        );
+        --drivers-card-band-color: #{rgba($team-red-bull, 0.98)};
+        --drivers-card-band-glow: #{rgba($team-red-bull, 0.4)};
+        --drivers-card-band-border: #{rgba($team-red-bull, 0.28)};
+        @include team-base-gradient($team-red-bull);
     }
 
     &--team-mercedes {
-        background: linear-gradient(
-            90deg,
-            rgba($team-mercedes, 0.1) 0%,
-            rgba($team-mercedes, 0.18) 50%,
-            rgba($team-mercedes, 0.1) 100%
-        );
+        --drivers-card-band-color: #{rgba($team-mercedes, 0.98)};
+        --drivers-card-band-glow: #{rgba($team-mercedes, 0.4)};
+        --drivers-card-band-border: #{rgba($team-mercedes, 0.28)};
+        @include team-base-gradient($team-mercedes);
     }
 
     &--team-ferrari {
-        background: linear-gradient(
-            90deg,
-            rgba($team-ferrari, 0.1) 0%,
-            rgba($team-ferrari, 0.18) 50%,
-            rgba($team-ferrari, 0.1) 100%
-        );
+        --drivers-card-band-color: #{rgba($team-ferrari, 0.98)};
+        --drivers-card-band-glow: #{rgba($team-ferrari, 0.4)};
+        --drivers-card-band-border: #{rgba($team-ferrari, 0.28)};
+        @include team-base-gradient($team-ferrari);
     }
 
     &--team-williams {
-        background: linear-gradient(
-            90deg,
-            rgba($team-williams, 0.1) 0%,
-            rgba($team-williams, 0.18) 50%,
-            rgba($team-williams, 0.1) 100%
-        );
+        --drivers-card-band-color: #{rgba($team-williams, 0.98)};
+        --drivers-card-band-glow: #{rgba($team-williams, 0.4)};
+        --drivers-card-band-border: #{rgba($team-williams, 0.28)};
+        @include team-base-gradient($team-williams);
     }
 
     &--team-aston-martin {
-        background: linear-gradient(
-            90deg,
-            rgba($team-aston-martin, 0.1) 0%,
-            rgba($team-aston-martin, 0.18) 50%,
-            rgba($team-aston-martin, 0.1) 100%
-        );
+        --drivers-card-band-color: #{rgba($team-aston-martin, 0.98)};
+        --drivers-card-band-glow: #{rgba($team-aston-martin, 0.4)};
+        --drivers-card-band-border: #{rgba($team-aston-martin, 0.28)};
+        @include team-base-gradient($team-aston-martin);
     }
 
     &--team-kick-sauber {
-        background: linear-gradient(
-            90deg,
-            rgba($team-kick-sauber, 0.1) 0%,
-            rgba($team-kick-sauber, 0.18) 50%,
-            rgba($team-kick-sauber, 0.1) 100%
-        );
+        --drivers-card-band-color: #{rgba($team-kick-sauber, 0.98)};
+        --drivers-card-band-glow: #{rgba($team-kick-sauber, 0.4)};
+        --drivers-card-band-border: #{rgba($team-kick-sauber, 0.28)};
+        @include team-base-gradient($team-kick-sauber);
     }
 
     &--team-haas {
-        background: linear-gradient(
-            90deg,
-            rgba($team-haas, 0.1) 0%,
-            rgba($team-haas, 0.18) 50%,
-            rgba($team-haas, 0.1) 100%
-        );
+        --drivers-card-band-color: #{rgba($team-haas, 0.98)};
+        --drivers-card-band-glow: #{rgba($team-haas, 0.4)};
+        --drivers-card-band-border: #{rgba($team-haas, 0.28)};
+        @include team-base-gradient($team-haas);
     }
 
     &--team-alpine {
-        background: linear-gradient(
-            90deg,
-            rgba($team-alpine, 0.1) 0%,
-            rgba($team-alpine, 0.18) 50%,
-            rgba($team-alpine, 0.1) 100%
-        );
+        --drivers-card-band-color: #{rgba($team-alpine, 0.98)};
+        --drivers-card-band-glow: #{rgba($team-alpine, 0.4)};
+        --drivers-card-band-border: #{rgba($team-alpine, 0.28)};
+        @include team-base-gradient($team-alpine);
     }
 
     &--team-racing-bulls {
-        background: linear-gradient(
-            90deg,
-            rgba($team-racing-bulls, 0.1) 0%,
-            rgba($team-racing-bulls, 0.18) 50%,
-            rgba($team-racing-bulls, 0.1) 100%
+        --drivers-card-band-color: #{rgba($team-racing-bulls, 0.98)};
+        --drivers-card-band-glow: #{rgba($team-racing-bulls, 0.4)};
+        --drivers-card-band-border: #{rgba($team-racing-bulls, 0.28)};
+        @include team-base-gradient($team-racing-bulls);
+    }
+
+    &__band {
+        @include accent-bands(
+            var(--drivers-card-band-glow),
+            var(--drivers-card-band-border)
         );
+
+        &--bottom {
+            border-top: 1px solid var(--drivers-card-band-border);
+            border-bottom: none;
+        }
+    }
+
+    &__content {
+        display: grid;
+        grid-template-columns:
+            minmax(0, calc((100% - #{$drivers-card-center-column}) / 2))
+            minmax(0, $drivers-card-center-column)
+            minmax(0, calc((100% - #{$drivers-card-center-column}) / 2));
+        align-items: center;
+        gap: clamp(0.75rem, 2vw, 1.5rem);
+        width: 100%;
+        padding: clamp(0.9rem, 2vw, 1.4rem);
     }
 
     &__center {
@@ -209,7 +219,7 @@
     &__team-name {
         margin: 0;
         font-family: 'Formula 1', sans-serif;
-        font-size: clamp(0.9rem, 1.8vw, 1.2rem);
+        font-size: clamp(0.9rem, 2vw, 2rem);
         color: $content-inverse;
     }
 
@@ -255,7 +265,7 @@
 
     &__driver-name {
         font-family: 'Formula 1', sans-serif;
-        font-size: clamp(0.8rem, 1.5vw, 1rem);
+        font-size: clamp(0.625rem, 1.5vw, 2rem);
         color: $content-inverse;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -264,7 +274,161 @@
 
     &__driver-number {
         font-family: '7-segment', sans-serif;
-        font-size: clamp(1rem, 1.8vw, 1.3rem);
+        font-size: clamp(1rem, 1.8vw, 2rem);
         color: $content-inverse;
+    }
+}
+
+/* Design fin des Cards pilotes */
+.app-drivers-card {
+    position: relative;
+    isolation: isolate;
+    background-color: $surface-contrast;
+
+    &::before,
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    &::before {
+        @include f1-diagonal-background(
+            118deg,
+            rgba($neutral-white, 0.03),
+            rgba($neutral-white, 0.025),
+            rgba($neutral-white, 0.03),
+            rgba($neutral-white, 0.025),
+            1,
+            $drivers-card-variant-a-edge-darkness,
+            $drivers-card-variant-a-edge-softness
+        );
+    }
+
+    > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    &--team-mclaren::after {
+        @include radial-halo(
+            $drivers-card-variant-a-halo-inset-y $drivers-card-variant-a-halo-inset-x,
+            $drivers-card-variant-a-halo-blur,
+            0.55,
+            rgba($team-mclaren, $drivers-card-variant-a-color-strength),
+            rgba($team-mclaren, $drivers-card-variant-a-color-strength),
+            0%,
+            72%
+        );
+    }
+
+    &--team-red-bull::after {
+        @include radial-halo(
+            $drivers-card-variant-a-halo-inset-y $drivers-card-variant-a-halo-inset-x,
+            $drivers-card-variant-a-halo-blur,
+            0.55,
+            rgba($team-red-bull, $drivers-card-variant-a-color-strength),
+            rgba($team-red-bull, $drivers-card-variant-a-color-strength),
+            0%,
+            72%
+        );
+    }
+
+    &--team-mercedes::after {
+        @include radial-halo(
+            $drivers-card-variant-a-halo-inset-y $drivers-card-variant-a-halo-inset-x,
+            $drivers-card-variant-a-halo-blur,
+            0.55,
+            rgba($team-mercedes, $drivers-card-variant-a-color-strength),
+            rgba($team-mercedes, $drivers-card-variant-a-color-strength),
+            0%,
+            72%
+        );
+    }
+
+    &--team-ferrari::after {
+        @include radial-halo(
+            $drivers-card-variant-a-halo-inset-y $drivers-card-variant-a-halo-inset-x,
+            $drivers-card-variant-a-halo-blur,
+            0.55,
+            rgba($team-ferrari, $drivers-card-variant-a-color-strength),
+            rgba($team-ferrari, $drivers-card-variant-a-color-strength),
+            0%,
+            72%
+        );
+    }
+
+    &--team-williams::after {
+        @include radial-halo(
+            $drivers-card-variant-a-halo-inset-y $drivers-card-variant-a-halo-inset-x,
+            $drivers-card-variant-a-halo-blur,
+            0.55,
+            rgba($team-williams, $drivers-card-variant-a-color-strength),
+            rgba($team-williams, $drivers-card-variant-a-color-strength),
+            0%,
+            72%
+        );
+    }
+
+    &--team-aston-martin::after {
+        @include radial-halo(
+            $drivers-card-variant-a-halo-inset-y $drivers-card-variant-a-halo-inset-x,
+            $drivers-card-variant-a-halo-blur,
+            0.55,
+            rgba($team-aston-martin, $drivers-card-variant-a-color-strength),
+            rgba($team-aston-martin, $drivers-card-variant-a-color-strength),
+            0%,
+            72%
+        );
+    }
+
+    &--team-kick-sauber::after {
+        @include radial-halo(
+            $drivers-card-variant-a-halo-inset-y $drivers-card-variant-a-halo-inset-x,
+            $drivers-card-variant-a-halo-blur,
+            0.55,
+            rgba($team-kick-sauber, $drivers-card-variant-a-color-strength),
+            rgba($team-kick-sauber, $drivers-card-variant-a-color-strength),
+            0%,
+            72%
+        );
+    }
+
+    &--team-haas::after {
+        @include radial-halo(
+            $drivers-card-variant-a-halo-inset-y $drivers-card-variant-a-halo-inset-x,
+            $drivers-card-variant-a-halo-blur,
+            0.55,
+            rgba($team-haas, $drivers-card-variant-a-color-strength),
+            rgba($team-haas, $drivers-card-variant-a-color-strength),
+            0%,
+            72%
+        );
+    }
+
+    &--team-alpine::after {
+        @include radial-halo(
+            $drivers-card-variant-a-halo-inset-y $drivers-card-variant-a-halo-inset-x,
+            $drivers-card-variant-a-halo-blur,
+            0.55,
+            rgba($team-alpine, $drivers-card-variant-a-color-strength),
+            rgba($team-alpine, $drivers-card-variant-a-color-strength),
+            0%,
+            72%
+        );
+    }
+
+    &--team-racing-bulls::after {
+        @include radial-halo(
+            $drivers-card-variant-a-halo-inset-y $drivers-card-variant-a-halo-inset-x,
+            $drivers-card-variant-a-halo-blur,
+            0.55,
+            rgba($team-racing-bulls, $drivers-card-variant-a-color-strength),
+            rgba($team-racing-bulls, $drivers-card-variant-a-color-strength),
+            0%,
+            72%
+        );
     }
 }

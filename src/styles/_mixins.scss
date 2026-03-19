@@ -24,3 +24,117 @@
 @mixin fluid-space($property, $value) {
     #{$property}: $value;
 }
+
+@mixin team-base-gradient($team-color) {
+    background: linear-gradient(
+        90deg,
+        rgba($team-color, 0.1) 0%,
+        rgba($team-color, 0.18) 50%,
+        rgba($team-color, 0.1) 100%
+    );
+}
+
+@mixin accent-bands(
+    $accent-glow,
+    $border-color,
+    $edge-color: rgba($neutral-black, 0.92),
+    $highlight-color: rgba($neutral-white, 0.2)
+) {
+    position: relative;
+    z-index: 1;
+    height: clamp(0.8rem, 1.4vw, 1.05rem);
+    background: linear-gradient(
+        90deg,
+        $edge-color 0%,
+        $accent-glow 14%,
+        $highlight-color 50%,
+        $accent-glow 86%,
+        $edge-color 100%
+    );
+    border-bottom: 1px solid $border-color;
+}
+
+@mixin radial-halo(
+    $inset,
+    $blur,
+    $opacity,
+    $center-color,
+    $mid-color,
+    $mid-stop,
+    $outer-stop
+) {
+    inset: $inset;
+    border-radius: 999px;
+    background: radial-gradient(
+        circle,
+        $center-color 0%,
+        $mid-color $mid-stop,
+        transparent $outer-stop
+    );
+    filter: blur($blur);
+    opacity: $opacity;
+}
+
+@mixin f1-diagonal-background(
+    $angle,
+    $white-strong,
+    $white-soft,
+    $accent-strong,
+    $accent-soft,
+    $opacity: 1,
+    $edge-darkness: null,
+    $edge-softness: null
+) {
+    $layers:
+        linear-gradient(
+            $angle,
+            transparent 0%,
+            transparent 8%,
+            $white-strong 8.4%,
+            transparent 8.8%,
+            transparent 28%,
+            $accent-strong 28.5%,
+            transparent 29%,
+            transparent 71%,
+            $accent-soft 71.5%,
+            transparent 72%,
+            transparent 91.2%,
+            $white-soft 91.6%,
+            transparent 92%,
+            transparent 100%
+        );
+
+    @if $edge-darkness != null and $edge-softness != null {
+        $layers:
+            linear-gradient(
+                $angle,
+                transparent 0%,
+                $white-strong 18%,
+                transparent 18.5%,
+                transparent 34%,
+                $white-soft 34.5%,
+                transparent 35%,
+                transparent 100%
+            ),
+            linear-gradient(
+                $angle,
+                transparent 65%,
+                $white-soft 65.5%,
+                transparent 66%,
+                transparent 81.5%,
+                $white-strong 82%,
+                transparent 100%
+            ),
+            linear-gradient(
+                90deg,
+                rgba($neutral-black, $edge-darkness) 0%,
+                rgba($neutral-black, $edge-softness) 30%,
+                rgba($neutral-black, 0) 50%,
+                rgba($neutral-black, $edge-softness) 70%,
+                rgba($neutral-black, $edge-darkness) 100%
+            );
+    }
+
+    background: $layers;
+    opacity: $opacity;
+}

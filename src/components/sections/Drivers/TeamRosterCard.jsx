@@ -37,30 +37,36 @@ export default function TeamRosterCard({ team }) {
         <article
             className={`app-drivers-card app-drivers-card--team-${teamPresentation.colorModifier}`}
         >
-            <DriverSpot driver={leftDriver} align="left" />
+            <div className="app-drivers-card__band app-drivers-card__band--top" />
 
-            <div className="app-drivers-card__center">
-                <div className="app-drivers-card__team">
-                    {teamPresentation.logoUrl ? (
+            <div className="app-drivers-card__content">
+                <DriverSpot driver={leftDriver} align="left" />
+
+                <div className="app-drivers-card__center">
+                    <div className="app-drivers-card__team">
+                        {teamPresentation.logoUrl ? (
+                            <img
+                                className="app-drivers-card__team-logo"
+                                src={teamPresentation.logoUrl}
+                                alt={team.name}
+                            />
+                        ) : null}
+                        <h2 className="app-drivers-card__team-name">{team.name}</h2>
+                    </div>
+
+                    {teamPresentation.carUrl ? (
                         <img
-                            className="app-drivers-card__team-logo"
-                            src={teamPresentation.logoUrl}
-                            alt={team.name}
+                            className="app-drivers-card__car"
+                            src={teamPresentation.carUrl}
+                            alt={`Voiture ${team.name}`}
                         />
                     ) : null}
-                    <h2 className="app-drivers-card__team-name">{team.name}</h2>
                 </div>
 
-                {teamPresentation.carUrl ? (
-                    <img
-                        className="app-drivers-card__car"
-                        src={teamPresentation.carUrl}
-                        alt={`Voiture ${team.name}`}
-                    />
-                ) : null}
+                <DriverSpot driver={rightDriver} align="right" />
             </div>
 
-            <DriverSpot driver={rightDriver} align="right" />
+            <div className="app-drivers-card__band app-drivers-card__band--bottom" />
         </article>
     );
 }

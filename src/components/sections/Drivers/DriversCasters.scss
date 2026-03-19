@@ -1,0 +1,167 @@
+﻿@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.app-drivers-showcase-card {
+    --showcase-accent: #{rgba($action-gold, 0.4)};
+    --showcase-border: #{rgba($action-gold, 0.28)};
+    --showcase-eyebrow: #{rgba($action-gold, 0.88)};
+    --showcase-halo-strong: #{rgba($action-gold, 0.16)};
+    --showcase-halo-soft: #{rgba($action-gold, 0.08)};
+    --showcase-stripe-strong: #{rgba($action-gold, 0.11)};
+    --showcase-stripe-soft: #{rgba($action-gold, 0.09)};
+    position: relative;
+    width: min(100%, 64rem);
+    border: 1px solid var(--showcase-border);
+    border-radius: 18px;
+    background:
+        linear-gradient(
+            135deg,
+            rgba($neutral-white, 0.035) 0%,
+            rgba($neutral-white, 0.01) 26%,
+            rgba($neutral-black, 0.18) 100%
+        ),
+        linear-gradient(
+            90deg,
+            rgba($neutral-black, 0.84) 0%,
+            rgba($surface-nav, 0.96) 50%,
+            rgba($neutral-black, 0.84) 100%
+        );
+    box-shadow:
+        0 0 0 1px rgba($neutral-black, 0.25) inset,
+        0 18px 44px rgba($neutral-black, 0.28);
+    overflow: hidden;
+    isolation: isolate;
+
+    &--staff {
+        --showcase-accent: #{rgba($neutral-white, 0.32)};
+        --showcase-border: #{rgba($neutral-white, 0.22)};
+        --showcase-eyebrow: #{rgba($neutral-white, 0.88)};
+        --showcase-halo-strong: #{rgba($neutral-white, 0.14)};
+        --showcase-halo-soft: #{rgba($neutral-white, 0.07)};
+        --showcase-stripe-strong: #{rgba($neutral-white, 0.11)};
+        --showcase-stripe-soft: #{rgba($neutral-white, 0.08)};
+    }
+
+    &::before,
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    &::before {
+        @include f1-diagonal-background(
+            115deg,
+            rgba($neutral-white, 0.055),
+            rgba($neutral-white, 0.05),
+            var(--showcase-stripe-strong),
+            var(--showcase-stripe-soft),
+            0.95
+        );
+    }
+
+    &::after {
+        @include radial-halo(
+            18% 22%,
+            38px,
+            0.92,
+            var(--showcase-halo-strong),
+            var(--showcase-halo-soft),
+            34%,
+            72%
+        );
+    }
+
+    &__band {
+        @include accent-bands(var(--showcase-accent), var(--showcase-border));
+
+        &--bottom {
+            border-top: 1px solid var(--showcase-border);
+            border-bottom: none;
+        }
+    }
+
+    &__inner {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: clamp(0.75rem, 1.8vw, 1.2rem);
+        padding: clamp(1rem, 2.4vw, 1.8rem);
+    }
+
+    &__eyebrow {
+        margin: 0;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: clamp(0.62rem, 1vw, 0.78rem);
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--showcase-eyebrow);
+    }
+
+    &__frame {
+        position: relative;
+        width: min(100%, 46rem);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: clamp(0.75rem, 1.8vw, 1.25rem);
+        padding: clamp(0.45rem, 1vw, 0.7rem);
+        border: 1px solid rgba($neutral-white, 0.12);
+        border-radius: 14px;
+        background:
+            linear-gradient(
+                180deg,
+                rgba($neutral-white, 0.05) 0%,
+                rgba($neutral-black, 0.1) 100%
+            );
+        overflow: hidden;
+
+        &::before,
+        &::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: clamp(0.4rem, 0.8vw, 0.6rem);
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent 0%,
+                    rgba($neutral-white, 0.18) 12%,
+                    var(--showcase-accent) 50%,
+                    rgba($neutral-white, 0.18) 88%,
+                    transparent 100%
+                );
+            pointer-events: none;
+        }
+
+        &::before {
+            top: 0;
+            border-bottom: 1px solid rgba($neutral-black, 0.24);
+        }
+
+        &::after {
+            bottom: 0;
+            border-top: 1px solid rgba($neutral-black, 0.24);
+        }
+
+        &--staff {
+            width: min(100%, 52rem);
+            justify-content: space-evenly;
+        }
+    }
+}
+
+.app-drivers-showcase-card .app-drivers__casters-title {
+    max-width: 24ch;
+    margin: 0;
+    text-wrap: balance;
+}
+
+.app-drivers__casters-image--staff {
+    width: min(44.444%, 14.25rem);
+}
