@@ -14,6 +14,8 @@ Mémoire de travail du projet pour garder les décisions, contraintes et priorit
 - Module `Résultats` public en place.
 - Saisie admin des résultats GP en place.
 - Drapeaux migrés depuis `flag-icons` vers des SVG locaux.
+- Métadonnées Open Graph / Twitter Card configurées dans `index.html` avec image publique `public/brand/les-fous-du-volant-oc.webp`.
+- Favicons publics servis depuis `public/favicon` et `public/site.webmanifest`.
 
 ## Choix techniques verrouillés
 
@@ -36,6 +38,7 @@ Aucune clé `secret` ou `service_role` ne doit être injectée dans le frontend.
 ## Auth et profils
 
 - Les utilisateurs sont synchronisés dans `profiles` à la connexion.
+- Le login Twitch via Supabase doit renvoyer l'utilisateur sur l'URL exacte en cours pour préserver le contexte d'usage, notamment sur `Multi-Twitch`.
 - Champs utiles de `profiles` :
   - `id`
   - `provider`
@@ -46,6 +49,7 @@ Aucune clé `secret` ou `service_role` ne doit être injectée dans le frontend.
   - `is_super_admin`
 - `provider_login` correspond au login Twitch.
 - `display_name` correspond au nom d'affichage Twitch avec sa casse.
+- Pour la détection Multi-Twitch, si `drivers.linked_user_id` n'est pas renseigné, le fallback de login doit privilégier `drivers.display_name`, puis seulement `drivers.id`, car certains `id` historiques ont perdu des underscores finaux.
 
 ## Permissions
 
@@ -162,6 +166,25 @@ Règles validées :
 - Les pages sont lazy-loadées pour réduire le bundle initial.
 - `wrangler` est installé localement pour éviter les téléchargements implicites au déploiement.
 - Le gros poste restant côté assets est désormais constitué des SVG/medias réels, pas d'une dépendance CSS globale de drapeaux.
+
+## Projection Multi-Twitch
+
+- Pour préserver au mieux le comportement Twitch natif, privilégier les embeds officiels Twitch pour la vidéo et le chat.
+- La détection des chaînes live doit passer par Supabase Edge Functions, jamais directement depuis le frontend public.
+- Le modèle retenu pour la détection live est un snapshot en base relu par le frontend, avec une Edge Function `refresh-multi-twitch-live` qui seule décide d'interroger Twitch au maximum une fois par tranche de 60 secondes.
+- Le refresh manuel Multi-Twitch contourne la fenêtre auto de 60 secondes, mais reste limité à une relance maximale toutes les 15 secondes.
+- Le snapshot live est stocké dans `public.multi_twitch_live_snapshot`.
+- La fonction métier de coordination SQL est `public.claim_multi_twitch_live_refresh(...)`.
+- La configuration locale Multi-Twitch (POV sélectionnées, panneaux, réglages audio) est persistée dans `localStorage` pour restaurer l'interface lors d'un retour sur la page.
+- Un mode de test temporaire ajoute des chaînes Twitch mockées à la détection live via un flag dans `src/components/sections/MultiTwitch/MultiTwitch.jsx` et `supabase/functions/refresh-multi-twitch-live/index.ts`.
+- Si ce mode de test n'est plus utile, il faut retirer le flag et la liste de chaînes dans les deux fichiers en même temps.
+- Le modèle cible le plus simple est :
+  - colonne gauche : sélection des chaînes actives
+  - centre : embeds vidéo Twitch officiels
+  - droite : un seul chat Twitch officiel, commutable entre les POV affichées
+- Le tchat Multi-Twitch doit rester basé sur l'embed officiel Twitch par iframe, pas sur un tchat custom.
+- Éviter par défaut la construction d'un chat custom multi-chaînes, plus coûteux en auth, modération et maintenance.
+- Tant que la section n'est pas prête pour la production, la route `/multi-twitch` doit afficher `Wip` sans supprimer ni casser le code du module `MultiTwitch`.
 
 ## Déploiement Cloudflare - procédure courante
 

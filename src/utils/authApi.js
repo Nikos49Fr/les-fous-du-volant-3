@@ -1,6 +1,7 @@
 import { supabase } from './supabaseClient';
 
 let authCodeExchangePromise = null;
+const AUTH_RETURN_URL_KEY = 'fdv-auth-return-url';
 
 function getProviderIdentity(user) {
     return (
@@ -90,6 +91,22 @@ function clearAuthParamsFromUrl() {
     window.history.replaceState({}, document.title, nextUrl);
 }
 
+function getStoredAuthReturnUrl() {
+    if (typeof window === 'undefined') {
+        return '';
+    }
+
+    return window.sessionStorage.getItem(AUTH_RETURN_URL_KEY) ?? '';
+}
+
+function clearStoredAuthReturnUrl() {
+    if (typeof window === 'undefined') {
+        return;
+    }
+
+    window.sessionStorage.removeItem(AUTH_RETURN_URL_KEY);
+}
+
 async function ensureSessionFromUrl() {
     if (typeof window === 'undefined') {
         return;
@@ -118,8 +135,17 @@ async function ensureSessionFromUrl() {
                 throw error;
             }
         } finally {
+            const targetUrl = getStoredAuthReturnUrl();
             clearAuthParamsFromUrl();
             authCodeExchangePromise = null;
+
+            if (targetUrl && targetUrl !== window.location.href) {
+                clearStoredAuthReturnUrl();
+                window.location.replace(targetUrl);
+                return;
+            }
+
+            clearStoredAuthReturnUrl();
         }
     })();
 
@@ -194,10 +220,12 @@ export async function fetchCurrentCapabilityIds() {
 }
 
 export async function signInWithTwitch() {
+    window.sessionStorage.setItem(AUTH_RETURN_URL_KEY, window.location.href);
+
     const { error } = await supabase.auth.signInWithOAuth({
         provider: 'twitch',
         options: {
-            redirectTo: window.location.origin,
+            redirectTo: window.location.href,
         },
     });
 
