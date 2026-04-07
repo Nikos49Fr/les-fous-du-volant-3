@@ -1,3 +1,5 @@
+const SUPER_ADMIN_CONFIGURABLE_CAPABILITY = 'multi_twitch.test_channels.view';
+
 ﻿function getCapabilityEnabled(user, capabilityId) {
     if (!Array.isArray(user.capabilities)) {
         return false;
@@ -93,11 +95,21 @@ export default function AdminCapabilitiesPanel({
 
                                 {capabilityIds.map((capabilityId) => {
                                     const cellKey = `${user.userId}:${capabilityId}`;
-                                    const checked = user.isSuperAdmin
-                                        ? true
-                                        : getCapabilityEnabled(user, capabilityId);
+                                    const isSuperAdminCapabilityOverride =
+                                        user.isSuperAdmin &&
+                                        capabilityId ===
+                                            SUPER_ADMIN_CONFIGURABLE_CAPABILITY;
+                                    const checked =
+                                        user.isSuperAdmin &&
+                                        !isSuperAdminCapabilityOverride
+                                            ? true
+                                            : getCapabilityEnabled(
+                                                  user,
+                                                  capabilityId,
+                                              );
                                     const disabled =
-                                        user.isSuperAdmin ||
+                                        (user.isSuperAdmin &&
+                                            !isSuperAdminCapabilityOverride) ||
                                         savingCells[cellKey] === true;
 
                                     return (

@@ -1,0 +1,46 @@
+@use '../../../../styles/variables' as *;
+
+.app-multi-twitch__pov-grid {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    background-color: $surface-nav;
+    align-content: start;
+    overflow: auto;
+
+    &--dragging .app-twitch-player-embed,
+    &--dragging .app-twitch-player-embed__mount,
+    &--dragging .app-twitch-player-embed__mount iframe {
+        pointer-events: none;
+    }
+
+    &--1 {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: minmax(0, 1fr);
+    }
+
+    &--2,
+    &--4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    &--3 {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+
+        .app-multi-twitch__pov-tile {
+            grid-column: span 2;
+        }
+    }
+
+    &--5 {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+
+        .app-multi-twitch__pov-tile {
+            grid-column: span 2;
+        }
+    }
+
+    &--6 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}

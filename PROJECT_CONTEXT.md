@@ -176,6 +176,25 @@ Règles validées :
 - Le snapshot live est stocké dans `public.multi_twitch_live_snapshot`.
 - La fonction métier de coordination SQL est `public.claim_multi_twitch_live_refresh(...)`.
 - La configuration locale Multi-Twitch (POV sélectionnées, panneaux, réglages audio) est persistée dans `localStorage` pour restaurer l'interface lors d'un retour sur la page.
+- Le réglage de volume réutilisable est factorisé dans `src/components/ui/VolumeControl/VolumeControl.jsx` pour servir à la fois au contrôle global et aux futurs contrôles individuels par POV.
+- Le composant `VolumeControl` porte sa largeur via `--app-volume-control-width` sur sa racine ; le `range` interne reste en `width: 100%` pour garder un réglage simple par contexte.
+- Les POV Multi-Twitch disposent maintenant aussi d'un `VolumeControl` individuel dans leur en-tête.
+- La barre de contrôle au-dessus du stage a été retirée ; le pilotage audio global vit désormais en bas du panneau gauche.
+- La zone audio du panneau gauche est découpée en sous-composants dédiés et contient :
+  - un `Master volume`
+  - un bouton `Mute all` / `Unmute all`
+  - une liste radio des POV sélectionnées pour désigner la POV master à écouter
+- La zone audio expose aussi une info-bulle d'aide dédiée au fonctionnement du mix audio.
+- Le contrôle audio global applique le mix principal sur les POV sélectionnées :
+  - POV master au volume `Master volume`
+  - autres POV à `1%`
+- Le bouton `Mute all` coupe toutes les POV sélectionnées et `Unmute all` restaure les volumes exacts mémorisés juste avant la coupure.
+- La section `MultiTwitch` est maintenant découpée par responsabilités avec SCSS locaux par zone :
+  - shell partagé pour les panneaux
+  - roster séparé
+  - stage/POV séparé
+  - chat séparé
+  - les sous-composants dédiés doivent porter leur propre style local, `MultiTwitch.scss` ne gardant que le placement global
 - Un mode de test temporaire ajoute des chaînes Twitch mockées à la détection live via un flag dans `src/components/sections/MultiTwitch/MultiTwitch.jsx` et `supabase/functions/refresh-multi-twitch-live/index.ts`.
 - Si ce mode de test n'est plus utile, il faut retirer le flag et la liste de chaînes dans les deux fichiers en même temps.
 - Le modèle cible le plus simple est :
@@ -183,8 +202,23 @@ Règles validées :
   - centre : embeds vidéo Twitch officiels
   - droite : un seul chat Twitch officiel, commutable entre les POV affichées
 - Le tchat Multi-Twitch doit rester basé sur l'embed officiel Twitch par iframe, pas sur un tchat custom.
+- Les chaînes Twitch de test Multi-Twitch restent surveillées par l'Edge Function, mais leur affichage frontend est désormais piloté par la permission utilisateur `multi_twitch.test_channels.view`.
+- Cette permission est exposée dans l'admin comme les autres capacités et constitue l'unique exception modifiable sur un profil super-admin.
+- Le thème du tchat Multi-Twitch est piloté côté frontend (`light` / `dark`) avec fallback initial sur `prefers-color-scheme`, puis persistance dans `localStorage`.
+- Le thème sombre du tchat Twitch repose sur le paramètre d'iframe `darkpopout`.
+- Le nombre de POV Multi-Twitch autorisées à l'écran dépend de la largeur viewport via des seuils simplifiés :
+  - `< 560px` : `1 POV`
+  - `< 769px` : `2 POV`
+  - `< 1024px` : `4 POV`
+  - `>= 1024px` : `6 POV`
+- En cas de réduction de largeur, les POV excédentaires restent sélectionnées en mémoire mais seules les POV autorisées sont affichées ; un message discret indique le nombre de POV masquées.
+- Les POV du stage utilisent un cadre interne gardant un ratio vidéo `4:3`; la barre de titre reste hors ratio et s'ajoute au-dessus.
+- L'ordre des POV sélectionnées est réordonnable directement dans le stage par drag-and-drop HTML5 ; cet ordre reste la source de vérité partagée pour la grille, la liste radio audio et le carrousel de tchat.
+- Les embeds vidéo Twitch doivent conserver un identifiant de montage stable basé sur `entry.id`.
+- La grille de POV doit conserver un ordre DOM stable pendant le drag-and-drop et ne faire varier que l'ordre visuel (`order`) afin d'éviter le rechargement du player déplacé.
+- La synchronisation audio des players Twitch est pilotée par prop (`volumePercent`) et doit être rejouée sur l'événement `READY` du player pour éviter les POV visuellement non rechargées mais audio encore mutées au retour ou après réordonnancement.
 - Éviter par défaut la construction d'un chat custom multi-chaînes, plus coûteux en auth, modération et maintenance.
-- Tant que la section n'est pas prête pour la production, la route `/multi-twitch` doit afficher `Wip` sans supprimer ni casser le code du module `MultiTwitch`.
+- La route `/multi-twitch` pointe de nouveau vers le module `MultiTwitch`; le wrapper `MultiTwitchWip` reste disponible si un masquage temporaire doit être réactivé plus tard.
 
 ## Déploiement Cloudflare - procédure courante
 
@@ -203,3 +237,8 @@ Règles validées :
 - Tous les textes affichables doivent rester en UTF-8 propre avec accents français corrects.
 - Cette règle vaut aussi pour les `aria-label`, `alt`, info-bulles et messages de fallback.
 - Factoriser le SCSS avec des mixins dès qu'un motif visuel ou une logique de style se répète de façon pertinente.
+- Stratégie Git planifiée après la mise en prod de `Multi-Twitch` :
+  - `main` doit redevenir la branche déployable propre
+  - les futures grosses features se feront sur branche dédiée
+  - les micro-corrections prod se feront depuis `main` ou une branche courte dédiée, puis seront reportées vers la branche feature si nécessaire
+- Tant que `Multi-Twitch` n'est pas livré en prod, on continue exceptionnellement sur l'état courant sans introduire de branche Git supplémentaire.

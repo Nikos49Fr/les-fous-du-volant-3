@@ -1,0 +1,73 @@
+﻿@use '../../../../styles/variables' as *;
+
+.app-multi-twitch__audio-tooltip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+
+    &:hover .app-multi-twitch__audio-tooltip-bubble,
+    &:focus-within .app-multi-twitch__audio-tooltip-bubble {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+}
+
+.app-multi-twitch__audio-tooltip-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1rem;
+    height: 1rem;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: $neutral-white-60;
+    cursor: help;
+
+    svg {
+        width: 0.92rem;
+        height: 0.92rem;
+        fill: currentColor;
+    }
+}
+
+.app-multi-twitch__audio-tooltip-bubble {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 0.35rem);
+    z-index: 40;
+    width: min(18rem, 72vw);
+    padding: 0.65rem 0.75rem;
+    border: 1px solid rgba($neutral-white, 0.1);
+    background: rgba($surface-nav, 0.96);
+    box-shadow: 0 0.6rem 1.4rem rgba($neutral-black, 0.35);
+    opacity: 0;
+    transform: translateY(0.2rem);
+    pointer-events: none;
+    transition:
+        opacity 150ms ease,
+        transform 150ms ease;
+
+    p {
+        margin: 0;
+        color: $neutral-white-75;
+        font-family: 'Titillium Web', sans-serif;
+        font-size: 0.84rem;
+        line-height: 1.36;
+
+        & + p {
+            margin-top: 0.45rem;
+        }
+    }
+
+    p:first-child {
+        color: $content-inverse;
+        font-weight: 700;
+    }
+}
+
+.app-multi-twitch__audio-tooltip-question {
+    color: $content-inverse !important;
+    font-weight: 700;
+}

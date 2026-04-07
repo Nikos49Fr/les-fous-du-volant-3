@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './TwitchPlayerEmbed.scss';
 
 let twitchScriptPromise;
@@ -44,15 +44,55 @@ export default function TwitchPlayerEmbed({
     channel,
     title,
     entryId,
-    onRegisterPlayerController,
+    volumePercent = 100,
 }) {
-    const reactId = useId();
-    const containerId = `app-twitch-player-${reactId.replace(/[^a-zA-Z0-9_-]/g, '')}`;
+    const containerId = `app-twitch-player-${String(entryId).replace(/[^a-zA-Z0-9_-]/g, '')}`;
     const [hasError, setHasError] = useState(false);
+    const desiredVolumePercentRef = useRef(
+        Math.min(100, Math.max(0, Number(volumePercent))),
+    );
+    const playerInstanceRef = useRef(null);
+    const isPlayerReadyRef = useRef(false);
+
+    useEffect(() => {
+        desiredVolumePercentRef.current = Math.min(
+            100,
+            Math.max(0, Number(volumePercent)),
+        );
+
+        if (!isPlayerReadyRef.current || !playerInstanceRef.current?.setVolume) {
+            return;
+        }
+
+        const normalizedVolume = desiredVolumePercentRef.current / 100;
+
+        if (playerInstanceRef.current?.setMuted) {
+            playerInstanceRef.current.setMuted(normalizedVolume <= 0);
+        }
+
+        playerInstanceRef.current.setVolume(normalizedVolume);
+    }, [volumePercent]);
 
     useEffect(() => {
         let playerInstance = null;
         let isDisposed = false;
+
+        function applyVolume(nextVolumePercent) {
+            if (!playerInstance?.setVolume) {
+                return;
+            }
+
+            const normalizedVolume = Math.min(
+                1,
+                Math.max(0, Number(nextVolumePercent) / 100),
+            );
+
+            if (playerInstance?.setMuted) {
+                playerInstance.setMuted(normalizedVolume <= 0);
+            }
+
+            playerInstance.setVolume(normalizedVolume);
+        }
 
         async function mountPlayer() {
             if (!channel) {
@@ -78,22 +118,17 @@ export default function TwitchPlayerEmbed({
                     muted: true,
                 });
 
-                onRegisterPlayerController?.(entryId, {
-                    setVolumePercent(nextVolumePercent) {
-                        if (!playerInstance?.setVolume) {
+                if (playerInstance?.addEventListener && twitch.Player?.READY) {
+                    playerInstance.addEventListener(twitch.Player.READY, () => {
+                        if (isDisposed) {
                             return;
                         }
 
-                        const normalizedVolume = Math.min(
-                            1,
-                            Math.max(0, Number(nextVolumePercent) / 100),
-                        );
-                        if (playerInstance?.setMuted) {
-                            playerInstance.setMuted(normalizedVolume <= 0);
-                        }
-                        playerInstance.setVolume(normalizedVolume);
-                    },
-                });
+                        isPlayerReadyRef.current = true;
+                        applyVolume(desiredVolumePercentRef.current);
+                    });
+                }
+                playerInstanceRef.current = playerInstance;
             } catch (_error) {
                 if (!isDisposed) {
                     setHasError(true);
@@ -105,12 +140,13 @@ export default function TwitchPlayerEmbed({
 
         return () => {
             isDisposed = true;
-            onRegisterPlayerController?.(entryId, null);
+            playerInstanceRef.current = null;
+            isPlayerReadyRef.current = false;
             if (playerInstance && typeof playerInstance.destroy === 'function') {
                 playerInstance.destroy();
             }
         };
-    }, [channel, containerId, entryId, onRegisterPlayerController]);
+    }, [channel, containerId]);
 
     return (
         <div className="app-twitch-player-embed">

@@ -15,19 +15,22 @@ function getParentHosts() {
     return [...hostnames];
 }
 
-export default function TwitchChatEmbed({ channel, title }) {
+export default function TwitchChatEmbed({ channel, title, theme = 'dark' }) {
     const embedSrc = useMemo(() => {
         if (!channel) {
             return '';
         }
 
         const params = new URLSearchParams();
+        if (theme === 'dark') {
+            params.append('darkpopout', '');
+        }
         for (const host of getParentHosts()) {
             params.append('parent', host);
         }
 
         return `https://www.twitch.tv/embed/${channel}/chat?${params.toString()}`;
-    }, [channel]);
+    }, [channel, theme]);
 
     if (!channel) {
         return (

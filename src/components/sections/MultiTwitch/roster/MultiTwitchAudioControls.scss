@@ -1,0 +1,27 @@
+﻿@use '../../../../styles/variables' as *;
+
+.app-multi-twitch__audio-controls {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.55rem, 0.8vw, 0.7rem);
+    padding: clamp(0.45rem, 0.75vw, 0.6rem)
+        clamp(0.45rem, 0.75vw, 0.6rem)
+        clamp(0.55rem, 0.9vw, 0.75rem);
+    border-top: 1px solid $stroke-divider;
+    background-color: rgba($surface-nav, 0.42);
+}
+
+.app-multi-twitch__audio-controls-header {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.app-multi-twitch__audio-controls-title {
+    margin: 0;
+    color: $content-inverse;
+    font-family: 'Titillium Web', sans-serif;
+    font-size: clamp(0.86rem, 1vw, 0.94rem);
+    font-weight: 700;
+    line-height: 1.1;
+}

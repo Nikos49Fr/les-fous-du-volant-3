@@ -22,12 +22,12 @@ export default function Home() {
                         rel="noreferrer"
                     >
                         <iframe
-                        className="app-home__trailer-embed"
-                        src={TRAILER_EMBED_URL}
-                        title="Tournoi des Fous du Volant - Saison 3 | Trailer officiel"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        referrerPolicy="strict-origin-when-cross-origin"
-                        allowFullScreen
+                            className="app-home__trailer-embed"
+                            src={TRAILER_EMBED_URL}
+                            title="Tournoi des Fous du Volant - Saison 3 | Trailer officiel"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            referrerPolicy="strict-origin-when-cross-origin"
+                            allowFullScreen
                         />
                     </a>
                 </div>
@@ -89,24 +89,24 @@ export default function Home() {
 
                 <ul>
                     <li>
-                        <strong>20h30</strong> : Qualifications Sprint (18 min)
+                        <strong>20h30</strong> : Qualifications Sprint (12 min)
                     </li>
                     <li>
-                        <strong>20h50 : Course Sprint 50 %</strong> (20 min)
+                        <strong>20h45 : Course Sprint 50 %</strong> (~20 min)
                     </li>
                     <li>
                         <strong>21h10</strong> :{' '}
-                        <em> Re-création du lobby + pause (5 à 10 min)</em>
+                        <em> Re-création du lobby + pause (~5 min)</em>
                     </li>
                     <li>
-                        <strong>21h25</strong> : Qualifications complètes (Q1 18
+                        <strong>21h20</strong> : Qualifications complètes (Q1 18
                         min + Q2 15 min + Q3 12 min)
                     </li>
                     <li>
-                        <strong>22h20 : Course 50 %</strong> (50 min)
+                        <strong>22h10 : Course 50 %</strong> (~50 min)
                     </li>
                     <li>
-                        <strong>23h10</strong> : Débrief
+                        <strong>23h00</strong> : Fin
                     </li>
                 </ul>
             </article>

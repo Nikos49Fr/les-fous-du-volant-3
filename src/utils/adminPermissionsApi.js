@@ -1,5 +1,39 @@
-﻿import { supabase } from './supabaseClient';
+import { supabase } from './supabaseClient';
 import { fetchCurrentViewer, syncCurrentProfile } from './authApi';
+
+const SUPER_ADMIN_CONFIGURABLE_CAPABILITY = 'multi_twitch.test_channels.view';
+const SYSTEM_CAPABILITY_METADATA = {
+    'calendar.write': {
+        label: 'Calendrier',
+        description: 'Revele et met a jour le calendrier.',
+        isSystem: true,
+    },
+    'results.write': {
+        label: 'Resultats',
+        description:
+            'Saisit et met a jour les resultats des qualifications et des courses.',
+        isSystem: true,
+    },
+    'multi_twitch.test_channels.view': {
+        label: 'Multi-Twitch tests',
+        description:
+            'Affiche les chaines Twitch de test dans la liste Multi-Twitch.',
+        isSystem: true,
+    },
+};
+
+function getCapabilityMetadata(capabilityId) {
+    const systemMetadata = SYSTEM_CAPABILITY_METADATA[capabilityId];
+    if (systemMetadata) {
+        return systemMetadata;
+    }
+
+    return {
+        label: capabilityId,
+        description: null,
+        isSystem: false,
+    };
+}
 
 function mapUserProfile(profile, capabilities) {
     return {
@@ -33,6 +67,26 @@ async function requireSuperAdmin() {
         const error = new Error('Forbidden');
         error.status = 403;
         throw error;
+    }
+}
+
+async function ensureCapabilityExists(capabilityId) {
+    const metadata = getCapabilityMetadata(capabilityId);
+
+    const { error } = await supabase.from('capabilities').upsert(
+        {
+            id: capabilityId,
+            label: metadata.label,
+            description: metadata.description,
+            is_system: metadata.isSystem,
+        },
+        { onConflict: 'id' },
+    );
+
+    if (error) {
+        const normalizedError = new Error(error.message);
+        normalizedError.status = 500;
+        throw normalizedError;
     }
 }
 
@@ -141,11 +195,16 @@ export async function setUserCapability({ targetUserId, capabilityId, enabled })
         throw error;
     }
 
-    if (targetProfile.is_super_admin === true) {
+    if (
+        targetProfile.is_super_admin === true &&
+        normalizedCapabilityId !== SUPER_ADMIN_CONFIGURABLE_CAPABILITY
+    ) {
         const error = new Error('Super-admin permissions cannot be modified');
         error.status = 403;
         throw error;
     }
+
+    await ensureCapabilityExists(normalizedCapabilityId);
 
     const payload = {
         user_id: targetUserId,

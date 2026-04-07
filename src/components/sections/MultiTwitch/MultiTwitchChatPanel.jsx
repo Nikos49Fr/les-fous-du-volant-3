@@ -1,11 +1,15 @@
-import ChevronLeftIcon from '../../../assets/icons/angle-left-solid-full.svg?react';
-import ChevronRightIcon from '../../../assets/icons/angle-right-solid-full.svg?react';
+import './shared/MultiTwitchPanelShell.scss';
+import './chat/MultiTwitchChatPanel.scss';
 import TwitchChatEmbed from '../../ui/TwitchChatEmbed/TwitchChatEmbed.jsx';
+import ChatThemeToggle from './chat/ChatThemeToggle.jsx';
+import MultiTwitchChatCarousel from './chat/MultiTwitchChatCarousel.jsx';
 import MultiTwitchPanelToggle from './MultiTwitchPanelToggle.jsx';
 
 export default function MultiTwitchChatPanel({
     isExpanded,
     onTogglePanel,
+    chatTheme,
+    onToggleTheme,
     selectedEntries,
     activeChatEntry,
     onPreviousChat,
@@ -30,32 +34,18 @@ export default function MultiTwitchChatPanel({
                         <h3>Tchat</h3>
                     </div>
                 ) : null}
+                {isExpanded ? (
+                    <ChatThemeToggle theme={chatTheme} onToggle={onToggleTheme} />
+                ) : null}
             </div>
 
             <div className="app-multi-twitch__panel-body">
-                <div className="app-multi-twitch__chat-carousel">
-                    <button
-                        className="app-multi-twitch__chat-arrow"
-                        type="button"
-                        aria-label="Tchat précédent"
-                        onClick={onPreviousChat}
-                        disabled={selectedEntries.length === 0}
-                    >
-                        <ChevronLeftIcon aria-hidden="true" focusable="false" />
-                    </button>
-                    <div className="app-multi-twitch__chat-channel">
-                        {activeChatEntry?.displayName ?? 'Aucun POV'}
-                    </div>
-                    <button
-                        className="app-multi-twitch__chat-arrow"
-                        type="button"
-                        aria-label="Tchat suivant"
-                        onClick={onNextChat}
-                        disabled={selectedEntries.length === 0}
-                    >
-                        <ChevronRightIcon aria-hidden="true" focusable="false" />
-                    </button>
-                </div>
+                <MultiTwitchChatCarousel
+                    selectedEntries={selectedEntries}
+                    activeChatEntry={activeChatEntry}
+                    onPreviousChat={onPreviousChat}
+                    onNextChat={onNextChat}
+                />
                 <div className="app-multi-twitch__chat-frame">
                     <TwitchChatEmbed
                         channel={
@@ -64,9 +54,11 @@ export default function MultiTwitchChatPanel({
                             ''
                         }
                         title={activeChatEntry?.displayName ?? ''}
+                        theme={chatTheme}
                     />
                 </div>
             </div>
         </aside>
     );
 }
+

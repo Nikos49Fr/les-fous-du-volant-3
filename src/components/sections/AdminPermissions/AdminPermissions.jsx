@@ -9,7 +9,11 @@ import {
     setUserCapability,
 } from '../../../utils/adminPermissionsApi';
 
-const BASE_CAPABILITIES = ['calendar.write', 'results.write'];
+const BASE_CAPABILITIES = [
+    'calendar.write',
+    'multi_twitch.test_channels.view',
+    'results.write',
+];
 const ADMIN_TAB_CAPABILITIES = 'capabilities';
 const ADMIN_TAB_DRIVERS = 'drivers';
 

@@ -1,0 +1,85 @@
+@use '../../../../styles/variables' as *;
+
+.app-multi-twitch__panel {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    background-color: $surface-contrast;
+    font-family: 'Titillium Web', sans-serif;
+    transition:
+        width 220ms ease,
+        flex-basis 220ms ease;
+
+    &-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: clamp(2rem, 3vw, 2.4rem);
+        border-bottom: 1px solid $stroke-divider;
+        box-sizing: border-box;
+    }
+
+    &-title-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        min-width: 0;
+        padding: clamp(0.2rem, 0.45vw, 0.32rem)
+            clamp(0.3rem, 0.55vw, 0.45rem);
+
+        &--chat {
+            flex: 1 1 auto;
+            text-align: left;
+        }
+
+        & h3 {
+            margin: 0;
+            min-width: 0;
+            font-family: 'Titillium Web', sans-serif;
+            font-size: clamp(0.95rem, 1.35vw, 1.1rem);
+            font-weight: 700;
+            line-height: 1.1;
+            color: $content-inverse;
+        }
+
+        & p {
+            margin: 0;
+            color: $neutral-white-60;
+            font-family: 'Titillium Web', sans-serif;
+            font-size: clamp(0.72rem, 0.95vw, 0.82rem);
+            line-height: 1.1;
+            text-align: left;
+        }
+    }
+
+    &-body {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        flex: 1 1 auto;
+        min-height: 0;
+        opacity: 1;
+        overflow: hidden;
+        transition: opacity 160ms ease;
+    }
+
+    &--left &-toggle {
+        border-left: 1px solid $stroke-divider;
+    }
+
+    &--right &-toggle {
+        border-right: 1px solid $stroke-divider;
+    }
+
+    &--collapsed {
+        width: clamp(2.5rem, 3vw, 2.9rem);
+        min-width: clamp(2.5rem, 3vw, 2.9rem);
+        max-width: clamp(2.5rem, 3vw, 2.9rem);
+        flex-basis: clamp(2.5rem, 3vw, 2.9rem);
+
+        .app-multi-twitch__panel-body {
+            opacity: 0;
+            pointer-events: none;
+        }
+    }
+}

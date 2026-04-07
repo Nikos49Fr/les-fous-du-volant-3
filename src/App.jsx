@@ -8,9 +8,7 @@ const Drivers = lazy(() => import('./components/sections/Drivers/Drivers.jsx'));
 const Calendar = lazy(() => import('./components/sections/Calendar/Calendar.jsx'));
 const Circuits = lazy(() => import('./components/sections/Circuits/Circuits.jsx'));
 const Results = lazy(() => import('./components/sections/Results/Results.jsx'));
-const MultiTwitchWip = lazy(
-    () => import('./components/sections/MultiTwitch/MultiTwitchWip.jsx'),
-);
+const MultiTwitch = lazy(() => import('./components/sections/MultiTwitch/MultiTwitch.jsx'));
 const LobbySetup = lazy(() => import('./components/sections/LobbySetup/LobbySetup.jsx'));
 const AdminPermissions = lazy(
     () => import('./components/sections/AdminPermissions/AdminPermissions.jsx'),
@@ -83,7 +81,7 @@ function AppShell() {
                         <Route path="/calendar" element={<Calendar />} />
                         <Route path="/circuits" element={<Circuits />} />
                         <Route path="/results" element={<Results />} />
-                        <Route path="/multi-twitch" element={<MultiTwitchWip />} />
+                        <Route path="/multi-twitch" element={<MultiTwitch />} />
                         <Route path="/lobby-setup" element={<LobbySetup />} />
                         <Route
                             path="/admin/permissions"

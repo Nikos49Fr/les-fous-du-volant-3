@@ -1,0 +1,27 @@
+@use '../../../../styles/variables' as *;
+
+.app-multi-twitch__stage {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: $surface-nav;
+}
+
+.app-multi-twitch__empty-stage {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid $stroke-divider;
+
+    & p {
+        margin: 0;
+        color: $neutral-white-60;
+        font-family: 'Titillium Web', sans-serif;
+        font-size: clamp(0.92rem, 1.2vw, 1rem);
+        text-align: center;
+    }
+}
+

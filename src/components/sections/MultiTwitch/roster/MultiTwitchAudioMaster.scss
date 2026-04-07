@@ -1,0 +1,64 @@
+﻿@use '../../../../styles/variables' as *;
+
+.app-multi-twitch__audio-master {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.45rem, 0.7vw, 0.6rem);
+}
+
+.app-multi-twitch__audio-subtitle {
+    margin: 0;
+    color: $neutral-white-75;
+    font-family: 'Titillium Web', sans-serif;
+    font-size: clamp(0.76rem, 0.9vw, 0.82rem);
+    font-weight: 600;
+    line-height: 1.1;
+}
+
+.app-multi-twitch__audio-master-volume {
+    --app-volume-control-width: 100%;
+}
+
+.app-multi-twitch__audio-mute-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.42rem;
+    align-self: flex-start;
+    padding: 0.34rem 0.55rem;
+    border: 1px solid transparent;
+    background: transparent;
+    font-family: 'Titillium Web', sans-serif;
+    font-size: clamp(0.84rem, 1vw, 0.92rem);
+    font-weight: 700;
+    line-height: 1.1;
+    cursor: pointer;
+    transition:
+        background-color 150ms ease,
+        border-color 150ms ease,
+        color 150ms ease;
+
+    svg {
+        width: 0.9rem;
+        height: 0.9rem;
+        fill: currentColor;
+    }
+
+    &--mute {
+        border-color: rgba($state-negative, 0.28);
+        background-color: rgba($state-negative, 0.08);
+        color: $state-negative;
+    }
+
+    &--restore {
+        border-color: rgba($state-positive, 0.28);
+        background-color: rgba($state-positive, 0.08);
+        color: $state-positive;
+    }
+
+    &:disabled {
+        color: rgba($neutral-white, 0.45);
+        border-color: rgba($neutral-white, 0.12);
+        background-color: transparent;
+        cursor: default;
+    }
+}

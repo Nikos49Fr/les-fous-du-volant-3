@@ -1,0 +1,84 @@
+@use '../../../../styles/variables' as *;
+
+.app-multi-twitch__refresh-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(0.3rem, 0.5vw, 0.45rem);
+    min-height: clamp(1.6rem, 2vw, 1.9rem);
+    padding: clamp(0.16rem, 0.3vw, 0.24rem)
+        clamp(0.35rem, 0.6vw, 0.5rem);
+    border-bottom: 1px solid $stroke-divider;
+    box-sizing: border-box;
+}
+
+.app-multi-twitch__refresh-label {
+    min-width: 0;
+    color: $neutral-white-60;
+    font-size: clamp(0.72rem, 0.9vw, 0.8rem);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.app-multi-twitch__refresh-button {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.15rem;
+    height: 1.15rem;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: $neutral-white-60;
+    cursor: pointer;
+    transition: color 150ms ease;
+
+    &:focus-visible {
+        outline: none;
+        box-shadow: none;
+    }
+
+    & svg {
+        width: 0.9rem;
+        height: 0.9rem;
+        fill: currentColor;
+    }
+
+    &--idle:hover {
+        color: $content-inverse;
+    }
+
+    &--auto-running {
+        color: $neutral-white-60;
+
+        & svg {
+            animation: app-multi-twitch-rotate 900ms linear infinite;
+        }
+    }
+
+    &--manual-running {
+        color: $action-success;
+
+        & svg {
+            animation: app-multi-twitch-rotate 900ms linear infinite;
+        }
+    }
+
+    &--cooldown {
+        color: $neutral-black-45;
+        cursor: default;
+    }
+}
+
+@keyframes app-multi-twitch-rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}

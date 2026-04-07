@@ -1,0 +1,68 @@
+@use '../../../../styles/variables' as *;
+
+.app-multi-twitch__theme-toggle {
+    position: relative;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    width: 54px;
+    height: 26px;
+    margin-right: 7px;
+    padding: 2px;
+    border: none;
+    border-radius: 999px;
+    background-color: rgba($neutral-white, 0.12);
+    cursor: pointer;
+    transition: background-color 180ms ease;
+
+    &:focus-visible {
+        outline: none;
+        box-shadow: none;
+    }
+
+    &--dark {
+        background-color: rgba($neutral-black, 0.82);
+
+        .app-multi-twitch__theme-toggle-thumb {
+            transform: translateX(28px);
+            background-color: $neutral-white-85;
+        }
+
+        .app-multi-twitch__theme-toggle-icon {
+            color: rgba($neutral-black, 0.9);
+        }
+    }
+
+    &--light {
+        background-color: rgba($neutral-white, 0.2);
+
+        .app-multi-twitch__theme-toggle-thumb {
+            background-color: rgba($neutral-black, 0.84);
+        }
+
+        .app-multi-twitch__theme-toggle-icon {
+            color: $neutral-white-85;
+        }
+    }
+}
+
+.app-multi-twitch__theme-toggle-thumb {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background-color: $content-inverse;
+    padding: 0;
+    transition:
+        transform 180ms ease,
+        background-color 180ms ease;
+}
+
+.app-multi-twitch__theme-toggle-icon {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+    transition: color 180ms ease;
+}

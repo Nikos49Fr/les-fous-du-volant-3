@@ -1,0 +1,61 @@
+@use '../../../../styles/variables' as *;
+
+.app-multi-twitch__chat-carousel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: clamp(2rem, 3vw, 2.4rem);
+    border-bottom: 1px solid $stroke-divider;
+}
+
+.app-multi-twitch__chat-arrow {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    align-self: stretch;
+    padding: 0 clamp(0.25rem, 0.5vw, 0.4rem);
+    border: none;
+    background: transparent;
+    color: $neutral-white-75;
+    cursor: pointer;
+    transition:
+        color 150ms ease,
+        background-color 150ms ease;
+
+    &:hover:not(:disabled) {
+        color: $content-inverse;
+        background-color: $neutral-white-06;
+    }
+
+    &:disabled {
+        opacity: 0.45;
+        cursor: default;
+    }
+
+    &:focus-visible {
+        outline: none;
+        box-shadow: none;
+    }
+
+    & svg {
+        width: 0.8rem;
+        height: 0.8rem;
+        fill: currentColor;
+    }
+}
+
+.app-multi-twitch__chat-channel {
+    min-width: 0;
+    flex: 1 1 auto;
+    padding: 0 clamp(0.35rem, 0.6vw, 0.5rem);
+    color: $content-inverse;
+    font-size: clamp(0.88rem, 1.1vw, 0.98rem);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+}
+

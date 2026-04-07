@@ -1,0 +1,35 @@
+@use '../../../../styles/variables' as *;
+
+.app-multi-twitch__panel-toggle {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    min-width: 1.35rem;
+    min-height: 1.35rem;
+    align-self: stretch;
+    padding: clamp(0.2rem, 0.45vw, 0.32rem)
+        clamp(0.3rem, 0.55vw, 0.45rem);
+    border: none;
+    background: transparent;
+    color: $neutral-white-75;
+    cursor: pointer;
+    transition: color 150ms ease;
+
+    &:hover {
+        color: $content-inverse;
+    }
+
+    &:focus-visible {
+        outline: none;
+        box-shadow: none;
+    }
+
+    & svg {
+        width: 0.88rem;
+        height: 0.88rem;
+        fill: currentColor;
+    }
+}
+

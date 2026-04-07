@@ -1,0 +1,9 @@
+@use '../../../../styles/variables' as *;
+
+.app-multi-twitch__chat-frame {
+    flex: 1 1 auto;
+    min-height: 0;
+    border-bottom: 1px solid $stroke-divider;
+    background-color: $surface-nav;
+}
+

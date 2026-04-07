@@ -1,0 +1,116 @@
+@use '../../../../styles/variables' as *;
+
+.app-multi-twitch__pov-tile {
+    min-width: 0;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    border-right: 1px solid $stroke-divider;
+    border-bottom: 1px solid $stroke-divider;
+    background-color: rgba($neutral-black, 0.1);
+    transition:
+        box-shadow 140ms ease,
+        outline-color 140ms ease;
+
+    &--dragging {
+        box-shadow: inset 0 0 0 2px rgba($brand-twitch, 0.45);
+        cursor: grabbing;
+    }
+
+    &--drag-over {
+        box-shadow: inset 0 0 0 2px $action-primary;
+    }
+
+    &--slot-3-last {
+        grid-column: 2 / span 2;
+    }
+
+    &--slot-5-fourth {
+        grid-column: 2 / span 2;
+    }
+
+    &--slot-5-fifth {
+        grid-column: 4 / span 2;
+    }
+}
+
+.app-multi-twitch__pov-header {
+    min-height: clamp(1.8rem, 2.5vw, 2.2rem);
+    display: flex;
+    align-items: center;
+    gap: clamp(0.3rem, 0.5vw, 0.45rem);
+    padding-inline: clamp(0.3rem, 0.5vw, 0.45rem);
+    border-bottom: 1px solid $stroke-divider;
+    min-width: 0;
+}
+
+.app-multi-twitch__pov-drag-handle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 0.9rem;
+    height: 0.9rem;
+    color: $neutral-white-60;
+    cursor: grab;
+
+    svg {
+        width: 100%;
+        height: 100%;
+        fill: currentColor;
+    }
+}
+
+.app-multi-twitch__pov-title {
+    min-width: 0;
+    flex: 1 1 auto;
+    color: $brand-twitch;
+    font-family: 'Titillium Web', sans-serif;
+    font-size: clamp(0.75rem, 1.5vw, 1rem);
+    font-weight: 400;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.app-multi-twitch__pov-volume {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    padding-left: clamp(0.3rem, 0.5vw, 0.45rem);
+    border-left: 1px solid $stroke-divider;
+}
+
+.app-multi-twitch__pov-volume-control {
+    --app-volume-control-width: clamp(6.5rem, 10vw, 8rem);
+}
+
+.app-multi-twitch__pov-body {
+    display: flex;
+    align-items: stretch;
+    justify-content: stretch;
+    min-height: 0;
+}
+
+.app-multi-twitch__pov-body-frame {
+    position: relative;
+    width: 100%;
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+}
+
+.app-multi-twitch__pov-body-frame > * {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $neutral-white-60;
+    font-family: 'Titillium Web', sans-serif;
+    font-size: clamp(0.88rem, 1.1vw, 0.98rem);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}

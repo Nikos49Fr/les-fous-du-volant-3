@@ -1,16 +1,15 @@
-﻿import {
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
-} from 'react';
+﻿import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './MultiTwitch.scss';
 import { fetchMultiTwitchRoster } from '../../../utils/driversApi';
 import {
     fetchMultiTwitchSnapshot,
     requestMultiTwitchRefresh,
 } from '../../../utils/multiTwitchApi';
+import {
+    fetchCurrentCapabilityIds,
+    subscribeToAuthChanges,
+} from '../../../utils/authApi';
+import { getMultiTwitchViewportMaxPov } from './shared/multiTwitchViewport.js';
 import MultiTwitchRosterPanel from './MultiTwitchRosterPanel.jsx';
 import MultiTwitchStagePanel from './MultiTwitchStagePanel.jsx';
 import MultiTwitchChatPanel from './MultiTwitchChatPanel.jsx';
@@ -22,6 +21,8 @@ const RETRY_AFTER_ERROR_MS = 5_000;
 const MAX_SELECTED_POV = 6;
 const AUDIO_BACKGROUND_VOLUME = 1;
 const MULTI_TWITCH_STORAGE_KEY = 'fdv-multi-twitch-config';
+const MULTI_TWITCH_TEST_CHANNELS_CAPABILITY =
+    'multi_twitch.test_channels.view';
 
 const CASTER_ENTRY = {
     id: 'guygui_onlive',
@@ -40,6 +41,13 @@ const MULTI_TWITCH_TEST_CHANNELS = [
     'SenshiHira',
     'Harvendore',
     'Mynthos',
+    'MissDadou',
+    'Miyukichan__',
+    'Monodie',
+    'JeanMassiet',
+    'Cyver__',
+    'Clara_Doxal',
+    'QuartierGaminClub',
 ];
 
 const TEST_CHANNEL_ENTRIES = MULTI_TWITCH_TEST_CHANNELS.map((login) => ({
@@ -87,25 +95,50 @@ function loadStoredConfig() {
                 : [],
             isSidebarExpanded: parsedValue?.isSidebarExpanded !== false,
             isChatExpanded: parsedValue?.isChatExpanded !== false,
+            chatTheme:
+                parsedValue?.chatTheme === 'light' ||
+                parsedValue?.chatTheme === 'dark'
+                    ? parsedValue.chatTheme
+                    : '',
             primaryAudioEntryId:
                 typeof parsedValue?.primaryAudioEntryId === 'string'
                     ? parsedValue.primaryAudioEntryId
                     : '',
-            primaryAudioVolume:
-                Number.isFinite(parsedValue?.primaryAudioVolume)
-                    ? Math.min(100, Math.max(0, Number(parsedValue.primaryAudioVolume)))
-                    : 100,
-            primaryAudioLastNonZeroVolume:
-                Number.isFinite(parsedValue?.primaryAudioLastNonZeroVolume)
-                    ? Math.min(
-                          100,
-                          Math.max(1, Number(parsedValue.primaryAudioLastNonZeroVolume)),
-                      )
-                    : 100,
+            primaryAudioVolume: Number.isFinite(parsedValue?.primaryAudioVolume)
+                ? Math.min(
+                      100,
+                      Math.max(0, Number(parsedValue.primaryAudioVolume)),
+                  )
+                : 100,
+            primaryAudioLastNonZeroVolume: Number.isFinite(
+                parsedValue?.primaryAudioLastNonZeroVolume,
+            )
+                ? Math.min(
+                      100,
+                      Math.max(
+                          1,
+                          Number(parsedValue.primaryAudioLastNonZeroVolume),
+                      ),
+                  )
+                : 100,
+            isAllAudioMuted: parsedValue?.isAllAudioMuted === true,
+            entryAudioSettings: normalizeStoredEntryAudioSettings(
+                parsedValue?.entryAudioSettings,
+            ),
         };
     } catch {
         return null;
     }
+}
+
+function resolveDefaultChatTheme() {
+    if (typeof window === 'undefined' || !window.matchMedia) {
+        return 'dark';
+    }
+
+    return window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light';
 }
 
 function isSnapshotStale(snapshot, nowMs = Date.now()) {
@@ -121,15 +154,52 @@ function canManualRefreshSnapshot(snapshot, nowMs = Date.now()) {
         return true;
     }
 
-    return nowMs - Date.parse(snapshot.updated_at) >= REFRESH_BUTTON_COOLDOWN_MS;
+    return (
+        nowMs - Date.parse(snapshot.updated_at) >= REFRESH_BUTTON_COOLDOWN_MS
+    );
+}
+
+function normalizeStoredEntryAudioSettings(rawEntryAudioSettings) {
+    if (
+        !rawEntryAudioSettings ||
+        typeof rawEntryAudioSettings !== 'object' ||
+        Array.isArray(rawEntryAudioSettings)
+    ) {
+        return {};
+    }
+
+    return Object.fromEntries(
+        Object.entries(rawEntryAudioSettings).flatMap(([entryId, value]) => {
+            if (
+                !value ||
+                typeof value !== 'object' ||
+                Array.isArray(value)
+            ) {
+                return [];
+            }
+
+            const volume = Number.isFinite(value.volume)
+                ? Math.min(100, Math.max(0, Number(value.volume)))
+                : 100;
+            const lastNonZeroVolume = Number.isFinite(value.lastNonZeroVolume)
+                ? Math.min(100, Math.max(1, Number(value.lastNonZeroVolume)))
+                : volume > 0
+                  ? volume
+                  : 100;
+
+            return [[entryId, { volume, lastNonZeroVolume }]];
+        }),
+    );
 }
 
 export default function MultiTwitch() {
     const storedConfig = useMemo(() => loadStoredConfig(), []);
     const [drivers, setDrivers] = useState([]);
-    const [selectedEntryIds, setSelectedEntryIds] = useState(
-        () => [...new Set((storedConfig?.selectedIds ?? []).slice(0, MAX_SELECTED_POV))],
-    );
+    const [selectedEntryIds, setSelectedEntryIds] = useState(() => [
+        ...new Set(
+            (storedConfig?.selectedIds ?? []).slice(0, MAX_SELECTED_POV),
+        ),
+    ]);
     const [isRosterLoading, setIsRosterLoading] = useState(true);
     const [snapshot, setSnapshot] = useState(null);
     const [isSnapshotLoading, setIsSnapshotLoading] = useState(true);
@@ -139,6 +209,13 @@ export default function MultiTwitch() {
     );
     const [isChatExpanded, setIsChatExpanded] = useState(
         storedConfig?.isChatExpanded ?? true,
+    );
+    const [chatTheme, setChatTheme] = useState(
+        storedConfig?.chatTheme || resolveDefaultChatTheme(),
+    );
+    const [canViewTestChannels, setCanViewTestChannels] = useState(false);
+    const [viewportWidth, setViewportWidth] = useState(() =>
+        typeof window === 'undefined' ? 1440 : window.innerWidth,
     );
     const [activeChatIndex, setActiveChatIndex] = useState(0);
     const [nowMs, setNowMs] = useState(() => Date.now());
@@ -151,13 +228,23 @@ export default function MultiTwitch() {
     const [primaryAudioVolume, setPrimaryAudioVolume] = useState(
         storedConfig?.primaryAudioVolume ?? 100,
     );
-    const [primaryAudioLastNonZeroVolume, setPrimaryAudioLastNonZeroVolume] = useState(
-        storedConfig?.primaryAudioLastNonZeroVolume ??
-            (storedConfig?.primaryAudioVolume > 0 ? storedConfig.primaryAudioVolume : 100),
+    const [primaryAudioLastNonZeroVolume, setPrimaryAudioLastNonZeroVolume] =
+        useState(
+            storedConfig?.primaryAudioLastNonZeroVolume ??
+                (storedConfig?.primaryAudioVolume > 0
+                    ? storedConfig.primaryAudioVolume
+                    : 100),
+        );
+    const [isAllAudioMuted, setIsAllAudioMuted] = useState(
+        storedConfig?.isAllAudioMuted ?? false,
     );
-    const [playerRegistryVersion, setPlayerRegistryVersion] = useState(0);
+    const [entryAudioSettings, setEntryAudioSettings] = useState(
+        () => storedConfig?.entryAudioSettings ?? {},
+    );
+    const [draggingEntryId, setDraggingEntryId] = useState('');
+    const [dragOverEntryId, setDragOverEntryId] = useState('');
 
-    const playerControllersRef = useRef(new Map());
+    const muteAllRestoreSettingsRef = useRef({});
 
     const fetchSnapshotAndStore = useCallback(async () => {
         const nextSnapshot = await fetchMultiTwitchSnapshot();
@@ -189,7 +276,9 @@ export default function MultiTwitch() {
     const processSnapshot = useCallback(
         async (currentSnapshot, trigger = 'auto') => {
             if (!currentSnapshot) {
-                markRefreshError('Impossible de charger l’état des lives pour le moment.');
+                markRefreshError(
+                    'Impossible de charger l’état des lives pour le moment.',
+                );
                 return;
             }
 
@@ -221,7 +310,9 @@ export default function MultiTwitch() {
                             return;
                         }
 
-                        markRefreshPending(responseSnapshot.refresh_trigger ?? trigger);
+                        markRefreshPending(
+                            responseSnapshot.refresh_trigger ?? trigger,
+                        );
                         return;
                     }
                 } catch (_error) {
@@ -245,7 +336,9 @@ export default function MultiTwitch() {
                 const currentSnapshot = await fetchSnapshotAndStore();
                 await processSnapshot(currentSnapshot, trigger);
             } catch (_error) {
-                markRefreshError('Impossible de charger l’état des lives pour le moment.');
+                markRefreshError(
+                    'Impossible de charger l’état des lives pour le moment.',
+                );
             } finally {
                 setIsSnapshotLoading(false);
             }
@@ -286,7 +379,62 @@ export default function MultiTwitch() {
     }, []);
 
     useEffect(() => {
-        if (!isSidebarExpanded || snapshot || pendingRefreshTrigger || errorMessage) {
+        let isMounted = true;
+
+        async function syncViewerCapabilities() {
+            try {
+                const capabilityIds = await fetchCurrentCapabilityIds();
+                if (!isMounted) {
+                    return;
+                }
+
+                setCanViewTestChannels(
+                    capabilityIds.includes(MULTI_TWITCH_TEST_CHANNELS_CAPABILITY),
+                );
+            } catch {
+                if (!isMounted) {
+                    return;
+                }
+
+                setCanViewTestChannels(false);
+            }
+        }
+
+        syncViewerCapabilities();
+
+        const unsubscribe = subscribeToAuthChanges(() => {
+            syncViewerCapabilities();
+        });
+
+        return () => {
+            isMounted = false;
+            unsubscribe?.();
+        };
+    }, []);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') {
+            return undefined;
+        }
+
+        function handleResize() {
+            setViewportWidth(window.innerWidth);
+        }
+
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (
+            !isSidebarExpanded ||
+            snapshot ||
+            pendingRefreshTrigger ||
+            errorMessage
+        ) {
             return;
         }
 
@@ -335,7 +483,9 @@ export default function MultiTwitch() {
         }
 
         const timeoutId = window.setTimeout(() => {
-            syncSnapshot(pendingRefreshTrigger === 'manual' ? 'manual' : 'auto');
+            syncSnapshot(
+                pendingRefreshTrigger === 'manual' ? 'manual' : 'auto',
+            );
         }, timeoutMs);
 
         return () => {
@@ -357,9 +507,11 @@ export default function MultiTwitch() {
                 ...driver,
                 sourceType: 'driver',
             })),
-            ...(ENABLE_MULTI_TWITCH_TEST_CHANNELS ? TEST_CHANNEL_ENTRIES : []),
+            ...(ENABLE_MULTI_TWITCH_TEST_CHANNELS && canViewTestChannels
+                ? TEST_CHANNEL_ENTRIES
+                : []),
         ],
-        [drivers],
+        [canViewTestChannels, drivers],
     );
 
     useEffect(() => {
@@ -395,7 +547,9 @@ export default function MultiTwitch() {
             new Map(
                 (snapshot?.live_channels ?? [])
                     .map((channel) => [
-                        String(channel?.twitch_login ?? '').trim().toLowerCase(),
+                        String(channel?.twitch_login ?? '')
+                            .trim()
+                            .toLowerCase(),
                         channel,
                     ])
                     .filter(([login]) => Boolean(login)),
@@ -410,7 +564,11 @@ export default function MultiTwitch() {
                 : [entry.twitchLogin];
 
             const activeTwitchLogin = candidateLogins.find((login) =>
-                liveChannelsByLogin.has(String(login ?? '').trim().toLowerCase()),
+                liveChannelsByLogin.has(
+                    String(login ?? '')
+                        .trim()
+                        .toLowerCase(),
+                ),
             );
 
             if (!activeTwitchLogin) {
@@ -420,7 +578,9 @@ export default function MultiTwitch() {
             return [
                 {
                     ...entry,
-                    activeTwitchLogin: String(activeTwitchLogin).trim().toLowerCase(),
+                    activeTwitchLogin: String(activeTwitchLogin)
+                        .trim()
+                        .toLowerCase(),
                 },
             ];
         });
@@ -445,7 +605,11 @@ export default function MultiTwitch() {
                         : [entry.twitchLogin];
 
                     const activeTwitchLogin = candidateLogins.find((login) =>
-                        liveChannelsByLogin.has(String(login ?? '').trim().toLowerCase()),
+                        liveChannelsByLogin.has(
+                            String(login ?? '')
+                                .trim()
+                                .toLowerCase(),
+                        ),
                     );
 
                     return {
@@ -460,16 +624,33 @@ export default function MultiTwitch() {
         [selectedEntryIds, rosterEntriesById, liveChannelsByLogin],
     );
 
+    const viewportMaxPov = useMemo(
+        () => getMultiTwitchViewportMaxPov(viewportWidth),
+        [viewportWidth],
+    );
+
+    const visibleSelectedEntries = useMemo(
+        () => selectedEntries.slice(0, viewportMaxPov),
+        [selectedEntries, viewportMaxPov],
+    );
+
+    const hiddenSelectedCount = Math.max(
+        0,
+        selectedEntries.length - visibleSelectedEntries.length,
+    );
+
     const endedSelectedEntries = useMemo(
         () => selectedEntries.filter((entry) => !entry.activeTwitchLogin),
         [selectedEntries],
     );
 
     const orderedLiveEntries = useMemo(() => {
-        const selectedLiveEntries = selectedEntries.filter(
-            (entry) => Boolean(entry.activeTwitchLogin),
+        const selectedLiveEntries = selectedEntries.filter((entry) =>
+            Boolean(entry.activeTwitchLogin),
         );
-        const selectedLiveIdSet = new Set(selectedLiveEntries.map((entry) => entry.id));
+        const selectedLiveIdSet = new Set(
+            selectedLiveEntries.map((entry) => entry.id),
+        );
 
         return [
             ...selectedLiveEntries,
@@ -478,17 +659,22 @@ export default function MultiTwitch() {
     }, [liveEntries, selectedEntries]);
 
     useEffect(() => {
-        if (selectedEntries.length === 0) {
+        if (visibleSelectedEntries.length === 0) {
             setActiveChatIndex(0);
             return;
         }
 
-        setActiveChatIndex((current) => Math.min(current, selectedEntries.length - 1));
-    }, [selectedEntries]);
+        setActiveChatIndex((current) =>
+            Math.min(current, visibleSelectedEntries.length - 1),
+        );
+    }, [visibleSelectedEntries]);
 
     useEffect(() => {
-        if (!selectedEntries.some((entry) => entry.id === primaryAudioEntryId)) {
-            setPrimaryAudioEntryId(selectedEntries[0]?.id ?? '');
+        if (
+            primaryAudioEntryId &&
+            !selectedEntries.some((entry) => entry.id === primaryAudioEntryId)
+        ) {
+            setPrimaryAudioEntryId('');
         }
     }, [primaryAudioEntryId, selectedEntries]);
 
@@ -503,14 +689,20 @@ export default function MultiTwitch() {
                 selectedIds: [...selectedEntryIds],
                 isSidebarExpanded,
                 isChatExpanded,
+                chatTheme,
                 primaryAudioEntryId,
                 primaryAudioVolume,
                 primaryAudioLastNonZeroVolume,
+                isAllAudioMuted,
+                entryAudioSettings,
             }),
         );
     }, [
+        chatTheme,
+        entryAudioSettings,
         isChatExpanded,
         isSidebarExpanded,
+        isAllAudioMuted,
         primaryAudioEntryId,
         primaryAudioLastNonZeroVolume,
         primaryAudioVolume,
@@ -527,70 +719,248 @@ export default function MultiTwitch() {
         }
     }, []);
 
-    const handleTogglePrimaryAudioMute = useCallback(() => {
-        setPrimaryAudioVolume((currentVolume) => {
-            if (currentVolume <= 0) {
-                const restoredVolume = Math.min(
-                    100,
-                    Math.max(1, Number(primaryAudioLastNonZeroVolume) || 100),
-                );
-                setPrimaryAudioLastNonZeroVolume(restoredVolume);
-                return restoredVolume;
+    const getEntryVolume = useCallback(
+        (entryId) => entryAudioSettings[entryId]?.volume ?? 100,
+        [entryAudioSettings],
+    );
+
+    const handleEntryVolumeChange = useCallback((entryId, nextVolume) => {
+        if (!entryId) {
+            return;
+        }
+
+        const normalizedVolume = Math.min(100, Math.max(0, Number(nextVolume)));
+
+        setEntryAudioSettings((current) => ({
+            ...current,
+            [entryId]: {
+                volume: normalizedVolume,
+                lastNonZeroVolume:
+                    normalizedVolume > 0
+                        ? normalizedVolume
+                        : current[entryId]?.lastNonZeroVolume ?? 100,
+            },
+        }));
+    }, []);
+
+    const handleToggleEntryMute = useCallback((entryId) => {
+        if (!entryId) {
+            return;
+        }
+
+        setEntryAudioSettings((current) => {
+            const currentVolume = current[entryId]?.volume ?? 100;
+            const lastNonZeroVolume =
+                current[entryId]?.lastNonZeroVolume ??
+                (currentVolume > 0 ? currentVolume : 100);
+            const restoredVolume = Math.min(
+                100,
+                Math.max(1, Number(lastNonZeroVolume)),
+            );
+
+            return {
+                ...current,
+                [entryId]: {
+                    volume: currentVolume <= 0 ? restoredVolume : 0,
+                    lastNonZeroVolume:
+                        currentVolume <= 0 ? restoredVolume : currentVolume,
+                },
+            };
+        });
+    }, []);
+
+    const applyAudioMix = useCallback(
+        ({
+            nextPrimaryEntryId = primaryAudioEntryId,
+            nextPrimaryVolume = primaryAudioVolume,
+            muteAll = isAllAudioMuted,
+        } = {}) => {
+            if (selectedEntries.length === 0) {
+                return;
             }
 
-            setPrimaryAudioLastNonZeroVolume(currentVolume);
-            return 0;
-        });
-    }, [primaryAudioLastNonZeroVolume]);
+            const mainEntryId = selectedEntries.some(
+                (entry) => entry.id === nextPrimaryEntryId,
+            )
+                ? nextPrimaryEntryId
+                : selectedEntries[0]?.id;
 
-    const applyAudioMix = useCallback(() => {
+            setEntryAudioSettings((current) => {
+                const nextSettings = { ...current };
+
+                for (const entry of selectedEntries) {
+                    const nextVolume =
+                        muteAll
+                            ? 0
+                            : entry.id === mainEntryId
+                            ? nextPrimaryVolume
+                            : AUDIO_BACKGROUND_VOLUME;
+
+                    nextSettings[entry.id] = {
+                        volume: nextVolume,
+                        lastNonZeroVolume:
+                            nextVolume > 0
+                                ? nextVolume
+                                : current[entry.id]?.lastNonZeroVolume ?? 100,
+                    };
+                }
+
+                return nextSettings;
+            });
+        },
+        [
+            isAllAudioMuted,
+            primaryAudioEntryId,
+            primaryAudioVolume,
+            selectedEntries,
+        ],
+    );
+
+    const handleTogglePrimaryAudioMute = useCallback(() => {
+        if (!primaryAudioEntryId) {
+            return;
+        }
+
+        if (primaryAudioVolume <= 0) {
+            const restoredVolume = Math.min(
+                100,
+                Math.max(1, Number(primaryAudioLastNonZeroVolume) || 100),
+            );
+
+            setPrimaryAudioLastNonZeroVolume(restoredVolume);
+            setPrimaryAudioVolume(restoredVolume);
+            applyAudioMix({
+                nextPrimaryEntryId: primaryAudioEntryId,
+                nextPrimaryVolume: restoredVolume,
+            });
+            return;
+        }
+
+        setPrimaryAudioLastNonZeroVolume(primaryAudioVolume);
+        setPrimaryAudioVolume(0);
+        applyAudioMix({
+            nextPrimaryEntryId: primaryAudioEntryId,
+            nextPrimaryVolume: 0,
+        });
+    }, [
+        applyAudioMix,
+        primaryAudioEntryId,
+        primaryAudioLastNonZeroVolume,
+        primaryAudioVolume,
+    ]);
+
+    const handlePrimaryAudioEntryChange = useCallback(
+        (nextEntryId) => {
+            setPrimaryAudioEntryId(nextEntryId);
+            setIsAllAudioMuted(false);
+            applyAudioMix({
+                nextPrimaryEntryId: nextEntryId,
+                nextPrimaryVolume: primaryAudioVolume,
+                muteAll: false,
+            });
+        },
+        [applyAudioMix, primaryAudioVolume],
+    );
+
+    const handleMasterAudioVolumeChange = useCallback(
+        (nextVolume) => {
+            const normalizedVolume = Math.min(
+                100,
+                Math.max(0, Number(nextVolume)),
+            );
+            const entriesWithCustomVolume = selectedEntries.filter(
+                (entry) => getEntryVolume(entry.id) !== AUDIO_BACKGROUND_VOLUME,
+            );
+
+            handlePrimaryAudioVolumeChange(normalizedVolume);
+
+            if (
+                !primaryAudioEntryId ||
+                entriesWithCustomVolume.length > 1
+            ) {
+                return;
+            }
+
+            setIsAllAudioMuted(false);
+            applyAudioMix({
+                nextPrimaryEntryId: primaryAudioEntryId,
+                nextPrimaryVolume: normalizedVolume,
+                muteAll: false,
+            });
+        },
+        [
+            applyAudioMix,
+            getEntryVolume,
+            handlePrimaryAudioVolumeChange,
+            primaryAudioEntryId,
+            selectedEntries,
+        ],
+    );
+
+    const handleToggleMuteAll = useCallback(() => {
         if (selectedEntries.length === 0) {
             return;
         }
 
-        const mainEntryId = selectedEntries.some(
-            (entry) => entry.id === primaryAudioEntryId,
-        )
-            ? primaryAudioEntryId
-            : selectedEntries[0]?.id;
+        if (isAllAudioMuted) {
+            setIsAllAudioMuted(false);
+            setEntryAudioSettings((current) => {
+                const nextSettings = { ...current };
 
-        for (const entry of selectedEntries) {
-            const playerController = playerControllersRef.current.get(entry.id);
-            if (!playerController?.setVolumePercent) {
-                continue;
-            }
+                for (const entry of selectedEntries) {
+                    if (muteAllRestoreSettingsRef.current[entry.id]) {
+                        nextSettings[entry.id] =
+                            muteAllRestoreSettingsRef.current[entry.id];
+                    }
+                }
 
-            if (entry.id === mainEntryId) {
-                playerController.setVolumePercent(primaryAudioVolume);
-            } else {
-                playerController.setVolumePercent(AUDIO_BACKGROUND_VOLUME);
-            }
+                return nextSettings;
+            });
+            return;
         }
-    }, [primaryAudioEntryId, primaryAudioVolume, selectedEntries]);
 
-    useEffect(() => {
-        applyAudioMix();
+        muteAllRestoreSettingsRef.current = Object.fromEntries(
+            selectedEntries.map((entry) => {
+                const currentVolume =
+                    entryAudioSettings[entry.id]?.volume ?? 100;
+
+                return [
+                    entry.id,
+                    {
+                        volume: currentVolume,
+                        lastNonZeroVolume:
+                            entryAudioSettings[entry.id]?.lastNonZeroVolume ??
+                            (currentVolume > 0 ? currentVolume : 100),
+                    },
+                ];
+            }),
+        );
+        setIsAllAudioMuted(true);
+        applyAudioMix({
+            nextPrimaryEntryId: primaryAudioEntryId,
+            nextPrimaryVolume: primaryAudioVolume,
+            muteAll: true,
+        });
     }, [
         applyAudioMix,
-        playerRegistryVersion,
+        entryAudioSettings,
+        isAllAudioMuted,
         primaryAudioEntryId,
         primaryAudioVolume,
         selectedEntries,
     ]);
 
-    const registerPlayerController = useCallback((entryId, controller) => {
-        if (!entryId) {
-            return;
+    const visiblePrimaryAudioEntryId = useMemo(() => {
+        const entriesWithCustomVolume = selectedEntries.filter(
+            (entry) => getEntryVolume(entry.id) !== AUDIO_BACKGROUND_VOLUME,
+        );
+
+        if (entriesWithCustomVolume.length > 1) {
+            return '';
         }
 
-        if (controller) {
-            playerControllersRef.current.set(entryId, controller);
-        } else {
-            playerControllersRef.current.delete(entryId);
-        }
-
-        setPlayerRegistryVersion((current) => current + 1);
-    }, []);
+        return primaryAudioEntryId;
+    }, [getEntryVolume, primaryAudioEntryId, selectedEntries]);
 
     function handleToggleEntry(entryId) {
         setSelectedEntryIds((current) => {
@@ -598,7 +968,7 @@ export default function MultiTwitch() {
                 return current.filter((id) => id !== entryId);
             }
 
-            if (current.length >= MAX_SELECTED_POV) {
+            if (current.length >= viewportMaxPov) {
                 return current;
             }
 
@@ -606,17 +976,67 @@ export default function MultiTwitch() {
         });
     }
 
+    const handlePovDragStart = useCallback((entryId) => {
+        setDraggingEntryId(entryId);
+        setDragOverEntryId('');
+    }, []);
+
+    const handlePovDragEnter = useCallback(
+        (targetEntryId) => {
+            if (!draggingEntryId || draggingEntryId === targetEntryId) {
+                setDragOverEntryId('');
+                return;
+            }
+
+            setDragOverEntryId(targetEntryId);
+        },
+        [draggingEntryId],
+    );
+
+    const handlePovDragEnd = useCallback(() => {
+        setDraggingEntryId('');
+        setDragOverEntryId('');
+    }, []);
+
+    const handlePovDrop = useCallback(
+        (targetEntryId) => {
+            if (!draggingEntryId || draggingEntryId === targetEntryId) {
+                setDraggingEntryId('');
+                setDragOverEntryId('');
+                return;
+            }
+
+            setSelectedEntryIds((current) => {
+                const currentIndex = current.indexOf(draggingEntryId);
+                const targetIndex = current.indexOf(targetEntryId);
+
+                if (currentIndex < 0 || targetIndex < 0) {
+                    return current;
+                }
+
+                const next = [...current];
+                next.splice(currentIndex, 1);
+                next.splice(targetIndex, 0, draggingEntryId);
+                return next;
+            });
+
+            setDraggingEntryId('');
+            setDragOverEntryId('');
+        },
+        [draggingEntryId],
+    );
+
     function handleCycleChat(direction) {
-        if (selectedEntries.length === 0) {
+        if (visibleSelectedEntries.length === 0) {
             return;
         }
 
         setActiveChatIndex((current) => {
             const nextIndex = current + direction;
             if (nextIndex < 0) {
-                return selectedEntries.length - 1;
+                return visibleSelectedEntries.length - 1;
             }
-            if (nextIndex >= selectedEntries.length) {
+            if (nextIndex >= visibleSelectedEntries.length) {
                 return 0;
             }
             return nextIndex;
@@ -632,7 +1052,7 @@ export default function MultiTwitch() {
         await syncSnapshot('manual');
     }
 
-    const activeChatEntry = selectedEntries[activeChatIndex] ?? null;
+    const activeChatEntry = visibleSelectedEntries[activeChatIndex] ?? null;
     const refreshReferenceTimestamp =
         snapshot?.refresh_status === 'running'
             ? snapshot.refresh_started_at
@@ -671,9 +1091,13 @@ export default function MultiTwitch() {
             <div className="app-multi-twitch__layout">
                 <MultiTwitchRosterPanel
                     isExpanded={isSidebarExpanded}
-                    onTogglePanel={() => setIsSidebarExpanded((current) => !current)}
+                    onTogglePanel={() =>
+                        setIsSidebarExpanded((current) => !current)
+                    }
                     errorMessage={errorMessage}
-                    isLoading={isRosterLoading || (isSnapshotLoading && !snapshot)}
+                    isLoading={
+                        isRosterLoading || (isSnapshotLoading && !snapshot)
+                    }
                     liveEntries={orderedLiveEntries}
                     endedSelectedEntries={endedSelectedEntries}
                     selectedIds={selectedIdSet}
@@ -682,24 +1106,44 @@ export default function MultiTwitch() {
                     refreshState={refreshState}
                     onManualRefresh={handleManualRefresh}
                     isRefreshButtonDisabled={isRefreshButtonDisabled}
-                    maxSelected={MAX_SELECTED_POV}
+                    maxSelected={viewportMaxPov}
+                    selectedEntries={selectedEntries}
+                    primaryAudioEntryId={visiblePrimaryAudioEntryId}
+                    onPrimaryAudioEntryChange={handlePrimaryAudioEntryChange}
+                    primaryAudioVolume={primaryAudioVolume}
+                    onPrimaryAudioVolumeChange={handleMasterAudioVolumeChange}
+                    onTogglePrimaryAudioMute={handleTogglePrimaryAudioMute}
+                    onToggleMuteAll={handleToggleMuteAll}
+                    areAllSelectedEntriesMuted={isAllAudioMuted}
                 />
 
                 <MultiTwitchStagePanel
-                    selectedEntries={selectedEntries}
-                    primaryAudioEntryId={primaryAudioEntryId}
-                    onPrimaryAudioEntryChange={setPrimaryAudioEntryId}
-                    primaryAudioVolume={primaryAudioVolume}
-                    onPrimaryAudioVolumeChange={handlePrimaryAudioVolumeChange}
-                    onTogglePrimaryAudioMute={handleTogglePrimaryAudioMute}
-                    onApplyAudioMix={applyAudioMix}
-                    onRegisterPlayerController={registerPlayerController}
+                    selectedEntries={visibleSelectedEntries}
+                    hiddenSelectedCount={hiddenSelectedCount}
+                    maxVisiblePov={viewportMaxPov}
+                    getEntryVolume={getEntryVolume}
+                    onEntryVolumeChange={handleEntryVolumeChange}
+                    onToggleEntryMute={handleToggleEntryMute}
+                    draggingEntryId={draggingEntryId}
+                    dragOverEntryId={dragOverEntryId}
+                    onPovDragStart={handlePovDragStart}
+                    onPovDragEnter={handlePovDragEnter}
+                    onPovDragEnd={handlePovDragEnd}
+                    onPovDrop={handlePovDrop}
                 />
 
                 <MultiTwitchChatPanel
                     isExpanded={isChatExpanded}
-                    onTogglePanel={() => setIsChatExpanded((current) => !current)}
-                    selectedEntries={selectedEntries}
+                    onTogglePanel={() =>
+                        setIsChatExpanded((current) => !current)
+                    }
+                    chatTheme={chatTheme}
+                    onToggleTheme={() =>
+                        setChatTheme((current) =>
+                            current === 'dark' ? 'light' : 'dark',
+                        )
+                    }
+                    selectedEntries={visibleSelectedEntries}
                     activeChatEntry={activeChatEntry}
                     onPreviousChat={() => handleCycleChat(-1)}
                     onNextChat={() => handleCycleChat(1)}

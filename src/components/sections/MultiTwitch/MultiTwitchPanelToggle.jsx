@@ -1,5 +1,6 @@
 import ArrowLeftToBarIcon from '../../../assets/icons/arrow-left-to-bar-solid.svg?react';
 import ArrowRightToBarIcon from '../../../assets/icons/arrow-right-to-bar-solid.svg?react';
+import './shared/MultiTwitchPanelToggle.scss';
 
 export default function MultiTwitchPanelToggle({
     isExpanded,

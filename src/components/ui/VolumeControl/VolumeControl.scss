@@ -1,0 +1,113 @@
+﻿@use '../../../styles/variables' as *;
+
+.app-volume-control {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    width: var(--app-volume-control-width, clamp(8rem, 14vw, 10.5rem));
+    gap: clamp(0.24rem, 0.45vw, 0.32rem);
+    color: $neutral-white-75;
+    font-family: 'Titillium Web', sans-serif;
+    font-size: clamp(0.72rem, 0.95vw, 0.82rem);
+    font-weight: 600;
+
+    &__toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border: none;
+        background: transparent;
+        color: inherit;
+        cursor: pointer;
+
+        &:disabled {
+            color: $neutral-black-45;
+            cursor: default;
+        }
+
+        &:focus-visible {
+            outline: none;
+            box-shadow: none;
+        }
+    }
+
+    &__icon {
+        width: 0.94rem;
+        height: 0.94rem;
+        fill: currentColor;
+
+        &--muted {
+            color: $state-negative;
+        }
+    }
+
+    &__range {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        border: none;
+        background: transparent;
+        -webkit-appearance: none;
+        appearance: none;
+        cursor: pointer;
+
+        &:disabled {
+            cursor: default;
+        }
+
+        &::-webkit-slider-runnable-track {
+            height: 0.08rem;
+            border-radius: 999px;
+            background: linear-gradient(
+                90deg,
+                $content-inverse 0%,
+                $content-inverse var(--app-volume-control-range-progress, 100%),
+                rgba($neutral-white, 0.38)
+                    var(--app-volume-control-range-progress, 100%),
+                rgba($neutral-white, 0.38) 100%
+            );
+        }
+
+        &::-webkit-slider-thumb {
+            width: 0.78rem;
+            height: 0.78rem;
+            margin-top: -0.35rem;
+            border: none;
+            border-radius: 999px;
+            background: $content-inverse;
+            box-shadow: 0 0 0 1px rgba($neutral-black, 0.55);
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        &::-moz-range-track {
+            height: 0.08rem;
+            border: none;
+            border-radius: 999px;
+            background: linear-gradient(
+                90deg,
+                $content-inverse 0%,
+                $content-inverse var(--app-volume-control-range-progress, 100%),
+                rgba($neutral-white, 0.38)
+                    var(--app-volume-control-range-progress, 100%),
+                rgba($neutral-white, 0.38) 100%
+            );
+        }
+
+        &::-moz-range-thumb {
+            width: 0.78rem;
+            height: 0.78rem;
+            border: none;
+            border-radius: 999px;
+            background: $content-inverse;
+            box-shadow: 0 0 0 1px rgba($neutral-black, 0.55);
+        }
+    }
+
+    &__value {
+        min-width: 2rem;
+        text-align: left;
+        color: $neutral-white-60;
+    }
+}

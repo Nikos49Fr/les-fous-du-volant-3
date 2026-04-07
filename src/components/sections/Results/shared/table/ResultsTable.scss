@@ -84,8 +84,6 @@ $table-team-padding-block: $space-fluid-md;
     }
 
     &__row {
-        position: relative;
-
         &--team-mclaren {
             background: linear-gradient(
                 90deg,
@@ -175,14 +173,6 @@ $table-team-padding-block: $space-fluid-md;
                 rgba($team-racing-bulls, 0.18) 100%
             );
         }
-
-        &--dimmed::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-color: rgba($surface-contrast, 0.38);
-            pointer-events: none;
-        }
     }
 
     &__cell {
@@ -195,7 +185,16 @@ $table-team-padding-block: $space-fluid-md;
     }
 
     &__cell--dimmed {
+        position: relative;
         color: $neutral-white-75;
+
+        &::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-color: rgba($surface-contrast, 0.38);
+            pointer-events: none;
+        }
 
         .app-results__entity,
         .app-results__grid,

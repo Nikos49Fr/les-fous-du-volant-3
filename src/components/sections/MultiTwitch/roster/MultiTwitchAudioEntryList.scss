@@ -1,0 +1,72 @@
+﻿@use '../../../../styles/variables' as *;
+
+.app-multi-twitch__audio-entry-list {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.18rem, 0.35vw, 0.24rem);
+}
+
+.app-multi-twitch__audio-entry-option {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.4rem, 0.65vw, 0.52rem);
+    min-width: 0;
+    padding: clamp(0.18rem, 0.35vw, 0.26rem) 0;
+    cursor: pointer;
+
+    &--selected {
+        .app-multi-twitch__audio-entry-name {
+            color: $content-inverse;
+        }
+    }
+}
+
+.app-multi-twitch__audio-entry-radio {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.app-multi-twitch__audio-entry-radio-mark {
+    position: relative;
+    flex: 0 0 auto;
+    width: 0.72rem;
+    height: 0.72rem;
+    border: 1px solid rgba($content-inverse, 0.7);
+    border-radius: 999px;
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 50%;
+        width: 0.34rem;
+        height: 0.34rem;
+        border-radius: 999px;
+        background-color: $state-positive;
+        transform: translate(-50%, -50%) scale(0);
+        transition: transform 140ms ease;
+    }
+
+    .app-multi-twitch__audio-entry-radio:checked + &::after {
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.app-multi-twitch__audio-entry-name {
+    min-width: 0;
+    color: $neutral-white-75;
+    font-family: 'Titillium Web', sans-serif;
+    font-size: clamp(0.9rem, 1.05vw, 0.96rem);
+    font-weight: 600;
+    line-height: 1.15;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
