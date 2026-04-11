@@ -1,0 +1,174 @@
+@use '../../../styles/variables' as *;
+
+.app-admin-drivers {
+    display: grid;
+    grid-template-columns: minmax(20rem, 26rem) minmax(0, 1fr);
+    gap: 1rem;
+
+    &__list,
+    &__editor {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        min-width: 0;
+    }
+
+    &__list-toolbar,
+    &__editor-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+    }
+
+    &__editor-header h3 {
+        margin: 0;
+        font-family: 'Formula 1', sans-serif;
+        font-size: clamp(0.9rem, 1.5vw, 1rem);
+        color: $content-inverse;
+    }
+
+    &__action {
+        border: 1px solid $stroke-default;
+        background-color: $surface-elevated;
+        color: $content-inverse;
+        border-radius: 6px;
+        padding: 0.55rem 0.85rem;
+        font-family: 'Formula 1', sans-serif;
+        font-size: clamp(0.74rem, 1.3vw, 0.86rem);
+        cursor: pointer;
+
+        &:hover:not(:disabled) {
+            border-color: $action-primary;
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    }
+
+    &__table-wrap {
+        overflow: auto;
+        border: 1px solid $stroke-default;
+        border-radius: 8px;
+        background-color: $surface-contrast;
+    }
+
+    &__table {
+        width: 100%;
+        border-collapse: collapse;
+
+        th,
+        td {
+            padding: 0.6rem 0.7rem;
+            border-bottom: 1px solid $stroke-default;
+            color: $content-inverse;
+            text-align: left;
+        }
+
+        th {
+            font-family: 'Formula 1', sans-serif;
+            font-size: clamp(0.7rem, 1.2vw, 0.82rem);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+    }
+
+    &__row {
+        cursor: pointer;
+
+        &:hover td {
+            background-color: rgba($neutral-white, 0.04);
+        }
+
+        &--active td {
+            background-color: rgba($action-primary, 0.12);
+        }
+    }
+
+    &__driver-name-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+    }
+
+    &__driver-name {
+        font-weight: 600;
+    }
+
+    &__driver-meta {
+        color: $neutral-white-60;
+        font-size: 0.84rem;
+    }
+
+    &__form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.85rem;
+        padding: 0.9rem;
+        border: 1px solid $stroke-default;
+        border-radius: 8px;
+        background-color: $surface-contrast;
+    }
+
+    &__field,
+    &__checkbox {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        color: $content-inverse;
+        font-family: 'Titillium Web', sans-serif;
+    }
+
+    &__field span,
+    &__checkbox span {
+        font-size: 0.9rem;
+    }
+
+    &__field input,
+    &__field select {
+        min-width: 0;
+        border: 1px solid $stroke-default;
+        border-radius: 6px;
+        background-color: $surface-nav;
+        color: $content-inverse;
+        padding: 0.55rem 0.65rem;
+        font-family: 'Titillium Web', sans-serif;
+        font-size: 0.95rem;
+    }
+
+    &__checkbox {
+        flex-direction: row;
+        align-items: center;
+        align-self: end;
+
+        input {
+            width: 1rem;
+            height: 1rem;
+            accent-color: $action-primary;
+        }
+    }
+
+    &__error {
+        margin: 0;
+        color: $action-primary;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    .app-admin-drivers {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .app-admin-drivers {
+        &__form-grid {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+}

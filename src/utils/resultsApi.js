@@ -7,10 +7,12 @@ import {
 import {
     buildResultsSchedule,
     buildResultsSessionsByRound,
+    getLastStartedGpRound,
     RESULTS_SESSION_TYPES,
     RESULTS_WRITE_CAPABILITY,
     sessionSupportsFastestLap,
 } from './resultsHelpers';
+import { isDriverPubliclyVisible, normalizeDriverGpRound, normalizeDriverStatus } from './driverAvailability';
 
 const CALENDAR_ROW_ID = 'season3';
 
@@ -56,15 +58,16 @@ export async function fetchResultsData() {
             .select('id, name, short_name, color_key, logo_key'),
         supabase
             .from('drivers')
-            .select('id, display_name, racing_number, team_id, is_active')
-            .eq('is_active', true),
+            .select(
+                'id, display_name, racing_number, team_id, is_active, status, active_from_gp_round, abandoned_after_gp_round',
+            ),
         supabase
             .from('result_sessions')
             .select('id, gp_round, session_type, fastest_lap_driver_id, updated_at, updated_by')
             .order('gp_round', { ascending: true }),
         supabase
             .from('result_entries')
-            .select('session_id, driver_id, position, status, has_fastest_lap'),
+            .select('session_id, driver_id, team_id, position, status, has_fastest_lap'),
     ]);
 
     if (calendarError) throw calendarError;
@@ -93,14 +96,37 @@ export async function fetchResultsData() {
             racingNumber: driver.racing_number,
             teamId: driver.team_id,
             team: teamsById.get(driver.team_id),
+            status: normalizeDriverStatus(driver.status),
+            activeFromGpRound: normalizeDriverGpRound(driver.active_from_gp_round, 1),
+            abandonedAfterGpRound:
+                driver.abandoned_after_gp_round == null
+                    ? null
+                    : normalizeDriverGpRound(driver.abandoned_after_gp_round, null),
         }))
         .sort((a, b) => a.displayName.localeCompare(b.displayName));
 
+    const driverIdsWithResults = new Set(
+        (entryRows ?? []).map((entry) => entry.driver_id).filter(Boolean),
+    );
+    const lastStartedGpRound = getLastStartedGpRound();
+    const publicDrivers = normalizedDrivers.filter((driver) =>
+        isDriverPubliclyVisible(
+            driver,
+            lastStartedGpRound,
+            driverIdsWithResults.has(driver.id),
+        ),
+    );
+
     return {
         canEdit,
-        drivers: normalizedDrivers,
+        drivers: publicDrivers,
+        adminDrivers: normalizedDrivers,
         schedule: buildResultsSchedule(normalizeRevealed(calendarRow?.revealed)),
-        sessionsByRound: buildResultsSessionsByRound(sessionRows, entryRows),
+        sessionsByRound: buildResultsSessionsByRound(
+            sessionRows,
+            entryRows,
+            teamsById,
+        ),
     };
 }
 
@@ -152,6 +178,7 @@ export async function saveResultsSession({
     const normalizedEntries = entries.map((entry) => ({
         session_id: sessionRow.id,
         driver_id: entry.driverId,
+        team_id: entry.teamId,
         position: entry.position,
         status: entry.status,
         has_fastest_lap:
@@ -172,7 +199,7 @@ export async function saveResultsSession({
     const { data: savedEntries, error: insertError } = await supabase
         .from('result_entries')
         .insert(normalizedEntries)
-        .select('driver_id, position, status, has_fastest_lap');
+        .select('driver_id, team_id, position, status, has_fastest_lap');
 
     if (insertError) {
         throw new Error(insertError.message ?? 'Sauvegarde impossible');
@@ -185,6 +212,7 @@ export async function saveResultsSession({
         fastestLapDriverId: sessionRow.fastest_lap_driver_id,
         entries: (savedEntries ?? []).map((entry) => ({
             driverId: entry.driver_id,
+            teamId: entry.team_id ?? null,
             position: entry.position,
             status: entry.status,
             hasFastestLap: entry.has_fastest_lap === true,

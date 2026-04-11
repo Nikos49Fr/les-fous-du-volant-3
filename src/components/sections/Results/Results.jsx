@@ -133,7 +133,7 @@ export default function Results() {
                                 />
                             ) : activeTab === RESULTS_MAIN_TAB_ADMIN ? (
                                 <ResultsAdminPanel
-                                    drivers={resultsData.drivers}
+                                    drivers={resultsData.adminDrivers}
                                     schedule={resultsData.schedule}
                                     sessionsByRound={resultsData.sessionsByRound}
                                     onSessionSaved={handleSessionSaved}

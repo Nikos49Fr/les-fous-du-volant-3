@@ -3,10 +3,16 @@ import { useEffect, useMemo, useState } from 'react';
 import Title from '../../ui/Title/Title';
 import AdminCapabilitiesPanel from './AdminCapabilitiesPanel';
 import AdminDriverLinksPanel from './AdminDriverLinksPanel';
+import AdminDriversPanel from './AdminDriversPanel';
+import { GP_NAMES } from '../../../data/dataGP';
+import { fetchRevealedGpIds } from '../../../utils/calendarApi';
 import {
+    buildSuggestedDriverId,
+    createDriver,
     fetchAdminPermissions,
     linkDriverToUser,
     setUserCapability,
+    updateDriver,
 } from '../../../utils/adminPermissionsApi';
 
 const BASE_CAPABILITIES = [
@@ -16,6 +22,7 @@ const BASE_CAPABILITIES = [
 ];
 const ADMIN_TAB_CAPABILITIES = 'capabilities';
 const ADMIN_TAB_DRIVERS = 'drivers';
+const ADMIN_TAB_DRIVER_LINKS = 'driver-links';
 
 function normalizeCapabilityId(value) {
     return String(value ?? '')
@@ -50,28 +57,57 @@ function upsertCapability(user, capability) {
 export default function AdminPermissions() {
     const [users, setUsers] = useState([]);
     const [drivers, setDrivers] = useState([]);
+    const [teams, setTeams] = useState([]);
+    const [gpSchedule, setGpSchedule] = useState([]);
     const [customCapabilities, setCustomCapabilities] = useState([]);
     const [newCapability, setNewCapability] = useState('');
     const [activeTab, setActiveTab] = useState(ADMIN_TAB_CAPABILITIES);
     const [isLoading, setIsLoading] = useState(true);
     const [loadError, setLoadError] = useState('');
     const [saveError, setSaveError] = useState('');
+    const [driverSaveError, setDriverSaveError] = useState('');
+    const [isDriverSaving, setIsDriverSaving] = useState(false);
     const [linkError, setLinkError] = useState('');
     const [savingCells, setSavingCells] = useState({});
     const [linkingDriverId, setLinkingDriverId] = useState('');
 
     useEffect(() => {
         let active = true;
+        const gpNameById = new Map(GP_NAMES.map((gp) => [Number(gp.id), gp]));
 
         const load = async () => {
             setIsLoading(true);
             setLoadError('');
 
             try {
-                const data = await fetchAdminPermissions();
+                const [data, revealedGpIds] = await Promise.all([
+                    fetchAdminPermissions(),
+                    fetchRevealedGpIds(),
+                ]);
                 if (!active) return;
                 setUsers(Array.isArray(data.users) ? data.users : []);
                 setDrivers(Array.isArray(data.drivers) ? data.drivers : []);
+                setTeams(Array.isArray(data.teams) ? data.teams : []);
+                setGpSchedule(
+                    (Array.isArray(revealedGpIds) ? revealedGpIds : [])
+                        .map((revealedGpId, index) => {
+                            const normalizedGpId = Number(revealedGpId);
+                            const gp = gpNameById.get(normalizedGpId);
+
+                            if (!gp || normalizedGpId <= 0) {
+                                return null;
+                            }
+
+                            return {
+                                id: index + 1,
+                                gpId: normalizedGpId,
+                                country: gp.country,
+                                flag: gp.flag,
+                                name: gp.name,
+                            };
+                        })
+                        .filter(Boolean),
+                );
             } catch (error) {
                 if (!active) return;
                 if (error.status === 403) {
@@ -121,6 +157,55 @@ export default function AdminPermissions() {
             a.displayName.localeCompare(b.displayName),
         );
     }, [drivers]);
+
+    async function handleCreateDriver(draft) {
+        setDriverSaveError('');
+        setIsDriverSaving(true);
+
+        try {
+            const createdDriver = await createDriver({
+                ...draft,
+                driverId:
+                    draft.driverId || buildSuggestedDriverId(draft.displayName),
+            });
+
+            setDrivers((currentDrivers) =>
+                [...currentDrivers, createdDriver].sort((leftDriver, rightDriver) =>
+                    leftDriver.displayName.localeCompare(rightDriver.displayName),
+                ),
+            );
+            return createdDriver;
+        } catch (error) {
+            setDriverSaveError(error.message ?? 'Création impossible');
+            throw error;
+        } finally {
+            setIsDriverSaving(false);
+        }
+    }
+
+    async function handleUpdateDriver(draft) {
+        setDriverSaveError('');
+        setIsDriverSaving(true);
+
+        try {
+            const savedDriver = await updateDriver(draft);
+            setDrivers((currentDrivers) =>
+                currentDrivers
+                    .map((driver) =>
+                        driver.driverId === savedDriver.driverId ? savedDriver : driver,
+                    )
+                    .sort((leftDriver, rightDriver) =>
+                        leftDriver.displayName.localeCompare(rightDriver.displayName),
+                    ),
+            );
+            return savedDriver;
+        } catch (error) {
+            setDriverSaveError(error.message ?? 'Mise à jour impossible');
+            throw error;
+        } finally {
+            setIsDriverSaving(false);
+        }
+    }
 
     function addCapabilityColumn() {
         const capabilityId = normalizeCapabilityId(newCapability);
@@ -222,6 +307,17 @@ export default function AdminPermissions() {
                                 type="button"
                                 onClick={() => setActiveTab(ADMIN_TAB_DRIVERS)}
                             >
+                                Gérer les pilotes
+                            </button>
+                            <button
+                                className={`app-admin-permissions__tab${
+                                    activeTab === ADMIN_TAB_DRIVER_LINKS
+                                        ? ' app-admin-permissions__tab--active'
+                                        : ''
+                                }`}
+                                type="button"
+                                onClick={() => setActiveTab(ADMIN_TAB_DRIVER_LINKS)}
+                            >
                                 Lier un pilote au profil Twitch
                             </button>
                         </div>
@@ -237,6 +333,16 @@ export default function AdminPermissions() {
                                     onCapabilityInputChange={setNewCapability}
                                     onAddCapability={addCapabilityColumn}
                                     onToggleCapability={toggleCapability}
+                                />
+                            ) : activeTab === ADMIN_TAB_DRIVERS ? (
+                                <AdminDriversPanel
+                                    drivers={orderedDrivers}
+                                    teams={teams}
+                                    gpSchedule={gpSchedule}
+                                    saveError={driverSaveError}
+                                    isSaving={isDriverSaving}
+                                    onCreateDriver={handleCreateDriver}
+                                    onUpdateDriver={handleUpdateDriver}
                                 />
                             ) : (
                                 <AdminDriverLinksPanel

@@ -93,7 +93,7 @@ export function getLastStartedGpRound(now = new Date()) {
     return lastStarted;
 }
 
-export function buildResultsSessionsByRound(sessionRows, entryRows) {
+export function buildResultsSessionsByRound(sessionRows, entryRows, teamsById = new Map()) {
     const sessionsByRound = {};
     const entriesBySessionId = new Map();
 
@@ -101,6 +101,8 @@ export function buildResultsSessionsByRound(sessionRows, entryRows) {
         const current = entriesBySessionId.get(entry.session_id) ?? [];
         current.push({
             driverId: entry.driver_id,
+            teamId: entry.team_id ?? null,
+            team: teamsById.get(entry.team_id) ?? null,
             position: entry.position,
             status: entry.status,
             hasFastestLap: entry.has_fastest_lap === true,
@@ -140,9 +142,13 @@ export function createEditorState(drivers, session) {
     const entryByDriverId = new Map((session?.entries ?? []).map((entry) => [entry.driverId, entry]));
     const classifiedDriverIds = [];
     const statusByDriverId = {};
+    const teamIdByDriverId = {};
 
     driverIds.forEach((driverId) => {
         const entry = entryByDriverId.get(driverId);
+        if (entry?.teamId) {
+            teamIdByDriverId[driverId] = entry.teamId;
+        }
         if (entry?.status) {
             statusByDriverId[driverId] = entry.status;
             return;
@@ -158,6 +164,7 @@ export function createEditorState(drivers, session) {
     return {
         classifiedDriverIds: classifiedDriverIds.map((item) => item.driverId),
         statusByDriverId,
+        teamIdByDriverId,
         fastestLapDriverId:
             sessionSupportsFastestLap(session?.sessionType)
                 ? session?.fastestLapDriverId ?? null
@@ -174,10 +181,16 @@ export function moveItem(array, fromIndex, toIndex) {
 
 export function buildEditorPayload(drivers, editorState) {
     const entries = [];
+    const driverById = new Map(drivers.map((driver) => [driver.id, driver]));
 
     editorState.classifiedDriverIds.forEach((driverId, index) => {
+        const driver = driverById.get(driverId);
         entries.push({
             driverId,
+            teamId:
+                editorState.teamIdByDriverId?.[driverId] ??
+                driver?.teamId ??
+                null,
             position: index + 1,
             status: null,
             hasFastestLap: editorState.fastestLapDriverId === driverId,
@@ -190,6 +203,10 @@ export function buildEditorPayload(drivers, editorState) {
 
         entries.push({
             driverId: driver.id,
+            teamId:
+                editorState.teamIdByDriverId?.[driver.id] ??
+                driver.teamId ??
+                null,
             position: null,
             status,
             hasFastestLap: false,
@@ -229,16 +246,24 @@ export function buildTournamentDriverStandings(drivers, sessionsByRound) {
 }
 
 export function buildTournamentTeamStandings(drivers, sessionsByRound) {
-    const driverStandings = buildTournamentDriverStandings(drivers, sessionsByRound);
     const byTeamId = new Map();
 
-    driverStandings.forEach((row) => {
-        const current = byTeamId.get(row.driver.team.id) ?? {
-            team: row.driver.team,
-            points: 0,
-        };
-        current.points += row.points;
-        byTeamId.set(row.driver.team.id, current);
+    Object.values(sessionsByRound).forEach((roundSessions) => {
+        ['sprint', 'race'].forEach((sessionType) => {
+            const session = roundSessions?.[sessionType];
+            (session?.entries ?? []).forEach((entry) => {
+                if (!entry.team?.id) {
+                    return;
+                }
+
+                const current = byTeamId.get(entry.team.id) ?? {
+                    team: entry.team,
+                    points: 0,
+                };
+                current.points += getResultsPointsForEntry(sessionType, entry);
+                byTeamId.set(entry.team.id, current);
+            });
+        });
     });
 
     return Array.from(byTeamId.values())
@@ -284,7 +309,12 @@ export function buildGpSessionRows(drivers, resultSession, qualifyingSession, se
             const qualifyingEntry = qualifyingEntryByDriverId.get(entry.driverId) ?? null;
 
             return {
-                driver,
+                driver: driver
+                    ? {
+                          ...driver,
+                          team: entry.team ?? driver.team,
+                      }
+                    : null,
                 entry,
                 qualifyingEntry,
                 points: getResultsPointsForEntry(sessionType, entry),

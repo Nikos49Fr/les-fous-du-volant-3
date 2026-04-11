@@ -1,10 +1,31 @@
 import { supabase } from './supabaseClient';
+import {
+    DRIVER_STATUS_ACTIVE,
+    normalizeDriverGpRound,
+    normalizeDriverStatus,
+} from './driverAvailability';
+import { getLastStartedGpRound } from './resultsHelpers';
 
 function normalizeLogin(value) {
     return String(value ?? '').trim().toLowerCase();
 }
 
+function isDriverCurrentlyActive(driver, currentGpRound) {
+    if (!driver) {
+        return false;
+    }
+
+    if (normalizeDriverStatus(driver.status) !== DRIVER_STATUS_ACTIVE) {
+        return false;
+    }
+
+    return (
+        normalizeDriverGpRound(driver.active_from_gp_round, 1) <= currentGpRound
+    );
+}
+
 export async function fetchDriversData() {
+    const currentGpRound = getLastStartedGpRound();
     const [
         { data: teams, error: teamsError },
         { data: drivers, error: driversError },
@@ -15,8 +36,9 @@ export async function fetchDriversData() {
             .order('name', { ascending: true }),
         supabase
             .from('drivers')
-            .select('id, display_name, racing_number, team_id, is_active')
-            .eq('is_active', true)
+            .select(
+                'id, display_name, racing_number, team_id, status, active_from_gp_round',
+            )
             .order('display_name', { ascending: true }),
     ]);
 
@@ -30,7 +52,9 @@ export async function fetchDriversData() {
 
     const driversByTeamId = new Map();
 
-    for (const driver of drivers ?? []) {
+    for (const driver of (drivers ?? []).filter((item) =>
+        isDriverCurrentlyActive(item, currentGpRound),
+    )) {
         const current = driversByTeamId.get(driver.team_id) ?? [];
         current.push({
             id: driver.id,
@@ -56,6 +80,7 @@ export async function fetchDriversData() {
 }
 
 export async function fetchMultiTwitchRoster() {
+    const currentGpRound = getLastStartedGpRound();
     const [
         { data: teams, error: teamsError },
         { data: drivers, error: driversError },
@@ -67,9 +92,8 @@ export async function fetchMultiTwitchRoster() {
         supabase
             .from('drivers')
             .select(
-                'id, display_name, racing_number, team_id, linked_user_id, is_active',
+                'id, display_name, racing_number, team_id, linked_user_id, status, active_from_gp_round',
             )
-            .eq('is_active', true)
             .order('display_name', { ascending: true }),
     ]);
 
@@ -81,8 +105,12 @@ export async function fetchMultiTwitchRoster() {
         throw driversError;
     }
 
+    const activeDrivers = (drivers ?? []).filter((driver) =>
+        isDriverCurrentlyActive(driver, currentGpRound),
+    );
+
     const linkedProfileIds = [...new Set(
-        (drivers ?? [])
+        activeDrivers
             .map((driver) => driver.linked_user_id)
             .filter(Boolean),
     )];
@@ -117,7 +145,7 @@ export async function fetchMultiTwitchRoster() {
         ]),
     );
 
-    return (drivers ?? []).map((driver) => {
+    return activeDrivers.map((driver) => {
         const primaryLogin = normalizeLogin(
             profileLoginById.get(driver.linked_user_id),
         );

@@ -1,23 +1,29 @@
 import { supabase } from './supabaseClient';
 import { fetchCurrentViewer, syncCurrentProfile } from './authApi';
+import { buildResultsSchedule } from './resultsHelpers';
+import {
+    DRIVER_STATUS_ACTIVE,
+    normalizeDriverGpRound,
+    normalizeDriverStatus,
+} from './driverAvailability';
 
 const SUPER_ADMIN_CONFIGURABLE_CAPABILITY = 'multi_twitch.test_channels.view';
 const SYSTEM_CAPABILITY_METADATA = {
     'calendar.write': {
         label: 'Calendrier',
-        description: 'Revele et met a jour le calendrier.',
+        description: 'R?v?le et met ? jour le calendrier.',
         isSystem: true,
     },
     'results.write': {
-        label: 'Resultats',
+        label: 'R?sultats',
         description:
-            'Saisit et met a jour les resultats des qualifications et des courses.',
+            'Saisit et met ? jour les r?sultats des qualifications et des courses.',
         isSystem: true,
     },
     'multi_twitch.test_channels.view': {
         label: 'Multi-Twitch tests',
         description:
-            'Affiche les chaines Twitch de test dans la liste Multi-Twitch.',
+            'Affiche les cha?nes Twitch de test dans la liste Multi-Twitch.',
         isSystem: true,
     },
 };
@@ -58,7 +64,34 @@ function mapDriverRow(driver) {
         linkedUserDisplayName: driver.profiles?.display_name ?? '',
         teamId: driver.team_id,
         teamName: driver.teams?.name ?? '',
+        isStreamer: driver.is_streamer === true,
+        status: normalizeDriverStatus(driver.status),
+        activeFromGpRound: normalizeDriverGpRound(driver.active_from_gp_round, 1),
+        abandonedAfterGpRound: Number.isInteger(driver.abandoned_after_gp_round)
+            ? driver.abandoned_after_gp_round
+            : driver.abandoned_after_gp_round == null
+              ? null
+              : normalizeDriverGpRound(driver.abandoned_after_gp_round, null),
+        abandonedAt: driver.abandoned_at ?? null,
+        isActive: driver.is_active === true,
     };
+}
+
+function mapTeamRow(team) {
+    return {
+        id: team.id,
+        name: team.name ?? '',
+        shortName: team.short_name ?? '',
+    };
+}
+
+function slugifyDriverId(value) {
+    return String(value ?? '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '');
 }
 
 async function requireSuperAdmin() {
@@ -97,6 +130,8 @@ export async function fetchAdminPermissions() {
         { data: profiles, error: profilesError },
         { data: capabilities, error: capabilitiesError },
         { data: drivers, error: driversError },
+        { data: teams, error: teamsError },
+        { data: calendarRow, error: calendarError },
     ] = await Promise.all([
         supabase
             .from('profiles')
@@ -109,9 +144,19 @@ export async function fetchAdminPermissions() {
             .select('user_id, capability_id, enabled, created_at, created_by, updated_at, updated_by'),
         supabase
             .from('drivers')
-            .select('id, display_name, racing_number, linked_user_id, team_id, teams(name), profiles:linked_user_id(display_name)')
-            .eq('is_active', true)
+            .select(
+                'id, display_name, racing_number, linked_user_id, team_id, is_streamer, is_active, status, active_from_gp_round, abandoned_after_gp_round, abandoned_at, teams(name), profiles:linked_user_id(display_name)',
+            )
             .order('display_name', { ascending: true }),
+        supabase
+            .from('teams')
+            .select('id, name, short_name')
+            .order('name', { ascending: true }),
+        supabase
+            .from('calendar_settings')
+            .select('revealed')
+            .eq('id', 'season3')
+            .single(),
     ]);
 
     if (profilesError) {
@@ -131,6 +176,22 @@ export async function fetchAdminPermissions() {
         error.status = 500;
         throw error;
     }
+
+    if (teamsError) {
+        const error = new Error(teamsError.message);
+        error.status = 500;
+        throw error;
+    }
+
+    if (calendarError) {
+        const error = new Error(calendarError.message);
+        error.status = 500;
+        throw error;
+    }
+
+    const gpSchedule = buildResultsSchedule(calendarRow?.revealed).filter(
+        (gp) => gp.isKnown === true,
+    );
 
     const capabilitiesByUserId = new Map();
     (capabilities ?? []).forEach((capability) => {
@@ -157,6 +218,8 @@ export async function fetchAdminPermissions() {
             ),
         ),
         drivers: (drivers ?? []).map(mapDriverRow),
+        teams: (teams ?? []).map(mapTeamRow),
+        gpSchedule,
     };
 }
 
@@ -264,4 +327,164 @@ export async function linkDriverToUser({ driverId, linkedUserId }) {
         linkedUserId: data.linked_user_id ?? null,
         linkedUserDisplayName: data.profiles?.display_name ?? '',
     };
+}
+
+function buildDriverPayload(input) {
+    const displayName = String(input.displayName ?? '').trim();
+    const driverId = String(input.driverId ?? '').trim().toLowerCase();
+    const racingNumber = String(input.racingNumber ?? '').trim();
+    const teamId = String(input.teamId ?? '').trim();
+    const status = normalizeDriverStatus(input.status);
+    const activeFromGpRound = normalizeDriverGpRound(input.activeFromGpRound, 1);
+    const abandonedAfterGpRound =
+        status === 'abandoned'
+            ? normalizeDriverGpRound(input.abandonedAfterGpRound, null)
+            : null;
+
+    if (!displayName) {
+        const error = new Error('Le nom affich? est requis');
+        error.status = 400;
+        throw error;
+    }
+
+    if (!driverId) {
+        const error = new Error("L'identifiant technique est requis");
+        error.status = 400;
+        throw error;
+    }
+
+    if (!racingNumber) {
+        const error = new Error('Le num?ro est requis');
+        error.status = 400;
+        throw error;
+    }
+
+    if (!teamId) {
+        const error = new Error("L'?curie est requise");
+        error.status = 400;
+        throw error;
+    }
+
+    if (status === 'abandoned' && !Number.isInteger(abandonedAfterGpRound)) {
+        const error = new Error("Le dernier GP disput? doit ?tre renseign? pour un abandon");
+        error.status = 400;
+        throw error;
+    }
+
+    if (
+        status === 'abandoned' &&
+        Number.isInteger(abandonedAfterGpRound) &&
+        abandonedAfterGpRound < activeFromGpRound
+    ) {
+        const error = new Error(
+            "Le dernier GP disput? ne peut pas ?tre ant?rieur au premier GP disponible",
+        );
+        error.status = 400;
+        throw error;
+    }
+
+    return {
+        id: driverId,
+        display_name: displayName,
+        racing_number: racingNumber,
+        team_id: teamId,
+        is_streamer: input.isStreamer === true,
+        status,
+        active_from_gp_round: activeFromGpRound,
+        abandoned_after_gp_round: abandonedAfterGpRound,
+        abandoned_at:
+            status === 'abandoned'
+                ? input.abandonedAt ?? new Date().toISOString()
+                : null,
+        is_active: status === DRIVER_STATUS_ACTIVE,
+    };
+}
+
+export function buildDefaultDriverDraft() {
+    return {
+        driverId: '',
+        displayName: '',
+        racingNumber: '',
+        teamId: '',
+        isStreamer: false,
+        status: 'draft',
+        activeFromGpRound: 1,
+        abandonedAfterGpRound: null,
+        abandonedAt: null,
+    };
+}
+
+export function buildDriverDraftFromRow(driver) {
+    if (!driver) {
+        return buildDefaultDriverDraft();
+    }
+
+    return {
+        driverId: driver.driverId,
+        displayName: driver.displayName,
+        racingNumber: driver.racingNumber,
+        teamId: driver.teamId,
+        isStreamer: driver.isStreamer === true,
+        status: normalizeDriverStatus(driver.status),
+        activeFromGpRound: normalizeDriverGpRound(driver.activeFromGpRound, 1),
+        abandonedAfterGpRound: driver.abandonedAfterGpRound ?? null,
+        abandonedAt: driver.abandonedAt ?? null,
+    };
+}
+
+export function buildSuggestedDriverId(displayName) {
+    return slugifyDriverId(displayName);
+}
+
+export async function createDriver(input) {
+    await requireSuperAdmin();
+
+    const payload = buildDriverPayload(input);
+    const { data, error } = await supabase
+        .from('drivers')
+        .insert(payload)
+        .select(
+            'id, display_name, racing_number, linked_user_id, team_id, is_streamer, is_active, status, active_from_gp_round, abandoned_after_gp_round, abandoned_at, teams(name), profiles:linked_user_id(display_name)',
+        )
+        .single();
+
+    if (error) {
+        const normalizedError = new Error(error.message ?? 'Création impossible');
+        normalizedError.status = 500;
+        throw normalizedError;
+    }
+
+    return mapDriverRow(data);
+}
+
+export async function updateDriver(input) {
+    await requireSuperAdmin();
+
+    const payload = buildDriverPayload(input);
+    const { data, error } = await supabase
+        .from('drivers')
+        .update({
+            display_name: payload.display_name,
+            racing_number: payload.racing_number,
+            team_id: payload.team_id,
+            is_streamer: payload.is_streamer,
+            status: payload.status,
+            active_from_gp_round: payload.active_from_gp_round,
+            abandoned_after_gp_round: payload.abandoned_after_gp_round,
+            abandoned_at: payload.abandoned_at,
+            is_active: payload.is_active,
+        })
+        .eq('id', payload.id)
+        .select(
+            'id, display_name, racing_number, linked_user_id, team_id, is_streamer, is_active, status, active_from_gp_round, abandoned_after_gp_round, abandoned_at, teams(name), profiles:linked_user_id(display_name)',
+        )
+        .single();
+
+    if (error) {
+        const normalizedError = new Error(error.message ?? 'Mise à jour impossible');
+        normalizedError.status = 500;
+        throw normalizedError;
+    }
+
+    return mapDriverRow(data);
 }

@@ -8,6 +8,7 @@ import ResultsDeleteConfirmModal from './ResultsDeleteConfirmModal';
 import ResultsSessionEditor from './ResultsSessionEditor';
 import Flag from '../../ui/Flag/Flag';
 import { deleteResultsGp, saveResultsSession } from '../../../utils/resultsApi';
+import { isDriverAvailableForGp } from '../../../utils/driverAvailability';
 import {
     buildEditorPayload,
     createEditorState,
@@ -34,6 +35,14 @@ export default function ResultsAdminPanel({
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [saveError, setSaveError] = useState('');
 
+    const editableDrivers = useMemo(
+        () =>
+            drivers.filter((driver) =>
+                isDriverAvailableForGp(driver, selectedGpRound),
+            ),
+        [drivers, selectedGpRound],
+    );
+
     useEffect(() => {
         if (!schedule.length) return;
 
@@ -49,14 +58,14 @@ export default function ResultsAdminPanel({
 
         RESULTS_SESSION_TYPES.forEach((sessionType) => {
             nextDrafts[sessionType] = createEditorState(
-                drivers,
+                editableDrivers,
                 roundSessions[sessionType],
             );
         });
 
         setDraftsBySessionType(nextDrafts);
         setSaveError('');
-    }, [drivers, selectedGpRound, sessionsByRound]);
+    }, [editableDrivers, selectedGpRound, sessionsByRound]);
 
     const selectedGp = useMemo(
         () => schedule.find((gp) => gp.id === selectedGpRound) ?? schedule[0],
@@ -64,8 +73,10 @@ export default function ResultsAdminPanel({
     );
 
     const activeDraft = useMemo(
-        () => draftsBySessionType[activeSessionType] ?? createEditorState(drivers),
-        [activeSessionType, draftsBySessionType, drivers],
+        () =>
+            draftsBySessionType[activeSessionType] ??
+            createEditorState(editableDrivers),
+        [activeSessionType, draftsBySessionType, editableDrivers],
     );
 
     async function handleSave() {
@@ -73,7 +84,7 @@ export default function ResultsAdminPanel({
         setSaveError('');
 
         try {
-            const payload = buildEditorPayload(drivers, activeDraft);
+            const payload = buildEditorPayload(editableDrivers, activeDraft);
             const savedSession = await saveResultsSession({
                 gpRound: selectedGpRound,
                 sessionType: activeSessionType,
@@ -83,7 +94,10 @@ export default function ResultsAdminPanel({
             onSessionSaved(savedSession);
             setDraftsBySessionType((current) => ({
                 ...current,
-                [activeSessionType]: createEditorState(drivers, savedSession),
+                [activeSessionType]: createEditorState(
+                    editableDrivers,
+                    savedSession,
+                ),
             }));
         } catch (error) {
             setSaveError(error.message ?? 'Sauvegarde impossible');
@@ -105,7 +119,7 @@ export default function ResultsAdminPanel({
 
             RESULTS_SESSION_TYPES.forEach((sessionType) => {
                 nextDrafts[sessionType] = createEditorState(
-                    drivers,
+                    editableDrivers,
                     roundSessions[sessionType],
                 );
             });
@@ -232,7 +246,7 @@ export default function ResultsAdminPanel({
 
             <div className="app-results-panel__content">
                 <ResultsSessionEditor
-                    drivers={drivers}
+                    drivers={editableDrivers}
                     editorState={activeDraft}
                     onChange={(nextDraft) =>
                         setDraftsBySessionType((current) => ({
