@@ -1,22 +1,29 @@
-﻿import './Drivers.scss';
+import './Drivers.scss';
 import './DriversCasters.scss';
 import { useEffect, useState } from 'react';
 import Title from '../../ui/Title/Title';
 import TeamRosterCard from './TeamRosterCard';
-import { fetchDriversData } from '../../../utils/driversApi';
+import DriversPilotsPanel from './DriversPilotsPanel';
+import {
+    fetchDriversData,
+    fetchDriversOverviewData,
+} from '../../../utils/driversApi';
 import castersImage from '../../../assets/images/profils/guyguy_et_ardan.webp';
 import staffRandyImage from '../../../assets/images/profils/staff_randy.webp';
 import staffLordImage from '../../../assets/images/profils/staff _lord.webp';
 
-const DRIVERS_TAB_DRIVERS = 'drivers';
+const DRIVERS_TAB_PILOTS = 'pilots';
+const DRIVERS_TAB_TEAMS = 'teams';
 const DRIVERS_TAB_CASTERS = 'casters';
 const DRIVERS_TAB_STAFF = 'staff';
 
 export default function Drivers() {
     const [teams, setTeams] = useState([]);
+    const [activeDrivers, setActiveDrivers] = useState([]);
+    const [inactiveDrivers, setInactiveDrivers] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [loadError, setLoadError] = useState('');
-    const [activeTab, setActiveTab] = useState(DRIVERS_TAB_DRIVERS);
+    const [activeTab, setActiveTab] = useState(DRIVERS_TAB_PILOTS);
 
     useEffect(() => {
         let active = true;
@@ -26,9 +33,15 @@ export default function Drivers() {
             setLoadError('');
 
             try {
-                const data = await fetchDriversData();
+                const [teamsData, driversData] = await Promise.all([
+                    fetchDriversData(),
+                    fetchDriversOverviewData(),
+                ]);
+
                 if (active) {
-                    setTeams(data);
+                    setTeams(teamsData);
+                    setActiveDrivers(driversData.activeDrivers);
+                    setInactiveDrivers(driversData.inactiveDrivers);
                 }
             } catch (error) {
                 if (active) {
@@ -52,19 +65,36 @@ export default function Drivers() {
     return (
         <section className="app-section app-drivers">
             <Title title="Toute l'équipe de cette saison" />
-            <div className="app-drivers__tabs" role="tablist" aria-label="Navigation participants">
+            <div
+                className="app-drivers__tabs"
+                role="tablist"
+                aria-label="Navigation participants"
+            >
                 <button
                     className={`app-drivers__tab${
-                        activeTab === DRIVERS_TAB_DRIVERS
+                        activeTab === DRIVERS_TAB_PILOTS
                             ? ' app-drivers__tab--active'
                             : ''
                     }`}
                     type="button"
                     role="tab"
-                    aria-selected={activeTab === DRIVERS_TAB_DRIVERS}
-                    onClick={() => setActiveTab(DRIVERS_TAB_DRIVERS)}
+                    aria-selected={activeTab === DRIVERS_TAB_PILOTS}
+                    onClick={() => setActiveTab(DRIVERS_TAB_PILOTS)}
                 >
-                    Pilotes & Écuries
+                    Pilotes
+                </button>
+                <button
+                    className={`app-drivers__tab${
+                        activeTab === DRIVERS_TAB_TEAMS
+                            ? ' app-drivers__tab--active'
+                            : ''
+                    }`}
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === DRIVERS_TAB_TEAMS}
+                    onClick={() => setActiveTab(DRIVERS_TAB_TEAMS)}
+                >
+                    Écuries
                 </button>
                 <button
                     className={`app-drivers__tab${
@@ -95,7 +125,16 @@ export default function Drivers() {
             </div>
 
             <div className="app-drivers-content">
-                {activeTab === DRIVERS_TAB_DRIVERS ? (
+                {activeTab === DRIVERS_TAB_PILOTS ? (
+                    <DriversPilotsPanel
+                        activeDrivers={activeDrivers}
+                        inactiveDrivers={inactiveDrivers}
+                        isLoading={isLoading}
+                        loadError={loadError}
+                    />
+                ) : null}
+
+                {activeTab === DRIVERS_TAB_TEAMS ? (
                     <>
                         {isLoading ? <p>Chargement des pilotes...</p> : null}
                         {loadError ? <p>{loadError}</p> : null}
@@ -166,7 +205,3 @@ export default function Drivers() {
         </section>
     );
 }
-
-
-
-

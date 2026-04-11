@@ -1,37 +1,34 @@
 import { DRIVER_PROFILE_IMAGE_BY_ID } from '../../../utils/driverPresentation';
 import { getTeamPresentation } from '../../../utils/teamPresentation';
 
-function DriverSpot({ driver, align = 'left' }) {
-    if (!driver) {
-        return <div className={`app-drivers-card__driver app-drivers-card__driver--${align}`} />;
-    }
-
-    const profileUrl = DRIVER_PROFILE_IMAGE_BY_ID[driver.id];
+function TeamDriverRow({ driver }) {
+    const profileUrl = DRIVER_PROFILE_IMAGE_BY_ID[driver.id] ?? '';
 
     return (
-        <div className={`app-drivers-card__driver app-drivers-card__driver--${align}`}>
-            {profileUrl ? (
-                <img
-                    className="app-drivers-card__driver-image"
-                    src={profileUrl}
-                    alt={driver.displayName}
-                />
-            ) : null}
-            <div className="app-drivers-card__driver-meta">
-                <span className="app-drivers-card__driver-name">
-                    {driver.displayName}
-                </span>
-                <span className="app-drivers-card__driver-number">
-                    {driver.racingNumber}
+        <li className="app-drivers-card__roster-item">
+            <div className="app-drivers-card__roster-driver">
+                {profileUrl ? (
+                    <img
+                        className="app-drivers-card__roster-image"
+                        src={profileUrl}
+                        alt={driver.displayName}
+                    />
+                ) : null}
+                <span className="app-drivers-card__roster-text">
+                    <span className="app-drivers-card__roster-name">
+                        {driver.displayName}
+                    </span>
+                    <span className="app-drivers-card__roster-number">
+                        {driver.racingNumber}
+                    </span>
                 </span>
             </div>
-        </div>
+        </li>
     );
 }
 
 export default function TeamRosterCard({ team }) {
     const teamPresentation = getTeamPresentation(team);
-    const [leftDriver, rightDriver] = team.drivers;
 
     return (
         <article
@@ -40,9 +37,15 @@ export default function TeamRosterCard({ team }) {
             <div className="app-drivers-card__band app-drivers-card__band--top" />
 
             <div className="app-drivers-card__content">
-                <DriverSpot driver={leftDriver} align="left" />
+                <div className="app-drivers-card__left">
+                    {teamPresentation.carUrl ? (
+                        <img
+                            className="app-drivers-card__car"
+                            src={teamPresentation.carUrl}
+                            alt={`Voiture ${team.name}`}
+                        />
+                    ) : null}
 
-                <div className="app-drivers-card__center">
                     <div className="app-drivers-card__team">
                         {teamPresentation.logoUrl ? (
                             <img
@@ -53,17 +56,15 @@ export default function TeamRosterCard({ team }) {
                         ) : null}
                         <h2 className="app-drivers-card__team-name">{team.name}</h2>
                     </div>
-
-                    {teamPresentation.carUrl ? (
-                        <img
-                            className="app-drivers-card__car"
-                            src={teamPresentation.carUrl}
-                            alt={`Voiture ${team.name}`}
-                        />
-                    ) : null}
                 </div>
 
-                <DriverSpot driver={rightDriver} align="right" />
+                <div className="app-drivers-card__right">
+                    <ul className="app-drivers-card__roster" aria-label={`Pilotes actifs ${team.name}`}>
+                        {team.drivers.map((driver) => (
+                            <TeamDriverRow key={driver.id} driver={driver} />
+                        ))}
+                    </ul>
+                </div>
             </div>
 
             <div className="app-drivers-card__band app-drivers-card__band--bottom" />

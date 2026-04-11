@@ -51,7 +51,8 @@
 
     &__list {
         display: flex;
-        flex-direction: column;
+        flex-wrap: wrap;
+        justify-content: center;
         gap: clamp(0.9rem, 2vw, 1.4rem);
     }
 
@@ -82,7 +83,6 @@
     }
 }
 
-$drivers-card-center-column: 50%;
 $drivers-card-variant-a-color-strength: 1;
 $drivers-card-variant-a-halo-inset-x: 14%;
 $drivers-card-variant-a-halo-inset-y: 8%;
@@ -91,9 +91,14 @@ $drivers-card-variant-a-edge-darkness: 0.22;
 $drivers-card-variant-a-edge-softness: 0.06;
 
 .app-drivers-card {
+    container-type: inline-size;
     display: flex;
+    flex: 0 1 clamp(22.5rem, 44vw, 37.875rem);
     flex-direction: column;
-    width: 100%;
+    width: clamp(22.5rem, 44vw, 37.875rem);
+    min-width: clamp(22.5rem, 44vw, 37.875rem);
+    max-width: clamp(22.5rem, 44vw, 37.875rem);
+    aspect-ratio: 13 / 5.4;
     border: 1px solid $stroke-default;
     border-radius: 14px;
     background-color: $surface-contrast;
@@ -170,6 +175,7 @@ $drivers-card-variant-a-edge-softness: 0.06;
     }
 
     &__band {
+        flex: 0 0 auto;
         @include accent-bands(
             var(--drivers-card-band-glow),
             var(--drivers-card-band-border)
@@ -182,36 +188,36 @@ $drivers-card-variant-a-edge-softness: 0.06;
     }
 
     &__content {
+        flex: 1 1 auto;
         display: grid;
-        grid-template-columns:
-            minmax(0, calc((100% - #{$drivers-card-center-column}) / 2))
-            minmax(0, $drivers-card-center-column)
-            minmax(0, calc((100% - #{$drivers-card-center-column}) / 2));
-        align-items: center;
-        gap: clamp(0.75rem, 2vw, 1.5rem);
+        grid-template-columns: minmax(0, 50%) minmax(0, 50%);
+        align-items: stretch;
+        gap: 0;
         width: 100%;
-        padding: clamp(0.9rem, 2vw, 1.4rem);
+        min-height: 0;
+        padding: 0 clamp(0.8rem, 3.2cqi, 1.15rem) 0 0;
     }
 
-    &__center {
+    &__left {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: clamp(0.75rem, 1.5vw, 1rem);
+        justify-content: center;
+        gap: clamp(0.35rem, 1.6cqi, 0.7rem);
         min-width: 0;
-        width: 100%;
     }
 
     &__team {
         display: flex;
-        flex-direction: column;
         align-items: center;
-        gap: 0.35rem;
+        justify-content: center;
+        gap: clamp(0.4rem, 1.8cqi, 0.75rem);
         text-align: center;
+        width: 100%;
     }
 
     &__team-logo {
-        width: clamp(5rem, 10vw, 7rem);
+        width: clamp(2rem, 8cqi, 3rem);
         height: auto;
         object-fit: contain;
     }
@@ -219,63 +225,79 @@ $drivers-card-variant-a-edge-softness: 0.06;
     &__team-name {
         margin: 0;
         font-family: 'Formula 1', sans-serif;
-        font-size: clamp(0.9rem, 2vw, 2rem);
+        font-size: clamp(0.9rem, 4cqi, 1.45rem);
         color: $content-inverse;
     }
 
     &__car {
         width: 100%;
+        max-width: clamp(15rem, 52cqi, 24rem);
         height: auto;
         object-fit: contain;
     }
 
-    &__driver {
+    &__right {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        gap: clamp(0.35rem, 0.8vw, 0.6rem);
+        justify-content: center;
         min-width: 0;
-        width: 100%;
-
-        &--left {
-            justify-content: flex-start;
-            text-align: center;
-        }
-
-        &--right {
-            justify-content: flex-end;
-            text-align: center;
-        }
     }
 
-    &__driver-image {
-        width: clamp(7.5rem, 16vw, 12rem);
-        height: auto;
-        object-fit: contain;
+    &__roster {
+        display: flex;
+        flex-direction: column;
+        gap: clamp(0.4rem, 1.8cqi, 0.7rem);
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    &__roster-item {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: clamp(0.35rem, 1.5cqi, 0.6rem);
+        min-width: 0;
+        padding-left: clamp(0.25rem, 1.1cqi, 0.45rem);
+        border-left: 1px solid rgba($neutral-white, 0.14);
+    }
+
+    &__roster-driver {
+        display: inline-flex;
+        align-items: center;
+        gap: 0;
+        min-width: 0;
+    }
+
+    &__roster-image {
         flex: 0 0 auto;
+        width: clamp(3.45rem, 14cqi, 6rem);
+        height: clamp(3.45rem, 14cqi, 6rem);
+        object-fit: contain;
     }
 
-    &__driver-meta {
-        display: flex;
+    &__roster-text {
+        display: inline-flex;
         flex-direction: column;
-        gap: 0.25rem;
+        align-items: flex-start;
+        gap: 0;
         min-width: 0;
-        align-items: center;
     }
 
-    &__driver-name {
+    &__roster-name {
+        min-width: 0;
         font-family: 'Formula 1', sans-serif;
-        font-size: clamp(0.625rem, 1.5vw, 2rem);
+        font-size: clamp(0.5625rem, 2.75cqi, 1rem);
         color: $content-inverse;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        white-space: normal;
+        overflow-wrap: anywhere;
     }
 
-    &__driver-number {
+    &__roster-number {
         font-family: '7-segment', sans-serif;
-        font-size: clamp(1rem, 1.8vw, 2rem);
+        font-size: clamp(0.88rem, 3.4cqi, 1.1rem);
         color: $content-inverse;
+        white-space: nowrap;
     }
 }
 
