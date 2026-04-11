@@ -275,8 +275,8 @@ $drivers-card-variant-a-edge-softness: 0.06;
 
     &__retired-badge {
         position: absolute;
-        bottom: clamp(0.7rem, 3.8cqi, 1.05rem);
-        left: clamp(-2.2rem, -8.6cqi, -1.5rem);
+        bottom: clamp(-0.5rem, 2.8cqi, 1.05rem);
+        left: clamp(-1.4rem, -8.6cqi, -1.5rem);
         z-index: 2;
         min-width: clamp(6.8rem, 28cqi, 9.5rem);
         padding: clamp(0.22rem, 1.4cqi, 0.38rem)

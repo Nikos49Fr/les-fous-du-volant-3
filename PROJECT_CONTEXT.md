@@ -18,6 +18,11 @@ On retire les détails de réglage ponctuels qui n'ont plus de valeur opération
 - Calendrier Supabase en place avec édition admin.
 - Résultats publics + saisie admin des GP en place.
 - Module Multi-Twitch en place et utilisable.
+- Gestion du cycle de vie des pilotes en place (`draft`, `active`, `abandoned`).
+- Section `Participants` refondue :
+  - onglet `Pilotes` avec cards individuelles, bio et lien Twitch
+  - onglet `Écuries` avec cards roster
+  - onglets `Casteurs` et `Staff` avec liens Twitch directs
 - Open Graph / Twitter Card configurés dans `index.html`.
 - Favicons servis depuis `public/favicon` et `public/site.webmanifest`.
 
@@ -149,6 +154,16 @@ Règles validées :
 - Les drapeaux sont stockés localement dans `src/assets/images/flags`.
 - Le composant partagé est `src/components/ui/Flag/Flag.jsx`.
 - Les images de pilotes restent gérées manuellement dans les assets.
+- Les bios pilotes sont éditées manuellement dans l'admin.
+- Les cards pilotes affichent :
+  - photo pilote
+  - nom + numéro
+  - voiture, logo et nom d'écurie
+  - bio tronquée avec tooltip natif sur hover
+  - lien Twitch si disponible
+- Les pilotes actifs sont affichés en premier.
+- Les pilotes inactifs sont listés ensuite sous un sous-titre dédié.
+- Les cards écuries n'affichent pour l'instant que les pilotes actifs.
 
 ## Multi-Twitch
 
@@ -184,11 +199,16 @@ Règles validées :
 - Les grosses features se font sur branche dédiée.
 - Les micro-corrections prod se font depuis `main` ou une branche courte dédiée, puis sont reportées vers la branche feature si nécessaire.
 - Si une branche feature est trop avancée pour un patch urgent, on tranche au cas par cas avant d'agir.
+- Workflow recommandé :
+  - développement sur branche feature
+  - commit local
+  - publication de la branche distante
+  - fusion vers `main` seulement quand la feature est jugée publiable
 
-## Branche en cours
+## Branche de travail actuelle
 
 - Branche actuelle : `feature/driver-management`
-- Objet : modèle de gestion du cycle de vie des pilotes, outillage admin associé, et adaptation minimale des résultats / saisie admin.
+- Statut : feature terminée localement, prête à être publiée puis fusionnée vers `main`.
 
 ## Cadrage verrouillé - driver management
 
@@ -227,12 +247,12 @@ Règles validées :
 
 ### Portée de la branche
 
-- Inclus :
+- Livré sur cette branche :
   - modèle de données des pilotes
   - panneau admin de gestion des pilotes
   - adaptation de la saisie admin des résultats
-  - logique minimale publique côté résultats pour rester cohérente
-- Exclu pour l'instant :
-  - refonte publique complète de la section `Participants`
+  - logique publique minimale côté résultats pour rester cohérente
+  - refonte publique de la section `Participants`
+- Hors scope de cette branche :
   - section `Commission`
-  - tagging visuel public détaillé des abandons sur toutes les vues
+  - tagging visuel public plus détaillé des abandons dans toutes les vues résultats
