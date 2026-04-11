@@ -59,6 +59,7 @@ function mapDriverRow(driver) {
     return {
         driverId: driver.id,
         displayName: driver.display_name ?? '',
+        bio: driver.bio ?? '',
         racingNumber: driver.racing_number ?? '',
         linkedUserId: driver.linked_user_id ?? null,
         linkedUserDisplayName: driver.profiles?.display_name ?? '',
@@ -145,7 +146,7 @@ export async function fetchAdminPermissions() {
         supabase
             .from('drivers')
             .select(
-                'id, display_name, racing_number, linked_user_id, team_id, is_streamer, is_active, status, active_from_gp_round, abandoned_after_gp_round, abandoned_at, teams(name), profiles:linked_user_id(display_name)',
+                'id, display_name, bio, racing_number, linked_user_id, team_id, is_streamer, is_active, status, active_from_gp_round, abandoned_after_gp_round, abandoned_at, teams(name), profiles:linked_user_id(display_name)',
             )
             .order('display_name', { ascending: true }),
         supabase
@@ -331,6 +332,7 @@ export async function linkDriverToUser({ driverId, linkedUserId }) {
 
 function buildDriverPayload(input) {
     const displayName = String(input.displayName ?? '').trim();
+    const bio = String(input.bio ?? '').trim();
     const driverId = String(input.driverId ?? '').trim().toLowerCase();
     const racingNumber = String(input.racingNumber ?? '').trim();
     const teamId = String(input.teamId ?? '').trim();
@@ -386,6 +388,7 @@ function buildDriverPayload(input) {
     return {
         id: driverId,
         display_name: displayName,
+        bio,
         racing_number: racingNumber,
         team_id: teamId,
         is_streamer: input.isStreamer === true,
@@ -404,6 +407,7 @@ export function buildDefaultDriverDraft() {
     return {
         driverId: '',
         displayName: '',
+        bio: '',
         racingNumber: '',
         teamId: '',
         isStreamer: false,
@@ -422,6 +426,7 @@ export function buildDriverDraftFromRow(driver) {
     return {
         driverId: driver.driverId,
         displayName: driver.displayName,
+        bio: driver.bio ?? '',
         racingNumber: driver.racingNumber,
         teamId: driver.teamId,
         isStreamer: driver.isStreamer === true,
@@ -444,7 +449,7 @@ export async function createDriver(input) {
         .from('drivers')
         .insert(payload)
         .select(
-            'id, display_name, racing_number, linked_user_id, team_id, is_streamer, is_active, status, active_from_gp_round, abandoned_after_gp_round, abandoned_at, teams(name), profiles:linked_user_id(display_name)',
+            'id, display_name, bio, racing_number, linked_user_id, team_id, is_streamer, is_active, status, active_from_gp_round, abandoned_after_gp_round, abandoned_at, teams(name), profiles:linked_user_id(display_name)',
         )
         .single();
 
@@ -465,6 +470,7 @@ export async function updateDriver(input) {
         .from('drivers')
         .update({
             display_name: payload.display_name,
+            bio: payload.bio,
             racing_number: payload.racing_number,
             team_id: payload.team_id,
             is_streamer: payload.is_streamer,
@@ -476,7 +482,7 @@ export async function updateDriver(input) {
         })
         .eq('id', payload.id)
         .select(
-            'id, display_name, racing_number, linked_user_id, team_id, is_streamer, is_active, status, active_from_gp_round, abandoned_after_gp_round, abandoned_at, teams(name), profiles:linked_user_id(display_name)',
+            'id, display_name, bio, racing_number, linked_user_id, team_id, is_streamer, is_active, status, active_from_gp_round, abandoned_after_gp_round, abandoned_at, teams(name), profiles:linked_user_id(display_name)',
         )
         .single();
 

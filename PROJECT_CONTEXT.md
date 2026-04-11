@@ -73,6 +73,7 @@ Aucune clé `service_role` ou autre secret ne doit entrer dans le frontend.
 - `supabase/sql/002_results_schema.sql`
 - `supabase/sql/003_multi_twitch_live_snapshot.sql`
 - `supabase/sql/004_driver_management.sql`
+- `supabase/sql/005_driver_bio.sql`
 
 ## Tables principales
 
@@ -210,6 +211,7 @@ Règles validées :
 - L'abandon prend effet à partir du GP suivant.
 - Un pilote abandonné reste dans le classement général avec ses points acquis.
 - Sa contribution aux points écurie reste aussi acquise.
+- Chaque pilote dispose aussi d'un champ `bio` éditable côté admin.
 
 ### Cas particuliers
 

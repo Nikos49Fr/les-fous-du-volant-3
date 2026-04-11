@@ -29,9 +29,9 @@ export default function DriversPilotsPanel({
             </section>
 
             {inactiveDrivers.length > 0 ? (
-                <section className="app-drivers-pilots__section">
+                <section className="app-drivers-pilots__section app-drivers-pilots__section--retired">
                     <h2 className="app-drivers-pilots__title">
-                        Pilotes ayant quitté le tournoi :
+                        Pilote(s) ayant quitté le tournoi
                     </h2>
                     <div className="app-drivers-pilots__list">
                         {inactiveDrivers.map((driver) => (

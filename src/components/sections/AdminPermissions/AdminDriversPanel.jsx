@@ -305,6 +305,17 @@ export default function AdminDriversPanel({
                         </select>
                     </label>
 
+                    <label className="app-admin-drivers__field app-admin-drivers__field--full">
+                        <span>Bio</span>
+                        <textarea
+                            rows="5"
+                            value={draft.bio}
+                            onChange={(event) =>
+                                updateDraft({ bio: event.target.value })
+                            }
+                        />
+                    </label>
+
                     <label className="app-admin-drivers__checkbox">
                         <input
                             type="checkbox"

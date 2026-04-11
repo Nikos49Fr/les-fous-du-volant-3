@@ -9,6 +9,11 @@
         display: flex;
         flex-direction: column;
         gap: clamp(0.8rem, 1.6vw, 1rem);
+
+        &--retired {
+            padding-top: clamp(0.85rem, 1.8vw, 1.2rem);
+            border-top: 1px solid rgba($neutral-white, 0.1);
+        }
     }
 
     &__title {
@@ -16,6 +21,7 @@
         font-family: 'Formula 1', sans-serif;
         font-size: clamp(0.9rem, 1.5vw, 1rem);
         color: $content-inverse;
+        text-align: center;
     }
 
     &__list {

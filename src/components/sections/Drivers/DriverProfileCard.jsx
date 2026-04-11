@@ -25,15 +25,15 @@ export default function DriverProfileCard({ driver, retired = false }) {
                 </span>
             ) : null}
 
+            <h2 className="app-driver-profile-card__name">
+                {driver.displayName}
+            </h2>
             <span className="app-driver-profile-card__number">
                 {driver.racingNumber}
             </span>
 
             <div className="app-driver-profile-card__content">
                 <div className="app-driver-profile-card__media">
-                    <h2 className="app-driver-profile-card__name">
-                        {driver.displayName}
-                    </h2>
                     {profileUrl ? (
                         <img
                             className="app-driver-profile-card__image"
@@ -71,12 +71,16 @@ export default function DriverProfileCard({ driver, retired = false }) {
                     </header>
 
                     <div className="app-driver-profile-card__meta">
-                        <section className="app-driver-profile-card__slot">
-                            <span className="app-driver-profile-card__slot-label">
-                                Bio
-                            </span>
-                            <p className="app-driver-profile-card__slot-value app-driver-profile-card__slot-value--muted">
-                                À venir
+                        <section className="app-driver-profile-card__slot app-driver-profile-card__slot--bio">
+                            <p
+                                className={`app-driver-profile-card__slot-value app-driver-profile-card__slot-value--bio${
+                                    driver.bio
+                                        ? ''
+                                        : ' app-driver-profile-card__slot-value--muted'
+                                }`}
+                                title={driver.bio || undefined}
+                            >
+                                {driver.bio || 'À venir'}
                             </p>
                         </section>
 

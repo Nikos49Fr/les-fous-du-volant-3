@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import Title from '../../ui/Title/Title';
 import TeamRosterCard from './TeamRosterCard';
 import DriversPilotsPanel from './DriversPilotsPanel';
+import TwitchIcon from '../../../assets/icons/twitch-brands-solid-full.svg?react';
+import ArrowUpRightFromSquareIcon from '../../../assets/icons/arrow-up-right-from-square-solid-full.svg?react';
 import {
     fetchDriversData,
     fetchDriversOverviewData,
@@ -16,6 +18,27 @@ const DRIVERS_TAB_PILOTS = 'pilots';
 const DRIVERS_TAB_TEAMS = 'teams';
 const DRIVERS_TAB_CASTERS = 'casters';
 const DRIVERS_TAB_STAFF = 'staff';
+
+function TwitchLink({ login }) {
+    return (
+        <a
+            className="app-drivers__twitch-link"
+            href={`https://www.twitch.tv/${login}`}
+            target="_blank"
+            rel="noreferrer"
+        >
+            <TwitchIcon
+                className="app-drivers__twitch-link-icon app-drivers__twitch-link-icon--brand"
+                aria-hidden="true"
+            />
+            <span>{login}</span>
+            <ArrowUpRightFromSquareIcon
+                className="app-drivers__twitch-link-icon"
+                aria-hidden="true"
+            />
+        </a>
+    );
+}
 
 export default function Drivers() {
     const [teams, setTeams] = useState([]);
@@ -164,9 +187,13 @@ export default function Drivers() {
                                         alt="ArdanFox et Guygui_OnLive, casteurs de l'événement"
                                     />
                                 </div>
-                                <h2 className="app-drivers__casters-title">
-                                    ArdanFox & Guygui_OnLive
-                                </h2>
+                                <div
+                                    className="app-drivers__casters-links"
+                                    aria-label="Chaînes Twitch des casteurs"
+                                >
+                                    <TwitchLink login="ArdanFox" />
+                                    <TwitchLink login="Guygui_OnLive" />
+                                </div>
                             </div>
                             <div className="app-drivers-showcase-card__band app-drivers-showcase-card__band--bottom" />
                         </article>
@@ -193,9 +220,13 @@ export default function Drivers() {
                                         alt="Lord_viserion"
                                     />
                                 </div>
-                                <h2 className="app-drivers__casters-title">
-                                    RandyComicsFr & Lord_viserion
-                                </h2>
+                                <div
+                                    className="app-drivers__casters-links"
+                                    aria-label="Chaînes Twitch du staff"
+                                >
+                                    <TwitchLink login="RandyComicsFr" />
+                                    <TwitchLink login="Lord_viserion" />
+                                </div>
                             </div>
                             <div className="app-drivers-showcase-card__band app-drivers-showcase-card__band--bottom" />
                         </article>

@@ -94,7 +94,7 @@ export async function fetchDriversOverviewData() {
         supabase
             .from('drivers')
             .select(
-                'id, display_name, racing_number, team_id, linked_user_id, is_streamer, status, active_from_gp_round, abandoned_after_gp_round',
+                'id, display_name, bio, racing_number, team_id, linked_user_id, is_streamer, status, active_from_gp_round, abandoned_after_gp_round',
             )
             .order('display_name', { ascending: true }),
         supabase.from('result_entries').select('driver_id'),
@@ -174,6 +174,7 @@ export async function fetchDriversOverviewData() {
                 : '',
             id: driver.id,
             displayName: driver.display_name,
+            bio: driver.bio ?? '',
             racingNumber: driver.racing_number,
             linkedUserId: driver.linked_user_id ?? null,
             isStreamer: driver.is_streamer === true,

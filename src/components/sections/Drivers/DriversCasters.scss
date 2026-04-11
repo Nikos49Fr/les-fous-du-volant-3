@@ -156,12 +156,41 @@
     }
 }
 
-.app-drivers-showcase-card .app-drivers__casters-title {
-    max-width: 24ch;
-    margin: 0;
-    text-wrap: balance;
-}
-
 .app-drivers__casters-image--staff {
     width: min(44.444%, 14.25rem);
+}
+
+.app-drivers__casters-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(0.45rem, 1.2vw, 0.7rem);
+    width: 100%;
+}
+
+.app-drivers__twitch-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.35rem, 0.9vw, 0.55rem);
+    color: $content-inverse;
+    text-decoration: none;
+    font-family: 'Formula 1', system-ui, sans-serif;
+    font-size: clamp(0.92rem, 1.8vw, 1.16rem);
+    line-height: 1.1;
+
+    &:hover {
+        color: $brand-twitch;
+    }
+}
+
+.app-drivers__twitch-link-icon {
+    flex: 0 0 auto;
+    width: clamp(0.72rem, 1.4vw, 0.92rem);
+    height: clamp(0.72rem, 1.4vw, 0.92rem);
+    fill: currentColor;
+
+    &--brand {
+        fill: $brand-twitch;
+    }
 }

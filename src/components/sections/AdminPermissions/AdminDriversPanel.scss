@@ -129,7 +129,8 @@
     }
 
     &__field input,
-    &__field select {
+    &__field select,
+    &__field textarea {
         min-width: 0;
         border: 1px solid $stroke-default;
         border-radius: 6px;
@@ -138,6 +139,16 @@
         padding: 0.55rem 0.65rem;
         font-family: 'Titillium Web', sans-serif;
         font-size: 0.95rem;
+    }
+
+    &__field textarea {
+        min-height: 7.5rem;
+        resize: vertical;
+        line-height: 1.45;
+    }
+
+    &__field--full {
+        grid-column: 1 / -1;
     }
 
     &__checkbox {
